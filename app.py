@@ -9985,11 +9985,49 @@ def telegram_api(method, payload=None, timeout=20):
         }
 
 
+def telegram_plain_text(text):
+    """Telegram 전송용: 대시보드 HTML을 일반 텍스트로 변환한다."""
+    text = str(text or "")
+
+    text = re.sub(r"(?i)<br\s*/?>", "\n", text)
+    text = re.sub(
+        r"(?i)</(?:p|div|li|tr|h[1-6])\s*>",
+        "\n",
+        text
+    )
+    text = re.sub(
+        r"(?i)<li(?:\s+[^>]*)?>",
+        "• ",
+        text
+    )
+    text = re.sub(r"<[^>]+>", "", text)
+
+    replacements = {
+        "&nbsp;": " ",
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        "&quot;": '"',
+        "&#39;": "'"
+    }
+
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+
+    text = re.sub(r"[ \t]+\n", "\n", text)
+    text = re.sub(r"\n[ \t]+", "\n", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+
+    return text.strip()
+
+
 def telegram_send_message(
     chat_id,
     text,
     disable_web_page_preview=True
 ):
+    text = telegram_plain_text(text)
+
     for chunk in telegram_split_text(text):
         telegram_api(
             "sendMessage",
