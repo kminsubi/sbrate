@@ -9988,36 +9988,20 @@ def telegram_api(method, payload=None, timeout=20):
 def telegram_plain_text(text):
     """Telegram 전송용: 대시보드 HTML을 일반 텍스트로 변환한다."""
     text = str(text or "")
-
     text = re.sub(r"(?i)<br\s*/?>", "\n", text)
-    text = re.sub(
-        r"(?i)</(?:p|div|li|tr|h[1-6])\s*>",
-        "\n",
-        text
-    )
-    text = re.sub(
-        r"(?i)<li(?:\s+[^>]*)?>",
-        "• ",
-        text
-    )
+    text = re.sub(r"(?i)</(?:p|div|li|tr|h[1-6])\s*>", "\n", text)
+    text = re.sub(r"(?i)<li(?:\s+[^>]*)?>", "• ", text)
     text = re.sub(r"<[^>]+>", "", text)
 
-    replacements = {
-        "&nbsp;": " ",
-        "&amp;": "&",
-        "&lt;": "<",
-        "&gt;": ">",
-        "&quot;": '"',
-        "&#39;": "'"
-    }
-
-    for old, new in replacements.items():
+    for old, new in {
+        "&nbsp;": " ", "&amp;": "&", "&lt;": "<", "&gt;": ">",
+        "&quot;": '"', "&#39;": "'"
+    }.items():
         text = text.replace(old, new)
 
     text = re.sub(r"[ \t]+\n", "\n", text)
     text = re.sub(r"\n[ \t]+", "\n", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
-
     return text.strip()
 
 
@@ -10580,6 +10564,142 @@ def telegram_brief():
     )
 
 
+def telegram_category_label(category):
+    if category == "isa":
+        return "ISA"
+    if category == "irp":
+        return "퇴직연금(IRP)"
+    return "정기예금"
+
+
+def telegram_data_rows(category="deposit", period="12"):
+    if category == "deposit":
+        products = unique_products(
+            build_products(f"{period}개월")
+        )
+        products = [
+            item for item in products
+            if safe_float(item.get("rate")) is not None
+            and safe_float(item.get("rate")) > 0
+        ]
+        rows = get_bank_best_rates(products)
+    else:
+        file_path = ISA_DATA_FILE if category == "isa" else IRP_DATA_FILE
+        rows = pension_items_with_period(
+            build_pension_products(
+                file_path,
+                "ISA" if category == "isa" else "퇴직연금"
+            ),
+            period
+        )
+
+    rows = [
+        item for item in rows
+        if safe_float(item.get("rate")) is not None
+        and safe_float(item.get("rate")) > 0
+    ]
+    rows.sort(
+        key=lambda x: safe_float(x.get("rate")) or 0,
+        reverse=True
+    )
+    return rows
+
+
+def telegram_fast_question(question, category="deposit", period="12"):
+    """단순 데이터 질문은 Gemini 없이 JSON에서 즉시 답변."""
+    q = str(question or "").strip()
+    q_norm = normalize(q)
+
+    analysis_words = [
+        "분석", "전망", "예측", "왜", "이유", "평가",
+        "브리핑", "전략", "시사점", "어떻게대응", "의견"
+    ]
+    if any(normalize(word) in q_norm for word in analysis_words):
+        return None
+
+    lookup_words = [
+        "높은", "낮은", "최고", "최저", "top", "상위",
+        "순위", "몇위", "금리", "비교", "우리금융보다", "우리보다"
+    ]
+    if not any(normalize(word) in q_norm for word in lookup_words):
+        return None
+
+    rows = telegram_data_rows(category, period)
+    label = telegram_category_label(category)
+
+    if not rows:
+        return f"📊 {label} {period}개월 기준\\n\\n현재 유효 금리 데이터가 없습니다."
+
+    woori = telegram_woori_row(rows)
+    top_match = re.search(r"(?:top|상위)\\s*(\\d+)", q, flags=re.I)
+    top_n = max(1, min(int(top_match.group(1)), 20)) if top_match else 10
+
+    if "최고" in q and "우리" not in q and "높" not in q:
+        top = rows[0]
+        return (
+            f"📊 {label} {period}개월 기준\\n\\n"
+            f"시장 최고금리 : {top.get('bank','-')} "
+            f"{safe_float(top.get('rate')) or 0:.2f}%"
+        )
+
+    if "최저" in q or "낮은" in q:
+        bottom = rows[-1]
+        return (
+            f"📊 {label} {period}개월 기준\\n\\n"
+            f"시장 최저금리 : {bottom.get('bank','-')} "
+            f"{safe_float(bottom.get('rate')) or 0:.2f}%"
+        )
+
+    if ("순위" in q or "몇위" in q) and "우리" in q:
+        if not woori:
+            return f"📊 {label} {period}개월 기준\\n\\n우리금융저축은행의 유효 금리 데이터가 없습니다."
+        rank = rows.index(woori) + 1
+        return (
+            f"📊 {label} {period}개월 기준\\n\\n"
+            f"우리금융저축은행 : {safe_float(woori.get('rate')) or 0:.2f}%\\n"
+            f"시장 순위 : {rank}위 / {len(rows)}개"
+        )
+
+    if "우리" in q and ("높" in q or "상위" in q or "비교" in q):
+        if not woori:
+            return f"📊 {label} {period}개월 기준\\n\\n우리금융저축은행의 유효 금리 데이터가 없습니다."
+
+        woori_rate = safe_float(woori.get("rate")) or 0
+        higher = [
+            item for item in rows
+            if (safe_float(item.get("rate")) or 0) > woori_rate
+        ]
+        lines = [
+            f"📊 {label} {period}개월 기준",
+            "",
+            f"우리금융 : {woori_rate:.2f}%",
+            f"우리금융보다 높은 곳 : {len(higher)}개",
+            ""
+        ]
+        for idx, item in enumerate(higher[:top_n], start=1):
+            rate = safe_float(item.get("rate")) or 0
+            lines.append(
+                f"{idx}. {item.get('bank','-')} {rate:.2f}% "
+                f"({rate - woori_rate:+.2f}%p)"
+            )
+        if len(higher) > top_n:
+            lines.append(f"\\n상위 {top_n}개만 표시했습니다.")
+        return "\\n".join(lines)
+
+    if "top" in q.lower() or "상위" in q:
+        lines = [f"🏆 {label} {period}개월 TOP {top_n}", ""]
+        for idx, item in enumerate(rows[:top_n], start=1):
+            lines.append(
+                f"{idx}. {item.get('bank','-')} "
+                f"{safe_float(item.get('rate')) or 0:.2f}%"
+            )
+        return "\\n".join(lines)
+
+    if category == "deposit":
+        return telegram_deposit_summary(period)
+    return telegram_pension_summary(category, period)
+
+
 def telegram_ai_question(
     question,
     category="deposit",
@@ -10814,11 +10934,18 @@ def telegram_handle_message(message):
         )
     )
 
-    answer = telegram_ai_question(
+    answer = telegram_fast_question(
         text,
         category=category,
         period=period
     )
+
+    if answer is None:
+        answer = telegram_ai_question(
+            text,
+            category=category,
+            period=period
+        )
 
     telegram_send_message(
         chat_id,
@@ -10878,6 +11005,97 @@ def telegram_webhook():
     return jsonify({
         "ok": True
     })
+
+
+@app.route(
+    "/telegram/morning-brief",
+    methods=["POST"]
+)
+def telegram_morning_brief():
+    expected_secret = os.getenv("TELEGRAM_BRIEF_SECRET", "").strip()
+    provided_secret = request.headers.get("X-SBRate-Secret", "").strip()
+
+    if expected_secret and provided_secret != expected_secret:
+        return jsonify({"ok": False, "error": "invalid_secret"}), 403
+
+    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    if not chat_id:
+        return jsonify({"ok": False, "error": "TELEGRAM_CHAT_ID missing"}), 503
+
+    telegram_send_message(chat_id, telegram_morning_brief_text())
+    return jsonify({"ok": True})
+
+
+def telegram_morning_brief_text():
+    try:
+        with app.test_request_context("/api/rate-changes", method="GET"):
+            response = api_rate_changes()
+        changes = response.get_json(silent=True) if hasattr(response, "get_json") else {}
+        changes = changes or {}
+    except Exception as e:
+        print("TELEGRAM MORNING CHANGE ERROR:", e)
+        changes = {}
+
+    up_items = changes.get("up_all", []) or []
+    down_items = changes.get("down_all", []) or []
+
+    lines = [
+        "☀️ SBRate Morning Brief",
+        "",
+        f"데이터 업데이트 : {telegram_read_update_time()}",
+        "",
+        "📊 정기예금 12개월 변동",
+        f"상승 {len(up_items)}건 / 하락 {len(down_items)}건"
+    ]
+
+    if up_items:
+        lines.extend(["", "🔺 상승"])
+        for item in up_items[:5]:
+            lines.append(
+                f"• {item.get('bank','-')} "
+                f"{safe_float(item.get('rate')) or 0:.2f}% "
+                f"({safe_float(item.get('change')) or 0:+.2f}%p)"
+            )
+
+    if down_items:
+        lines.extend(["", "🔻 하락"])
+        for item in down_items[:5]:
+            lines.append(
+                f"• {item.get('bank','-')} "
+                f"{safe_float(item.get('rate')) or 0:.2f}% "
+                f"({safe_float(item.get('change')) or 0:+.2f}%p)"
+            )
+
+    if not up_items and not down_items:
+        lines.extend(["", "금일 주요 정기예금 금리 변동 없음"])
+
+    for category in ["isa", "irp"]:
+        rows = telegram_data_rows(category, "12")
+        label = telegram_category_label(category)
+        woori = telegram_woori_row(rows)
+
+        lines.extend(["", f"📌 {label} 12개월"])
+
+        if rows:
+            top = rows[0]
+            lines.append(
+                f"시장 최고 : {top.get('bank','-')} "
+                f"{safe_float(top.get('rate')) or 0:.2f}%"
+            )
+        if woori:
+            lines.append(
+                f"우리금융 : {safe_float(woori.get('rate')) or 0:.2f}% "
+                f"({rows.index(woori)+1}위/{len(rows)}개)"
+            )
+
+    lines.extend([
+        "",
+        "🌐 대시보드",
+        SB_RATE_PUBLIC_URL,
+        "📱 모바일",
+        SB_RATE_PUBLIC_URL + "/mobile"
+    ])
+    return "\\n".join(lines)
 
 
 @app.route(
