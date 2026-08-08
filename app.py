@@ -11303,6 +11303,18 @@ def telegram_handle_message(message):
         .lower()
     )
 
+    if command == "/chatid":
+        telegram_send_message(
+            chat_id,
+            (
+                "🆔 Telegram Chat ID\n\n"
+                f"{chat_id}\n\n"
+                "이 숫자를 Render의 "
+                "TELEGRAM_CHAT_ID Value에 입력하세요."
+            )
+        )
+        return
+
     if command == "/start":
         telegram_send_main_menu(
             chat_id,
