@@ -9988,6 +9988,13 @@ def telegram_api(method, payload=None, timeout=20):
 def telegram_plain_text(text):
     """Telegram 전송용: 대시보드 HTML을 일반 텍스트로 변환한다."""
     text = str(text or "")
+
+    # 잘못 생성된 "\\n" 문자열도 실제 줄바꿈으로 변환
+    text = text.replace(
+        "\\n",
+        "\n"
+    )
+
     text = re.sub(r"(?i)<br\s*/?>", "\n", text)
     text = re.sub(r"(?i)</(?:p|div|li|tr|h[1-6])\s*>", "\n", text)
     text = re.sub(r"(?i)<li(?:\s+[^>]*)?>", "• ", text)
@@ -10008,19 +10015,35 @@ def telegram_plain_text(text):
 def telegram_send_message(
     chat_id,
     text,
-    disable_web_page_preview=True
+    disable_web_page_preview=True,
+    reply_markup=None,
+    force_reply=False
 ):
     text = telegram_plain_text(text)
+    chunks = telegram_split_text(text)
 
-    for chunk in telegram_split_text(text):
+    for idx, chunk in enumerate(chunks):
+        payload = {
+            "chat_id": chat_id,
+            "text": chunk,
+            "disable_web_page_preview":
+                disable_web_page_preview
+        }
+
+        # 버튼/ForceReply는 마지막 메시지에만 부착
+        if idx == len(chunks) - 1:
+            if reply_markup:
+                payload["reply_markup"] = reply_markup
+
+            if force_reply:
+                payload["reply_markup"] = {
+                    "force_reply": True,
+                    "selective": True
+                }
+
         telegram_api(
             "sendMessage",
-            {
-                "chat_id": chat_id,
-                "text": chunk,
-                "disable_web_page_preview":
-                    disable_web_page_preview
-            }
+            payload
         )
 
 
@@ -10786,6 +10809,448 @@ def telegram_detect_category(text):
     return "deposit"
 
 
+def telegram_main_menu():
+    return {
+        "inline_keyboard": [
+            [
+                {
+                    "text": "🏦 정기예금",
+                    "callback_data": "cat:deposit"
+                },
+                {
+                    "text": "🏦 ISA",
+                    "callback_data": "cat:isa"
+                }
+            ],
+            [
+                {
+                    "text": "🏦 퇴직연금(IRP)",
+                    "callback_data": "cat:irp"
+                }
+            ],
+            [
+                {
+                    "text": "📊 오늘의 브리핑",
+                    "callback_data": "brief"
+                },
+                {
+                    "text": "🤖 AI 자연어 질문",
+                    "callback_data": "ai_help"
+                }
+            ],
+            [
+                {
+                    "text": "🖥 PC 대시보드",
+                    "url": SB_RATE_PUBLIC_URL
+                },
+                {
+                    "text": "📱 모바일 대시보드",
+                    "url": SB_RATE_PUBLIC_URL + "/mobile"
+                }
+            ],
+            [
+                {
+                    "text": "🐞 오류제보",
+                    "callback_data": "error_report"
+                }
+            ]
+        ]
+    }
+
+
+def telegram_period_menu(category):
+    return {
+        "inline_keyboard": [
+            [
+                {
+                    "text": "3개월",
+                    "callback_data": f"period:{category}:3"
+                },
+                {
+                    "text": "6개월",
+                    "callback_data": f"period:{category}:6"
+                },
+                {
+                    "text": "12개월",
+                    "callback_data": f"period:{category}:12"
+                }
+            ],
+            [
+                {
+                    "text": "24개월",
+                    "callback_data": f"period:{category}:24"
+                },
+                {
+                    "text": "36개월",
+                    "callback_data": f"period:{category}:36"
+                }
+            ],
+            [
+                {
+                    "text": "⬅️ 메인 메뉴",
+                    "callback_data": "main"
+                }
+            ]
+        ]
+    }
+
+
+def telegram_query_menu(category, period):
+    return {
+        "inline_keyboard": [
+            [
+                {
+                    "text": "🏆 최고금리",
+                    "callback_data":
+                        f"query:{category}:{period}:highest"
+                },
+                {
+                    "text": "🔟 TOP10",
+                    "callback_data":
+                        f"query:{category}:{period}:top10"
+                }
+            ],
+            [
+                {
+                    "text": "🏦 우리금융 순위",
+                    "callback_data":
+                        f"query:{category}:{period}:woori_rank"
+                }
+            ],
+            [
+                {
+                    "text": "📈 우리금융보다 높은 곳",
+                    "callback_data":
+                        f"query:{category}:{period}:higher"
+                }
+            ],
+            [
+                {
+                    "text": "💬 이 상품 자연어 질문",
+                    "callback_data":
+                        f"ai_category:{category}:{period}"
+                }
+            ],
+            [
+                {
+                    "text": "⬅️ 기간 선택",
+                    "callback_data":
+                        f"cat:{category}"
+                },
+                {
+                    "text": "🏠 메인",
+                    "callback_data": "main"
+                }
+            ]
+        ]
+    }
+
+
+def telegram_send_main_menu(chat_id, intro=True):
+    text = (
+        "안녕하세요. SBRate입니다. 🤖\\n\\n"
+        "조회할 메뉴를 선택해주세요."
+        if intro
+        else
+        "SBRate 메뉴를 선택해주세요."
+    )
+
+    telegram_send_message(
+        chat_id,
+        text,
+        reply_markup=telegram_main_menu()
+    )
+
+
+def telegram_answer_callback(callback_id, text=None):
+    payload = {
+        "callback_query_id": callback_id
+    }
+
+    if text:
+        payload["text"] = text
+
+    telegram_api(
+        "answerCallbackQuery",
+        payload,
+        timeout=10
+    )
+
+
+def telegram_callback_result(
+    category,
+    period,
+    query_type
+):
+    label = telegram_category_label(
+        category
+    )
+
+    if query_type == "highest":
+        return telegram_fast_question(
+            f"{label} {period}개월 최고금리",
+            category,
+            period
+        )
+
+    if query_type == "top10":
+        return telegram_fast_question(
+            f"{label} {period}개월 TOP10",
+            category,
+            period
+        )
+
+    if query_type == "woori_rank":
+        return telegram_fast_question(
+            f"{label} {period}개월 우리금융 순위",
+            category,
+            period
+        )
+
+    if query_type == "higher":
+        return telegram_fast_question(
+            f"{label} {period}개월 우리금융보다 높은 곳",
+            category,
+            period
+        )
+
+    return (
+        f"📊 {label} {period}개월 기준\\n\\n"
+        "조회 항목을 선택해주세요."
+    )
+
+
+def telegram_handle_callback(callback):
+    callback_id = callback.get("id")
+
+    message = callback.get("message") or {}
+
+    chat = message.get("chat") or {}
+
+    chat_id = chat.get("id")
+
+    data = str(
+        callback.get("data", "")
+    ).strip()
+
+    if chat_id is None:
+        return
+
+    telegram_answer_callback(
+        callback_id
+    )
+
+    if data == "main":
+        telegram_send_main_menu(
+            chat_id,
+            intro=False
+        )
+        return
+
+    if data.startswith("cat:"):
+        category = data.split(
+            ":",
+            1
+        )[1]
+
+        label = telegram_category_label(
+            category
+        )
+
+        telegram_send_message(
+            chat_id,
+            (
+                f"🏦 {label}\\n\\n"
+                "조회할 기간을 선택해주세요."
+            ),
+            reply_markup=
+                telegram_period_menu(
+                    category
+                )
+        )
+        return
+
+    if data.startswith("period:"):
+        parts = data.split(":")
+
+        if len(parts) != 3:
+            return
+
+        _, category, period = parts
+
+        label = telegram_category_label(
+            category
+        )
+
+        telegram_send_message(
+            chat_id,
+            (
+                f"📊 {label} {period}개월\\n\\n"
+                "조회할 내용을 선택해주세요."
+            ),
+            reply_markup=
+                telegram_query_menu(
+                    category,
+                    period
+                )
+        )
+        return
+
+    if data.startswith("query:"):
+        parts = data.split(":")
+
+        if len(parts) != 4:
+            return
+
+        _, category, period, query_type = parts
+
+        telegram_send_typing(
+            chat_id
+        )
+
+        answer = telegram_callback_result(
+            category,
+            period,
+            query_type
+        )
+
+        telegram_send_message(
+            chat_id,
+            answer,
+            reply_markup=
+                telegram_query_menu(
+                    category,
+                    period
+                )
+        )
+        return
+
+    if data == "brief":
+        telegram_send_typing(
+            chat_id
+        )
+
+        telegram_send_message(
+            chat_id,
+            telegram_brief(),
+            reply_markup=
+                telegram_main_menu()
+        )
+        return
+
+    if data == "ai_help":
+        telegram_send_message(
+            chat_id,
+            (
+                "🤖 AI 자연어 질문\\n\\n"
+                "궁금한 내용을 자유롭게 입력해주세요.\\n\\n"
+                "예)\\n"
+                "• 정기예금 6개월 TOP5 알려줘\\n"
+                "• ISA 12개월 우리금융 순위는?\\n"
+                "• IRP 24개월 우리금융보다 높은 곳\\n"
+                "• 최근 금리 변동을 분석해줘\\n\\n"
+                "상품명과 기간을 함께 입력하면 "
+                "더 정확하게 조회합니다."
+            ),
+            reply_markup=
+                telegram_main_menu()
+        )
+        return
+
+    if data.startswith("ai_category:"):
+        parts = data.split(":")
+
+        if len(parts) != 3:
+            return
+
+        _, category, period = parts
+
+        label = telegram_category_label(
+            category
+        )
+
+        telegram_send_message(
+            chat_id,
+            (
+                f"💬 {label} {period}개월 자연어 질문\\n\\n"
+                "이제 질문을 그대로 입력해주세요.\\n"
+                "예) 우리금융보다 높은 곳 알려줘\\n"
+                "예) 시장 경쟁력을 분석해줘\\n\\n"
+                f"상품/기간을 생략하면 "
+                f"{label} {period}개월 기준으로 "
+                "질문하는 것이 가장 정확합니다."
+            )
+        )
+        return
+
+    if data == "error_report":
+        telegram_send_message(
+            chat_id,
+            (
+                "🐞 오류제보\\n\\n"
+                "아래 메시지에 답장하는 방식으로 "
+                "오류 내용을 입력해주세요.\\n\\n"
+                "예) ISA 6개월 조회 시 순위가 이상합니다."
+            ),
+            force_reply=True
+        )
+        return
+
+
+def telegram_save_error_report(
+    chat_id,
+    message_text
+):
+    payload = {
+        "category": "Telegram",
+        "product": "SBRate Bot",
+        "period": "",
+        "error_type": "텔레그램 오류제보",
+        "message": str(
+            message_text or ""
+        ).strip(),
+        "page_url": "telegram",
+        "user_agent": f"telegram_chat_{chat_id}"
+    }
+
+    try:
+        with app.test_request_context(
+            "/api/error-report",
+            method="POST",
+            json=payload
+        ):
+            response = api_error_report()
+
+        if isinstance(
+            response,
+            tuple
+        ):
+            response = response[0]
+
+        result = (
+            response.get_json(
+                silent=True
+            )
+            if hasattr(
+                response,
+                "get_json"
+            )
+            else {}
+        ) or {}
+
+        return bool(
+            result.get("ok")
+        )
+
+    except Exception as e:
+        print(
+            "TELEGRAM ERROR REPORT SAVE ERROR:",
+            e
+        )
+
+        return False
+
+
 def telegram_help_text():
     return (
         "안녕하세요. SBRate입니다. 🤖\n\n"
@@ -10838,26 +11303,82 @@ def telegram_handle_message(message):
         .lower()
     )
 
-    if command in [
-        "/start",
-        "/help"
-    ]:
+    if command == "/start":
+        telegram_send_main_menu(
+            chat_id,
+            intro=True
+        )
+        return
+
+    if command == "/help":
         telegram_send_message(
             chat_id,
-            telegram_help_text()
+            telegram_help_text(),
+            reply_markup=
+                telegram_main_menu()
+        )
+        return
+
+    # 오류제보 ForceReply 응답 처리
+    reply_to = (
+        message.get(
+            "reply_to_message"
+        )
+        or {}
+    )
+
+    reply_text = str(
+        reply_to.get(
+            "text",
+            ""
+        )
+    )
+
+    if "오류제보" in reply_text:
+        saved = telegram_save_error_report(
+            chat_id,
+            text
+        )
+
+        telegram_send_message(
+            chat_id,
+            (
+                "✅ 오류제보가 접수되었습니다."
+                if saved
+                else
+                "⚠️ 오류제보 저장 중 문제가 발생했습니다."
+            ),
+            reply_markup=
+                telegram_main_menu()
         )
         return
 
     if command == "/report":
         telegram_send_message(
             chat_id,
-            (
-                "📊 SBRateBot\n\n"
-                f"PC 대시보드\n"
-                f"{SB_RATE_PUBLIC_URL}\n\n"
-                f"모바일\n"
-                f"{SB_RATE_PUBLIC_URL}/mobile"
-            )
+            "📊 SBRateBot 대시보드를 선택해주세요.",
+            reply_markup={
+                "inline_keyboard": [
+                    [
+                        {
+                            "text": "🖥 PC 대시보드",
+                            "url": SB_RATE_PUBLIC_URL
+                        }
+                    ],
+                    [
+                        {
+                            "text": "📱 모바일 대시보드",
+                            "url": SB_RATE_PUBLIC_URL + "/mobile"
+                        }
+                    ],
+                    [
+                        {
+                            "text": "🏠 메인 메뉴",
+                            "callback_data": "main"
+                        }
+                    ]
+                ]
+            }
         )
         return
 
@@ -10986,6 +11507,22 @@ def telegram_webhook():
         )
         or {}
     )
+
+    callback_query = update.get(
+        "callback_query"
+    )
+
+    if isinstance(
+        callback_query,
+        dict
+    ):
+        telegram_handle_callback(
+            callback_query
+        )
+
+        return jsonify({
+            "ok": True
+        })
 
     message = (
         update.get("message")
@@ -11139,7 +11676,8 @@ def configure_telegram_webhook():
                 TELEGRAM_WEBHOOK_SECRET,
             "allowed_updates": [
                 "message",
-                "edited_message"
+                "edited_message",
+                "callback_query"
             ],
             "drop_pending_updates":
                 False
@@ -11155,32 +11693,17 @@ def configure_telegram_webhook():
         {
             "command": "start",
             "description":
-                "SBRate 시작"
-        },
-        {
-            "command": "deposit",
-            "description":
-                "정기예금 시장현황"
-        },
-        {
-            "command": "isa",
-            "description":
-                "ISA 시장현황"
-        },
-        {
-            "command": "irp",
-            "description":
-                "퇴직연금 시장현황"
+                "SBRate 메인 메뉴"
         },
         {
             "command": "brief",
             "description":
-                "AI 시장 브리핑"
+                "오늘의 시장 브리핑"
         },
         {
             "command": "report",
             "description":
-                "대시보드 바로가기"
+                "PC·모바일 대시보드"
         },
         {
             "command": "help",
