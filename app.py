@@ -10826,16 +10826,20 @@ def telegram_main_menu():
                 {
                     "text": "🏦 퇴직연금(IRP)",
                     "callback_data": "cat:irp"
+                },
+                {
+                    "text": "📊 오늘의 브리핑",
+                    "callback_data": "brief"
                 }
             ],
             [
                 {
-                    "text": "📊 오늘의 브리핑",
-                    "callback_data": "brief"
-                },
-                {
                     "text": "🤖 AI 자연어 질문",
                     "callback_data": "ai_help"
+                },
+                {
+                    "text": "🐞 오류제보",
+                    "callback_data": "error_report"
                 }
             ],
             [
@@ -10846,12 +10850,6 @@ def telegram_main_menu():
                 {
                     "text": "📱 모바일 대시보드",
                     "url": SB_RATE_PUBLIC_URL + "/mobile"
-                }
-            ],
-            [
-                {
-                    "text": "🐞 오류제보",
-                    "callback_data": "error_report"
                 }
             ]
         ]
@@ -10977,6 +10975,46 @@ def telegram_answer_callback(callback_id, text=None):
     )
 
 
+def telegram_data_footer(category="deposit", period="12"):
+    source = (
+        "저축은행중앙회 비교공시"
+        if category == "deposit"
+        else "각 저축은행 공식 공시·상품 페이지"
+    )
+
+    return (
+        "\n\n"
+        f"⏱ 데이터 업데이트 : {telegram_read_update_time()}\n"
+        f"🔎 출처 : {source}"
+    )
+
+
+def telegram_with_footer(text, category="deposit", period="12"):
+    text = str(text or "").strip()
+
+    if not text:
+        return text
+
+    # 오류/안내 메시지에는 불필요한 데이터 footer를 붙이지 않는다.
+    if any(
+        marker in text
+        for marker in [
+            "유효 금리 데이터가 없습니다",
+            "오류가 발생",
+            "생성하지 못했습니다"
+        ]
+    ):
+        return text
+
+    return (
+        text
+        + telegram_data_footer(
+            category,
+            period
+        )
+    )
+
+
 def telegram_callback_result(
     category,
     period,
@@ -10986,36 +11024,36 @@ def telegram_callback_result(
         category
     )
 
-    if query_type == "highest":
-        return telegram_fast_question(
+    question_map = {
+        "highest":
             f"{label} {period}개월 최고금리",
-            category,
-            period
-        )
-
-    if query_type == "top10":
-        return telegram_fast_question(
+        "top10":
             f"{label} {period}개월 TOP10",
-            category,
-            period
-        )
-
-    if query_type == "woori_rank":
-        return telegram_fast_question(
+        "woori_rank":
             f"{label} {period}개월 우리금융 순위",
+        "higher":
+            f"{label} {period}개월 우리금융보다 높은 곳"
+    }
+
+    question = question_map.get(
+        query_type
+    )
+
+    if question:
+        answer = telegram_fast_question(
+            question,
             category,
             period
         )
 
-    if query_type == "higher":
-        return telegram_fast_question(
-            f"{label} {period}개월 우리금융보다 높은 곳",
+        return telegram_with_footer(
+            answer,
             category,
             period
         )
 
     return (
-        f"📊 {label} {period}개월 기준\\n\\n"
+        f"📊 {label} {period}개월 기준\n\n"
         "조회 항목을 선택해주세요."
     )
 
@@ -11172,14 +11210,16 @@ def telegram_handle_callback(callback):
         telegram_send_message(
             chat_id,
             (
-                f"💬 {label} {period}개월 자연어 질문\\n\\n"
-                "이제 질문을 그대로 입력해주세요.\\n"
-                "예) 우리금융보다 높은 곳 알려줘\\n"
-                "예) 시장 경쟁력을 분석해줘\\n\\n"
+                f"💬 {label} {period}개월 자연어 질문\n\n"
+                "이제 질문을 그대로 입력해주세요.\n"
+                "예) 우리금융보다 높은 곳 알려줘\n"
+                "예) 시장 경쟁력을 분석해줘\n\n"
                 f"상품/기간을 생략하면 "
                 f"{label} {period}개월 기준으로 "
                 "질문하는 것이 가장 정확합니다."
-            )
+            ),
+            reply_markup=
+                telegram_main_menu()
         )
         return
 
@@ -11238,9 +11278,12 @@ def telegram_save_error_report(
             else {}
         ) or {}
 
-        return bool(
-            result.get("ok")
-        )
+        if result.get("ok"):
+            return str(
+                result.get("id", "")
+            ).strip() or "접수완료"
+
+        return None
 
     except Exception as e:
         print(
@@ -11347,7 +11390,7 @@ def telegram_handle_message(message):
     )
 
     if "오류제보" in reply_text:
-        saved = telegram_save_error_report(
+        report_id = telegram_save_error_report(
             chat_id,
             text
         )
@@ -11355,10 +11398,16 @@ def telegram_handle_message(message):
         telegram_send_message(
             chat_id,
             (
-                "✅ 오류제보가 접수되었습니다."
-                if saved
+                (
+                    "✅ 오류제보가 접수되었습니다.\n"
+                    f"접수번호 : {report_id}"
+                )
+                if report_id
                 else
-                "⚠️ 오류제보 저장 중 문제가 발생했습니다."
+                (
+                    "⚠️ 오류제보 저장 중 문제가 발생했습니다.\n"
+                    "잠시 후 다시 시도해주세요."
+                )
             ),
             reply_markup=
                 telegram_main_menu()
@@ -11407,9 +11456,15 @@ def telegram_handle_message(message):
 
         telegram_send_message(
             chat_id,
-            telegram_deposit_summary(
+            telegram_with_footer(
+                telegram_deposit_summary(
+                    period
+                ),
+                "deposit",
                 period
-            )
+            ),
+            reply_markup=
+                telegram_main_menu()
         )
         return
 
@@ -11422,10 +11477,16 @@ def telegram_handle_message(message):
 
         telegram_send_message(
             chat_id,
-            telegram_pension_summary(
+            telegram_with_footer(
+                telegram_pension_summary(
+                    "isa",
+                    period
+                ),
                 "isa",
                 period
-            )
+            ),
+            reply_markup=
+                telegram_main_menu()
         )
         return
 
@@ -11438,17 +11499,25 @@ def telegram_handle_message(message):
 
         telegram_send_message(
             chat_id,
-            telegram_pension_summary(
+            telegram_with_footer(
+                telegram_pension_summary(
+                    "irp",
+                    period
+                ),
                 "irp",
                 period
-            )
+            ),
+            reply_markup=
+                telegram_main_menu()
         )
         return
 
     if command == "/brief":
         telegram_send_message(
             chat_id,
-            telegram_brief()
+            telegram_brief(),
+            reply_markup=
+                telegram_main_menu()
         )
         return
 
@@ -11479,10 +11548,18 @@ def telegram_handle_message(message):
             category=category,
             period=period
         )
+    else:
+        answer = telegram_with_footer(
+            answer,
+            category,
+            period
+        )
 
     telegram_send_message(
         chat_id,
-        answer
+        answer,
+        reply_markup=
+            telegram_main_menu()
     )
 
 
@@ -11567,12 +11644,45 @@ def telegram_morning_brief():
     if expected_secret and provided_secret != expected_secret:
         return jsonify({"ok": False, "error": "invalid_secret"}), 403
 
-    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
-    if not chat_id:
-        return jsonify({"ok": False, "error": "TELEGRAM_CHAT_ID missing"}), 503
+    chat_ids_raw = (
+        os.getenv(
+            "TELEGRAM_CHAT_IDS",
+            ""
+        ).strip()
+        or os.getenv(
+            "TELEGRAM_CHAT_ID",
+            ""
+        ).strip()
+    )
 
-    telegram_send_message(chat_id, telegram_morning_brief_text())
-    return jsonify({"ok": True})
+    chat_ids = [
+        item.strip()
+        for item in chat_ids_raw.split(",")
+        if item.strip()
+    ]
+
+    if not chat_ids:
+        return jsonify({
+            "ok": False,
+            "error":
+                "TELEGRAM_CHAT_ID(S) missing"
+        }), 503
+
+    message = telegram_morning_brief_text()
+
+    failed = []
+
+    for chat_id in chat_ids:
+        results = telegram_send_message(
+            chat_id,
+            message
+        )
+
+    return jsonify({
+        "ok": True,
+        "recipient_count": len(chat_ids),
+        "failed": failed
+    })
 
 
 def telegram_morning_brief_text():
@@ -11734,6 +11844,20 @@ def configure_telegram_webhook():
     print(
         "Telegram setMyCommands:",
         command_result
+    )
+
+    menu_button_result = telegram_api(
+        "setChatMenuButton",
+        {
+            "menu_button": {
+                "type": "commands"
+            }
+        }
+    )
+
+    print(
+        "Telegram setChatMenuButton:",
+        menu_button_result
     )
 
 
