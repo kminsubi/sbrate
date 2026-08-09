@@ -9814,17 +9814,35 @@ def telegram_notify_error_report(report):
             report
         )
 
-        text = (
-            "🚨 SBRate 오류 제보\n\n"
-            f"접수번호 : {report.get('id', '-')}\n"
-            f"접수경로 : {source}\n"
-            f"상품 : {report.get('product') or '-'}\n"
-            f"기간 : {report.get('period') or '-'}\n"
-            f"유형 : {report.get('error_type') or '기타'}\n\n"
-            "내용\n"
-            f"{report.get('message') or '-'}\n\n"
+        lines = [
+            "🚨 SBRate 오류 제보",
+            "",
+            f"접수번호 : {report.get('id', '-')}",
+            f"접수경로 : {source}"
+        ]
+
+        product = str(report.get("product") or "").strip()
+        period = str(report.get("period") or "").strip()
+        error_type = str(report.get("error_type") or "").strip()
+
+        if product and product != "-":
+            lines.append(f"상품 : {product}")
+
+        if period and period != "-":
+            lines.append(f"기간 : {period}")
+
+        if error_type and error_type != "-":
+            lines.append(f"유형 : {error_type}")
+
+        lines.extend([
+            "",
+            "내용",
+            str(report.get("message") or "-"),
+            "",
             f"접수시각 : {report.get('created_at') or '-'}"
-        )
+        ])
+
+        text = "\n".join(lines)
 
         page_url = str(
             report.get("page_url", "")
@@ -10971,7 +10989,7 @@ def telegram_main_menu():
                     "callback_data": "ai_help"
                 },
                 {
-                    "text": "🐞 오류제보",
+                    "text": "📣 제보하기",
                     "callback_data": "error_report"
                 }
             ],
@@ -11384,10 +11402,10 @@ def telegram_handle_callback(callback):
         telegram_send_message(
             chat_id,
             (
-                "🐞 오류제보\\n\\n"
-                "아래 메시지에 답장하는 방식으로 "
-                "오류 내용을 입력해주세요.\\n\\n"
-                "예) ISA 6개월 조회 시 순위가 이상합니다."
+                "📣 제보하기\\n\\n"
+                "데이터 오류나 이용 중 불편한 점을 알려주세요.\\n"
+                "아래 메시지에 답장하는 방식으로 입력해주세요.\\n\\n"
+                "예) ISA 6개월 우리금융 순위가 이상합니다."
             ),
             force_reply=True
         )
@@ -11402,7 +11420,7 @@ def telegram_save_error_report(
         "category": "Telegram",
         "product": "SBRate Bot",
         "period": "",
-        "error_type": "텔레그램 오류제보",
+        "error_type": "텔레그램 제보",
         "message": str(
             message_text or ""
         ).strip(),
@@ -11565,7 +11583,7 @@ def telegram_handle_message(message):
         )
     )
 
-    if "오류제보" in reply_text:
+    if "오류제보" in reply_text or "제보하기" in reply_text:
         report_id = telegram_save_error_report(
             chat_id,
             text
@@ -11575,13 +11593,13 @@ def telegram_handle_message(message):
             chat_id,
             (
                 (
-                    "✅ 오류제보가 접수되었습니다.\n"
+                    "✅ 제보가 접수되었습니다.\n"
                     f"접수번호 : {report_id}"
                 )
                 if report_id
                 else
                 (
-                    "⚠️ 오류제보 저장 중 문제가 발생했습니다.\n"
+                    "⚠️ 제보 저장 중 문제가 발생했습니다.\n"
                     "잠시 후 다시 시도해주세요."
                 )
             ),
