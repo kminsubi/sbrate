@@ -9777,6 +9777,76 @@ ERROR_REPORT_FILE = os.path.join(
     "error_reports.json"
 )
 
+# 오류 제보 관리자 개인 Telegram Chat ID
+# Render Environment:
+# TELEGRAM_ADMIN_CHAT_ID = 개인 /chatid 값
+TELEGRAM_ADMIN_CHAT_ID = os.getenv(
+    "TELEGRAM_ADMIN_CHAT_ID",
+    ""
+).strip()
+
+
+def telegram_error_report_source(report):
+    category = str(
+        (report or {}).get("category", "")
+    ).strip()
+
+    page_url = str(
+        (report or {}).get("page_url", "")
+    ).strip()
+
+    if category.lower() == "telegram" or page_url.lower() == "telegram":
+        return "Telegram"
+
+    if "/mobile" in page_url.lower():
+        return "모바일 대시보드"
+
+    return "PC 대시보드"
+
+
+def telegram_notify_error_report(report):
+    """오류 제보 저장 후 관리자 개인 Telegram으로 알린다."""
+    if not TELEGRAM_ADMIN_CHAT_ID:
+        return False
+
+    try:
+        source = telegram_error_report_source(
+            report
+        )
+
+        text = (
+            "🚨 SBRate 오류 제보\n\n"
+            f"접수번호 : {report.get('id', '-')}\n"
+            f"접수경로 : {source}\n"
+            f"상품 : {report.get('product') or '-'}\n"
+            f"기간 : {report.get('period') or '-'}\n"
+            f"유형 : {report.get('error_type') or '기타'}\n\n"
+            "내용\n"
+            f"{report.get('message') or '-'}\n\n"
+            f"접수시각 : {report.get('created_at') or '-'}"
+        )
+
+        page_url = str(
+            report.get("page_url", "")
+        ).strip()
+
+        if page_url and page_url.lower() != "telegram":
+            text += f"\n페이지 : {page_url}"
+
+        telegram_send_message(
+            TELEGRAM_ADMIN_CHAT_ID,
+            text
+        )
+
+        return True
+
+    except Exception as e:
+        print(
+            "ERROR REPORT TELEGRAM NOTIFY ERROR:",
+            e
+        )
+        return False
+
 
 @app.route("/api/error-report", methods=["POST"])
 def api_error_report():
@@ -9837,6 +9907,12 @@ def api_error_report():
         os.replace(
             temp_file,
             ERROR_REPORT_FILE
+        )
+
+        # JSON 저장 성공 후 관리자 Telegram 알림.
+        # 알림 실패가 제보 저장 자체를 실패시키지는 않는다.
+        telegram_notify_error_report(
+            report
         )
 
         return jsonify({
@@ -10032,6 +10108,7 @@ def telegram_send_message(
 ):
     text = telegram_plain_text(text)
     chunks = telegram_split_text(text)
+    last_message_id = None
 
     for idx, chunk in enumerate(chunks):
         payload = {
@@ -10052,10 +10129,55 @@ def telegram_send_message(
                     "selective": True
                 }
 
-        telegram_api(
+        result = telegram_api(
             "sendMessage",
             payload
         )
+
+        if isinstance(result, dict):
+            last_message_id = (
+                (result.get("result") or {}).get(
+                    "message_id"
+                )
+                or last_message_id
+            )
+
+    return last_message_id
+
+
+def telegram_delete_message(chat_id, message_id):
+    if not message_id:
+        return
+
+    telegram_api(
+        "deleteMessage",
+        {
+            "chat_id": chat_id,
+            "message_id": message_id
+        },
+        timeout=10
+    )
+
+
+def telegram_send_progress(
+    chat_id,
+    text="🔎 요청을 처리하고 있습니다..."
+):
+    telegram_send_typing(
+        chat_id
+    )
+
+    return telegram_send_message(
+        chat_id,
+        text
+    )
+
+
+def telegram_finish_progress(chat_id, message_id):
+    telegram_delete_message(
+        chat_id,
+        message_id
+    )
 
 
 def telegram_send_typing(chat_id):
@@ -10845,7 +10967,7 @@ def telegram_main_menu():
             ],
             [
                 {
-                    "text": "🤖 AI 자연어 질문",
+                    "text": "💬 AI에게 물어보기",
                     "callback_data": "ai_help"
                 },
                 {
@@ -10935,7 +11057,7 @@ def telegram_query_menu(category, period):
             ],
             [
                 {
-                    "text": "💬 이 상품 자연어 질문",
+                    "text": "💬 AI에게 물어보기",
                     "callback_data":
                         f"ai_category:{category}:{period}"
                 }
@@ -11163,14 +11285,20 @@ def telegram_handle_callback(callback):
 
         _, category, period, query_type = parts
 
-        telegram_send_typing(
-            chat_id
+        progress_id = telegram_send_progress(
+            chat_id,
+            "🔎 금리 정보를 조회하고 있습니다..."
         )
 
         answer = telegram_callback_result(
             category,
             period,
             query_type
+        )
+
+        telegram_finish_progress(
+            chat_id,
+            progress_id
         )
 
         telegram_send_message(
@@ -11185,13 +11313,21 @@ def telegram_handle_callback(callback):
         return
 
     if data == "brief":
-        telegram_send_typing(
-            chat_id
+        progress_id = telegram_send_progress(
+            chat_id,
+            "📊 최신 데이터를 분석해 브리핑을 만들고 있습니다..."
+        )
+
+        answer = telegram_brief()
+
+        telegram_finish_progress(
+            chat_id,
+            progress_id
         )
 
         telegram_send_message(
             chat_id,
-            telegram_brief(),
+            answer,
             reply_markup=
                 telegram_main_menu()
         )
@@ -11201,7 +11337,7 @@ def telegram_handle_callback(callback):
         telegram_send_message(
             chat_id,
             (
-                "🤖 AI 자연어 질문\\n\\n"
+                "💬 AI에게 물어보기\\n\\n"
                 "궁금한 내용을 자유롭게 입력해주세요.\\n\\n"
                 "예)\\n"
                 "• 정기예금 6개월 TOP5 알려줘\\n"
@@ -11231,7 +11367,7 @@ def telegram_handle_callback(callback):
         telegram_send_message(
             chat_id,
             (
-                f"💬 {label} {period}개월 자연어 질문\n\n"
+                f"💬 {label} {period}개월 AI에게 물어보기\n\n"
                 "이제 질문을 그대로 입력해주세요.\n"
                 "예) 우리금융보다 높은 곳 알려줘\n"
                 "예) 시장 경쟁력을 분석해줘\n\n"
@@ -11329,7 +11465,7 @@ def telegram_help_text():
         "/help - 사용방법\n\n"
         "기간을 같이 입력할 수도 있습니다.\n"
         "예: /deposit 6, /isa 24, /irp 36\n\n"
-        "명령어 없이 자연어로 질문해도 됩니다.\n"
+        "명령어 없이 AI에게 바로 물어봐도 됩니다.\n"
         "예: 우리금융보다 금리 높은 곳 알려줘\n"
         "예: ISA 우리금융 경쟁력 알려줘\n"
         "예: 퇴직연금 최고금리 알려줘"
@@ -11483,10 +11619,6 @@ def telegram_handle_message(message):
         )
         return
 
-    telegram_send_typing(
-        chat_id
-    )
-
     if command == "/deposit":
         period = telegram_period_from_text(
             text,
@@ -11494,15 +11626,27 @@ def telegram_handle_message(message):
             pension=False
         )
 
-        telegram_send_message(
+        progress_id = telegram_send_progress(
             chat_id,
-            telegram_with_footer(
-                telegram_deposit_summary(
-                    period
-                ),
-                "deposit",
+            "🔎 정기예금 정보를 조회하고 있습니다..."
+        )
+
+        answer = telegram_with_footer(
+            telegram_deposit_summary(
                 period
             ),
+            "deposit",
+            period
+        )
+
+        telegram_finish_progress(
+            chat_id,
+            progress_id
+        )
+
+        telegram_send_message(
+            chat_id,
+            answer,
             reply_markup=
                 telegram_main_menu()
         )
@@ -11515,16 +11659,28 @@ def telegram_handle_message(message):
             pension=True
         )
 
-        telegram_send_message(
+        progress_id = telegram_send_progress(
             chat_id,
-            telegram_with_footer(
-                telegram_pension_summary(
-                    "isa",
-                    period
-                ),
+            "🔎 ISA 정보를 조회하고 있습니다..."
+        )
+
+        answer = telegram_with_footer(
+            telegram_pension_summary(
                 "isa",
                 period
             ),
+            "isa",
+            period
+        )
+
+        telegram_finish_progress(
+            chat_id,
+            progress_id
+        )
+
+        telegram_send_message(
+            chat_id,
+            answer,
             reply_markup=
                 telegram_main_menu()
         )
@@ -11537,25 +11693,49 @@ def telegram_handle_message(message):
             pension=True
         )
 
-        telegram_send_message(
+        progress_id = telegram_send_progress(
             chat_id,
-            telegram_with_footer(
-                telegram_pension_summary(
-                    "irp",
-                    period
-                ),
+            "🔎 퇴직연금 정보를 조회하고 있습니다..."
+        )
+
+        answer = telegram_with_footer(
+            telegram_pension_summary(
                 "irp",
                 period
             ),
+            "irp",
+            period
+        )
+
+        telegram_finish_progress(
+            chat_id,
+            progress_id
+        )
+
+        telegram_send_message(
+            chat_id,
+            answer,
             reply_markup=
                 telegram_main_menu()
         )
         return
 
     if command == "/brief":
+        progress_id = telegram_send_progress(
+            chat_id,
+            "📊 최신 데이터를 분석해 브리핑을 만들고 있습니다..."
+        )
+
+        answer = telegram_brief()
+
+        telegram_finish_progress(
+            chat_id,
+            progress_id
+        )
+
         telegram_send_message(
             chat_id,
-            telegram_brief(),
+            answer,
             reply_markup=
                 telegram_main_menu()
         )
@@ -11576,6 +11756,11 @@ def telegram_handle_message(message):
         )
     )
 
+    progress_id = telegram_send_progress(
+        chat_id,
+        "🤖 질문을 분석하고 있습니다..."
+    )
+
     answer = telegram_fast_question(
         text,
         category=category,
@@ -11594,6 +11779,11 @@ def telegram_handle_message(message):
             category,
             period
         )
+
+    telegram_finish_progress(
+        chat_id,
+        progress_id
+    )
 
     telegram_send_message(
         chat_id,
