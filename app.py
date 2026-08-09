@@ -9899,6 +9899,17 @@ SB_RATE_PUBLIC_URL = os.getenv(
     "https://sbratebot-v5.onrender.com"
 ).strip().rstrip("/")
 
+SB_RATE_TELEGRAM_USERNAME = os.getenv(
+    "SB_RATE_TELEGRAM_USERNAME",
+    "SBRateBot"
+).strip().lstrip("@")
+
+SB_RATE_TELEGRAM_URL = (
+    f"https://t.me/{SB_RATE_TELEGRAM_USERNAME}"
+    if SB_RATE_TELEGRAM_USERNAME
+    else "https://t.me/SBRateBot"
+)
+
 TELEGRAM_API_BASE = (
     f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
     if TELEGRAM_BOT_TOKEN
@@ -11074,6 +11085,16 @@ def telegram_handle_callback(callback):
     if chat_id is None:
         return
 
+    # 그룹방의 기존 인라인 버튼 클릭도 무응답 처리.
+    if not telegram_is_private_chat(
+        chat
+    ):
+        telegram_answer_callback(
+            callback_id,
+            "상세 조회는 SBRateBot 개인채팅에서 이용해주세요."
+        )
+        return
+
     telegram_answer_callback(
         callback_id
     )
@@ -11315,6 +11336,15 @@ def telegram_help_text():
     )
 
 
+def telegram_is_private_chat(chat):
+    return str(
+        (chat or {}).get(
+            "type",
+            ""
+        )
+    ).lower() == "private"
+
+
 def telegram_handle_message(message):
     chat = (
         message.get("chat")
@@ -11345,6 +11375,16 @@ def telegram_handle_message(message):
         .split("@")[0]
         .lower()
     )
+
+    # 그룹/슈퍼그룹은 Morning Brief 전용.
+    # 관리용 /chatid 외 일반 명령·자연어 질문에는 응답하지 않는다.
+    if (
+        not telegram_is_private_chat(
+            chat
+        )
+        and command != "/chatid"
+    ):
+        return
 
     if command == "/chatid":
         telegram_send_message(
@@ -11672,10 +11712,25 @@ def telegram_morning_brief():
 
     failed = []
 
+    detail_button = {
+        "inline_keyboard": [
+            [
+                {
+                    "text":
+                        "🤖 SBRateBot에서 상세조회",
+                    "url":
+                        SB_RATE_TELEGRAM_URL
+                }
+            ]
+        ]
+    }
+
     for chat_id in chat_ids:
-        results = telegram_send_message(
+        telegram_send_message(
             chat_id,
-            message
+            message,
+            reply_markup=
+                detail_button
         )
 
     return jsonify({
@@ -11752,7 +11807,10 @@ def telegram_morning_brief_text():
         "🌐 대시보드",
         SB_RATE_PUBLIC_URL,
         "📱 모바일",
-        SB_RATE_PUBLIC_URL + "/mobile"
+        SB_RATE_PUBLIC_URL + "/mobile",
+        "",
+        "상세 조회·AI 질문은 "
+        "@SBRateBot 개인채팅에서 이용해주세요."
     ])
     return "\\n".join(lines)
 
