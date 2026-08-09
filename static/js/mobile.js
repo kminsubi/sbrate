@@ -1272,7 +1272,7 @@ function buildKakaoShareText(){
 
 
 function mobileDashboardShareUrl(){
-  return "https://sbratebot-v5.onrender.com/mobile";
+  return "https://sbrate.onrender.com/mobile";
 }
 
 

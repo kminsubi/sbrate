@@ -9896,7 +9896,7 @@ TELEGRAM_BOT_TOKEN = os.getenv(
 # SB_RATE_PUBLIC_URL만 추가하면 Telegram webhook도 자동 변경된다.
 SB_RATE_PUBLIC_URL = os.getenv(
     "SB_RATE_PUBLIC_URL",
-    "https://sbratebot-v5.onrender.com"
+    "https://sbrate.onrender.com"
 ).strip().rstrip("/")
 
 SB_RATE_TELEGRAM_USERNAME = os.getenv(

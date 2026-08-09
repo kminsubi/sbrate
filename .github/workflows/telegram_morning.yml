@@ -19,4 +19,4 @@ jobs:
             --max-time 180 \
             -X POST \
             -H "X-SBRate-Secret: ${{ secrets.TELEGRAM_BRIEF_SECRET }}" \
-            "https://sbratebot-v5.onrender.com/telegram/morning-brief"
+            "https://sbrate.onrender.com/telegram/morning-brief"
