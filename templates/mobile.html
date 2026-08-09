@@ -7,6 +7,11 @@
   <title>SBRateBot Mobile</title>
   <link rel="stylesheet" href="/static/css/mobile.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Kakao JavaScript SDK -->
+  <script
+    src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"
+    crossorigin="anonymous">
+  </script>
 </head>
 <body>
   <div class="app-shell">
@@ -185,9 +190,10 @@
         </div>
 
         <article class="panel-card more-list">
-          <button id="mobile-error-report">🛠 오류 제보</button>
+          <button id="mobile-kakao-share" type="button">💬 카카오톡 공유</button>
+          <button id="mobile-error-report" type="button">🛠 오류 제보</button>
           <a href="/" class="more-link">🖥 PC 대시보드 열기</a>
-          <div class="version-row"><span>Mobile Version</span><strong>V1.5 Stable</strong></div>
+          <div class="version-row"><span>Mobile Version</span><strong>V1.6 Stable</strong></div>
         </article>
       </section>
     </main>

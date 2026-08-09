@@ -15,6 +15,10 @@ const MobileState = {
 
 const $ = (id) => document.getElementById(id);
 
+// Kakao Developers > 플랫폼 키 > JavaScript 키 값을 아래에 입력하세요.
+// JavaScript 키는 웹에서 사용하는 공개 식별키이며 Admin 키/REST API 키를 넣으면 안 됩니다.
+const KAKAO_JAVASCRIPT_KEY = "9f12a43c394b689a99d49dd633f4d8ca";
+
 function number(value){
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
@@ -1168,6 +1172,172 @@ function setUpdateTime(){
 }
 
 /* =========================================================
+   KAKAO SHARE
+========================================================= */
+
+function initKakaoShare(){
+  if(
+    !KAKAO_JAVASCRIPT_KEY ||
+    KAKAO_JAVASCRIPT_KEY ===
+      "PASTE_YOUR_KAKAO_JAVASCRIPT_KEY_HERE"
+  ){
+    console.warn(
+      "KAKAO SHARE: JavaScript 키가 아직 설정되지 않았습니다."
+    );
+    return false;
+  }
+
+  if(
+    typeof window.Kakao === "undefined"
+  ){
+    console.warn(
+      "KAKAO SHARE: Kakao SDK를 불러오지 못했습니다."
+    );
+    return false;
+  }
+
+  try{
+    if(!window.Kakao.isInitialized()){
+      window.Kakao.init(
+        KAKAO_JAVASCRIPT_KEY
+      );
+    }
+
+    return window.Kakao.isInitialized();
+  }
+  catch(error){
+    console.error(
+      "KAKAO INIT ERROR",
+      error
+    );
+    return false;
+  }
+}
+
+
+function buildKakaoShareText(){
+  const data =
+    MobileState.data[
+      MobileState.product
+    ];
+
+  const label =
+    currentLabel();
+
+  const period =
+    MobileState.period;
+
+  const wooriRate =
+    displayRateOrDash(
+      data?.wr
+    );
+
+  const topRate =
+    displayRateOrDash(
+      data?.max
+    );
+
+  const topBank =
+    data?.ranked?.[0]
+      ? displayBankName(
+          data.ranked[0].bank
+        )
+      : "-";
+
+  const rankText =
+    data?.rank
+      ? (
+          data?.total
+            ? `${data.rank}위 / ${data.total}개 기관`
+            : `${data.rank}위`
+        )
+      : "-";
+
+  const basis =
+    mobileDataBasis();
+
+  return [
+    "📊 SBRate 금리 모니터링",
+    "",
+    `${label} ${period}개월`,
+    `우리금융 : ${wooriRate}`,
+    `시장 최고 : ${topBank} ${topRate}`,
+    `시장 순위 : ${rankText}`,
+    "",
+    `데이터 업데이트 : ${basis}`,
+    "",
+    "최신 금리 현황은 모바일 대시보드에서 확인하세요."
+  ].join("\n");
+}
+
+
+function mobileDashboardShareUrl(){
+  return (
+    `${window.location.origin}/mobile`
+  );
+}
+
+
+function shareKakao(){
+  const data =
+    MobileState.data[
+      MobileState.product
+    ];
+
+  if(!data){
+    toast(
+      "시장 데이터를 불러온 후 공유해주세요."
+    );
+    return;
+  }
+
+  if(!initKakaoShare()){
+    if(
+      KAKAO_JAVASCRIPT_KEY ===
+      "PASTE_YOUR_KAKAO_JAVASCRIPT_KEY_HERE"
+    ){
+      toast(
+        "카카오 JavaScript 키를 먼저 설정해주세요."
+      );
+    }
+    else{
+      toast(
+        "카카오톡 공유 모듈을 불러오지 못했습니다."
+      );
+    }
+
+    return;
+  }
+
+  const shareUrl =
+    mobileDashboardShareUrl();
+
+  try{
+    window.Kakao.Share.sendDefault({
+      objectType:"text",
+      text:buildKakaoShareText(),
+      link:{
+        mobileWebUrl:shareUrl,
+        webUrl:shareUrl
+      },
+      buttonTitle:
+        "모바일 대시보드 보기"
+    });
+  }
+  catch(error){
+    console.error(
+      "KAKAO SHARE ERROR",
+      error
+    );
+
+    toast(
+      "카카오톡 공유를 실행하지 못했습니다."
+    );
+  }
+}
+
+
+/* =========================================================
    NAV / ERROR REPORT
 ========================================================= */
 
@@ -1870,6 +2040,14 @@ document.addEventListener(
           }
         }
       );
+
+    $("mobile-kakao-share")
+      ?.addEventListener(
+        "click",
+        shareKakao
+      );
+
+    initKakaoShare();
 
     initNavObserver();
     initErrorReport();
