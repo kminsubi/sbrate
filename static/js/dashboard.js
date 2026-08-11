@@ -3335,7 +3335,7 @@ function buildExecutiveReportBase(data, dataBasis){
           <div class="er-title"><span>07 · AI Management Insight</span><span class="text-indigo-600">AI</span></div>
           <div class="er-body">
             <div id="executive-report-ai-text" class="text-gray-500 leading-[1.5]">
-              AI 종합 판단을 생성하고 있습니다...
+              AI 시장분석 판단을 생성하고 있습니다...
             </div>
           </div>
         </section>

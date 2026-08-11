@@ -51,18 +51,27 @@ jobs:
           echo "Fixed deposit: ${{ steps.deposit.outcome }}"
           echo "ISA/IRP      : ${{ steps.pension.outcome }}"
 
+      - name: Save daily history snapshot
+        if: always() && steps.deposit.outcome == 'success' && steps.pension.outcome == 'success'
+        run: |
+          python crawler/snapshot_history.py
+
       - name: Commit updated data
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          for f in             data/latest_rates.json             data/previous_rates.json             data/update_info.json             data/banks.json             data/isa_rates.json             data/irp_rates.json             data/pension_sources.json
+          for f in             data/latest_rates.json             data/previous_rates.json             data/update_info.json             data/banks.json             data/isa_rates.json             data/irp_rates.json             data/pension_sources.json             data/history/*.json
           do
             if [ -f "$f" ]; then
               git add "$f"
             fi
           done
+
+          if [ -d "data/history" ]; then
+            git add data/history/*.json 2>/dev/null || true
+          fi
 
           if git diff --cached --quiet; then
             echo "No data changes to commit"

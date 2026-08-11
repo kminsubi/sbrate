@@ -2642,6 +2642,10 @@ def api_kpi():
 
     return jsonify({
 
+        "last_update": current_data_update_time(),
+        "last_updated": current_data_update_time(),
+        "timezone": "Asia/Seoul",
+
         "product_count": len(products),
 
         "change_count": change_count,
@@ -2922,6 +2926,9 @@ def api_woori():
     # -------------------------------
 
     return jsonify({
+
+        "last_update": current_data_update_time(),
+        "timezone": "Asia/Seoul",
 
         "bank": woori["bank"],
 
@@ -9670,6 +9677,36 @@ def pension_items_with_period(items, period):
     return items
 
 
+def load_update_info():
+    update_file = os.path.join(
+        BASE_DIR,
+        "data",
+        "update_info.json"
+    )
+
+    try:
+        with open(
+            update_file,
+            "r",
+            encoding="utf-8"
+        ) as f:
+            data = json.load(f)
+
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def current_data_update_time():
+    info = load_update_info()
+    return (
+        info.get("last_update")
+        or info.get("updated_at")
+        or info.get("update_time")
+        or "-"
+    )
+
+
 @app.route("/api/isa")
 def api_isa():
     period = str(request.args.get("period", "")).strip()
@@ -9687,6 +9724,8 @@ def api_isa():
     return jsonify({
         "category": "ISA",
         "count": len(items),
+        "last_update": current_data_update_time(),
+        "timezone": "Asia/Seoul",
         "items": items
     })
 
@@ -9708,6 +9747,8 @@ def api_irp():
     return jsonify({
         "category": "퇴직연금",
         "count": len(items),
+        "last_update": current_data_update_time(),
+        "timezone": "Asia/Seoul",
         "items": items
     })
 
@@ -10210,32 +10251,7 @@ def telegram_send_typing(chat_id):
 
 
 def telegram_read_update_time():
-    update_file = os.path.join(
-        BASE_DIR,
-        "data",
-        "update_info.json"
-    )
-
-    try:
-        with open(
-            update_file,
-            "r",
-            encoding="utf-8"
-        ) as f:
-            data = json.load(f)
-
-        if isinstance(data, dict):
-            return (
-                data.get("last_update")
-                or data.get("updated_at")
-                or data.get("update_time")
-                or "-"
-            )
-
-    except Exception:
-        pass
-
-    return "-"
+    return current_data_update_time()
 
 
 def telegram_period_from_text(
@@ -10559,183 +10575,196 @@ def telegram_pension_summary(
     return "\n".join(lines)
 
 
+def telegram_change_text(value):
+    n = safe_float(value)
+    if n is None or abs(n) < 0.00001:
+        return "-"
+    if n > 0:
+        return f"+{abs(n):.2f}%p 상승"
+    return f"▲{abs(n):.2f}%p 하락"
+
+
+def telegram_product_name(item):
+    return str((item or {}).get("product") or "-").strip() or "-"
+
+
 def telegram_brief():
     deposit_products = unique_products(
-        build_products(
-            "12개월"
-        )
+        build_products("12개월")
     )
-
     deposit_products = [
-        item
-        for item in deposit_products
-        if safe_float(
-            item.get("rate")
-        ) is not None
-        and safe_float(
-            item.get("rate")
-        ) > 0
+        item for item in deposit_products
+        if safe_float(item.get("rate")) is not None
+        and safe_float(item.get("rate")) > 0
     ]
 
-    bank_best = get_bank_best_rates(
-        deposit_products
-    )
-
+    bank_best = get_bank_best_rates(deposit_products)
     bank_best = [
-        item
-        for item in bank_best
-        if safe_float(
-            item.get("rate")
-        ) is not None
-        and safe_float(
-            item.get("rate")
-        ) > 0
+        item for item in bank_best
+        if safe_float(item.get("rate")) is not None
+        and safe_float(item.get("rate")) > 0
     ]
-
     bank_best.sort(
-        key=lambda x:
-            safe_float(
-                x.get("rate")
-            ) or 0,
+        key=lambda x: safe_float(x.get("rate")) or 0,
         reverse=True
     )
 
     isa_items = pension_items_with_period(
-        build_pension_products(
-            ISA_DATA_FILE,
-            "ISA"
-        ),
+        build_pension_products(ISA_DATA_FILE, "ISA"),
         "12"
     )
-
     irp_items = pension_items_with_period(
-        build_pension_products(
-            IRP_DATA_FILE,
-            "퇴직연금"
-        ),
+        build_pension_products(IRP_DATA_FILE, "퇴직연금"),
         "12"
     )
 
     def compact(items):
         valid = [
-            item
-            for item in items
-            if safe_float(
-                item.get("rate")
-            ) is not None
-            and safe_float(
-                item.get("rate")
-            ) > 0
+            item for item in items
+            if safe_float(item.get("rate")) is not None
+            and safe_float(item.get("rate")) > 0
         ]
-
         valid.sort(
-            key=lambda x:
-                safe_float(
-                    x.get("rate")
-                ) or 0,
+            key=lambda x: safe_float(x.get("rate")) or 0,
             reverse=True
         )
-
-        top = (
-            valid[0]
-            if valid
-            else {}
-        )
-
-        woori = telegram_woori_row(
-            valid
-        )
-
+        top = valid[0] if valid else {}
+        woori = telegram_woori_row(valid)
         return {
+            "valid": valid,
             "count": len(valid),
             "top": top,
             "woori": woori,
-            "woori_rank": (
-                valid.index(woori) + 1
-                if woori
-                else None
-            )
+            "woori_rank": valid.index(woori) + 1 if woori else None
         }
 
-    deposit_compact = compact(
-        bank_best
-    )
+    dep = compact(bank_best)
+    isa = compact(isa_items)
+    irp = compact(irp_items)
 
-    isa_compact = compact(
-        isa_items
-    )
+    dep_rates = [safe_float(x.get("rate")) or 0 for x in dep["valid"]]
+    dep_avg = sum(dep_rates) / len(dep_rates) if dep_rates else 0
+    dep_top_rate = safe_float(dep["top"].get("rate")) or 0
+    dep_woori_rate = safe_float((dep["woori"] or {}).get("rate")) or 0
+    dep_gap = dep_woori_rate - dep_top_rate if dep["woori"] else None
 
-    irp_compact = compact(
-        irp_items
-    )
-
-    market_context = {
-        "데이터업데이트":
-            telegram_read_update_time(),
-        "정기예금":
-            deposit_compact,
-        "ISA":
-            isa_compact,
-        "퇴직연금":
-            irp_compact
-    }
-
-    prompt = (
-        "SBRateBot의 오늘 수신시장 브리핑을 작성해줘. "
-        "반드시 제공 데이터에 있는 숫자만 사용하고 "
-        "새로운 숫자를 추정하거나 만들지 마. "
-        "정기예금, ISA, 퇴직연금 순으로 핵심 현황을 설명하고, "
-        "우리금융저축은행의 경쟁력과 오늘 확인할 포인트를 "
-        "간결하고 전문적인 한국어로 정리해줘. "
-        "텔레그램 메시지이므로 표는 사용하지 말고 "
-        "900자 이내로 작성해줘."
-    )
-
+    # rate changes
+    changes = {"up_all": [], "down_all": [], "up_count": 0, "down_count": 0}
     try:
-        ai_text = ask_gemini(
-            prompt,
-            json.dumps(
-                market_context,
-                ensure_ascii=False,
-                indent=2,
-                default=str
-            )
-        )
-
-        if ai_text:
-            return (
-                "🤖 SBRate AI 시장 브리핑\n\n"
-                + ai_text
-                + "\n\n"
-                + "🌐 대시보드\n"
-                + SB_RATE_PUBLIC_URL
-                + "\n"
-                + "📱 모바일\n"
-                + SB_RATE_PUBLIC_URL
-                + "/mobile"
-            )
-
+        with app.test_request_context("/api/rate-changes", method="GET"):
+            response = api_rate_changes()
+        changes = response.get_json(silent=True) or changes
     except Exception as e:
-        print(
-            "TELEGRAM BRIEF GEMINI ERROR:",
-            e
+        print("TELEGRAM MORNING CHANGE ERROR:", e)
+
+    def pension_lines(label, data):
+        top = data["top"] or {}
+        w = data["woori"] or {}
+        top_rate = safe_float(top.get("rate")) or 0
+        wr = safe_float(w.get("rate")) if w else None
+        lines = [
+            f"📌 {label} 12개월",
+            f"🥇 {top.get('bank','-')} {top_rate:.2f}%"
+        ]
+        if w:
+            product = telegram_product_name(w)
+            gap = (wr or 0) - top_rate
+            lines.extend([
+                f"🔵 우리금융 {wr:.2f}% · {data['woori_rank']}위 / {data['count']}개",
+                f"상품 : {product}",
+                f"최고 대비 : {gap:+.2f}%p" if gap >= 0 else f"최고 대비 : ▲{abs(gap):.2f}%p",
+                f"공시일 : {w.get('disclosure_date') or '미확인'}"
+            ])
+        else:
+            lines.append("🔵 우리금융 : 유효금리 미확인")
+        return lines
+
+    lines = [
+        "☀️ SBRate Morning Brief",
+        f"데이터 기준 : {telegram_read_update_time()} KST",
+        "",
+        "━━━━━━━━━━━━━━━━",
+        "📌 오늘의 핵심",
+        "━━━━━━━━━━━━━━━━",
+        f"시장 최고 : {dep_top_rate:.2f}%",
+        f"시장 평균 : {dep_avg:.2f}%",
+    ]
+
+    if dep["woori"]:
+        lines.extend([
+            f"우리금융 : {dep_woori_rate:.2f}% · {dep['woori_rank']}위 / {dep['count']}개",
+            f"대표상품 : {telegram_product_name(dep['woori'])}",
+            f"시장 최고 대비 : {dep_gap:+.2f}%p" if dep_gap is not None and dep_gap >= 0 else f"시장 최고 대비 : ▲{abs(dep_gap or 0):.2f}%p",
+        ])
+
+    lines.extend([
+        f"전일 변동 : 상승 {changes.get('up_count',0)} / 하락 {changes.get('down_count',0)}",
+        "",
+        "━━━━━━━━━━━━━━━━",
+        "🏦 정기예금 12개월 TOP3",
+        "━━━━━━━━━━━━━━━━",
+    ])
+
+    for idx, item in enumerate(dep["valid"][:3], start=1):
+        lines.append(
+            f"{idx}. {item.get('bank','-')} {safe_float(item.get('rate')) or 0:.2f}%"
         )
 
-    # Gemini 실패 시 데이터 기반 기본 브리핑.
-    return (
-        "🤖 SBRate 시장 브리핑\n\n"
-        + telegram_deposit_summary("12")
-        + "\n\n"
-        + telegram_pension_summary(
-            "isa",
-            "12"
-        )
-        + "\n\n"
-        + telegram_pension_summary(
-            "irp",
-            "12"
-        )
-    )
+    movement = (changes.get("up_all") or [])[:3] + (changes.get("down_all") or [])[:3]
+    lines.extend(["", "🔥 주요 변동"])
+    if movement:
+        for item in movement[:5]:
+            c = safe_float(item.get("change")) or 0
+            lines.append(
+                f"• {item.get('bank','-')} {safe_float(item.get('rate')) or 0:.2f}% · {telegram_change_text(c)}"
+            )
+    else:
+        lines.append("• 전일 대비 주요 금리 변동 없음")
+
+    lines.extend(["", *pension_lines("ISA", isa), "", *pension_lines("퇴직연금(IRP)", irp)])
+
+    # deterministic insight: no invented values
+    insight = []
+    if dep["woori"] and dep["woori_rank"]:
+        if dep["woori_rank"] <= 10:
+            insight.append(f"① 정기예금은 우리금융이 시장 {dep['woori_rank']}위로 상위권입니다.")
+        else:
+            insight.append(f"① 정기예금은 우리금융이 시장 {dep['woori_rank']}위로 상위권과 Gap 점검이 필요합니다.")
+    if isa["woori_rank"] == 1:
+        insight.append("② ISA는 우리금융이 시장 1위를 유지하고 있습니다.")
+    elif isa["woori_rank"]:
+        insight.append(f"② ISA는 우리금융이 시장 {isa['woori_rank']}위입니다.")
+    if irp["woori_rank"]:
+        insight.append(f"③ 퇴직연금(IRP)은 우리금융이 시장 {irp['woori_rank']}위입니다.")
+    if changes.get("up_count",0) or changes.get("down_count",0):
+        insight.append("④ 오늘은 금리 변동기관과 우리금융의 순위·Gap 변화를 우선 확인하세요.")
+
+    lines.extend([
+        "",
+        "━━━━━━━━━━━━━━━━",
+        "🤖 AI Morning Insight",
+        "━━━━━━━━━━━━━━━━",
+        *insight,
+        "",
+        "🌐 PC 대시보드",
+        SB_RATE_PUBLIC_URL,
+        "📱 모바일 대시보드",
+        SB_RATE_PUBLIC_URL + "/mobile",
+        "💬 상세조회 : @SBRateBot"
+    ])
+
+    # data anomaly guard
+    warnings = []
+    if dep["count"] < 50:
+        warnings.append(f"정기예금 유효기관 {dep['count']}개")
+    if isa["count"] < 5:
+        warnings.append(f"ISA 유효기관 {isa['count']}개")
+    if irp["count"] < 5:
+        warnings.append(f"IRP 유효기관 {irp['count']}개")
+    if warnings:
+        lines.insert(2, "⚠ 데이터 점검 필요 : " + " / ".join(warnings))
+
+    return "\n".join(lines)
 
 
 def telegram_category_label(category):

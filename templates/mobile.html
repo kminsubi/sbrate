@@ -36,7 +36,7 @@
       <div class="data-meta">
         <div class="data-meta-left">
           <span id="mobile-market-label">12개월 시장현황</span>
-          <button id="mobile-report-open" class="top-report-btn">보고서</button>
+          <button id="mobile-report-open" class="top-report-btn">AI 시장분석</button>
         </div>
         <div class="data-meta-right">
           <span class="mobile-time-line">
@@ -59,14 +59,18 @@
             <span id="hero-rank-pill" class="rank-pill">-위</span>
           </div>
 
-          <div class="hero-rate-row">
-            <div>
+          <div class="hero-main-grid">
+            <div class="hero-wibee-wrap" aria-hidden="true">
+              <img src="/static/images/wibee.png" alt="" class="hero-wibee" />
+            </div>
+            <div class="hero-rate-panel">
+              <span id="hero-woori-product" class="hero-product-name">대표상품 -</span>
               <span class="metric-label">우리금융 금리</span>
               <strong id="hero-woori-rate" class="hero-rate">-</strong>
-            </div>
-            <div class="hero-gap">
-              <span>시장 최고 대비</span>
-              <strong id="hero-gap-top">-</strong>
+              <div class="hero-gap">
+                <span>시장 최고 대비</span>
+                <strong id="hero-gap-top">-</strong>
+              </div>
             </div>
           </div>
 
@@ -191,7 +195,7 @@
 
         <article class="panel-card more-list">
           <button id="mobile-kakao-share" type="button">💬 카카오톡 공유</button>
-          <button id="mobile-error-report" type="button">🛠 오류 제보</button>
+          <button id="mobile-error-report" type="button">📣 제보하기</button>
           <a href="/" class="more-link">🖥 PC 대시보드 열기</a>
           <div class="version-row"><span>Mobile Version</span><strong>V1.6 Stable</strong></div>
         </article>
@@ -226,7 +230,7 @@
 
         <div class="modal-body report-body">
           <div id="mobile-report-content">
-            <div class="loading">보고서를 준비하고 있습니다.</div>
+            <div class="loading">AI 시장분석 보고서를 준비하고 있습니다.</div>
           </div>
         </div>
       </div>
@@ -237,7 +241,7 @@
         <div class="modal-head">
           <div>
             <span class="eyebrow">FEEDBACK</span>
-            <h3>오류 제보</h3>
+            <h3>📣 제보하기</h3>
           </div>
           <button id="mobile-error-close" class="icon-btn">×</button>
         </div>

@@ -137,10 +137,7 @@ function extractDataBasis(...payloads){
     ];
     for(const value of candidates){
       if(value){
-        const parsed = new Date(String(value).replace(/\./g,"-"));
-        if(!Number.isNaN(parsed.getTime())){
-          return {value:formatClockDateTime(parsed), kind:"데이터 업데이트 시간"};
-        }
+        // 서버가 Asia/Seoul 기준 문자열을 제공하므로 브라우저가 임의 timezone 변환하지 않도록 그대로 표시한다.
         return {value:String(value), kind:"데이터 업데이트 시간"};
       }
     }
@@ -516,6 +513,20 @@ function renderHero(data){
 
   $("hero-woori-rate").textContent =
     pct(data?.wr);
+
+  const heroProduct =
+    data?.woori?.product ||
+    data?.woori?.product_name ||
+    data?.woori?.fin_prdt_nm ||
+    "-";
+
+  const heroProductEl = $("hero-woori-product");
+  if(heroProductEl){
+    heroProductEl.textContent =
+      heroProduct === "-"
+        ? "대표상품 -"
+        : `대표상품 · ${heroProduct}`;
+  }
 
   $("hero-rank-pill").textContent =
     data?.rank
@@ -1216,60 +1227,49 @@ function initKakaoShare(){
 
 
 function buildKakaoShareText(){
-  const data =
-    MobileState.data[
-      MobileState.product
-    ];
+  const data = MobileState.data[MobileState.product];
+  const label = currentLabel();
+  const period = MobileState.period;
+  const wooriRate = displayRateOrDash(data?.wr);
+  const topRate = displayRateOrDash(data?.max);
+  const topBank = data?.ranked?.[0]
+    ? displayBankName(data.ranked[0].bank)
+    : "-";
+  const rankText = data?.rank
+    ? (data?.total ? `${data.rank}위 / ${data.total}개` : `${data.rank}위`)
+    : "-";
+  const wooriProduct = data?.woori?.product || data?.woori?.product_name || "-";
+  const topGap = number(data?.wr) !== null && number(data?.max) !== null
+    ? number(data.wr) - number(data.max)
+    : null;
+  const gapText = topGap === null
+    ? "-"
+    : topGap >= 0
+      ? `+${Math.abs(topGap).toFixed(2)}%p`
+      : `▲${Math.abs(topGap).toFixed(2)}%p`;
 
-  const label =
-    currentLabel();
-
-  const period =
-    MobileState.period;
-
-  const wooriRate =
-    displayRateOrDash(
-      data?.wr
-    );
-
-  const topRate =
-    displayRateOrDash(
-      data?.max
-    );
-
-  const topBank =
-    data?.ranked?.[0]
-      ? displayBankName(
-          data.ranked[0].bank
-        )
-      : "-";
-
-  const rankText =
-    data?.rank
-      ? (
-          data?.total
-            ? `${data.rank}위 / ${data.total}개 기관`
-            : `${data.rank}위`
-        )
-      : "-";
-
-  const basis =
-    mobileDataBasis();
-
-  return [
-    "📊 SBRate 금리 모니터링",
+  const lines = [
+    "☀️ SBRate 오늘의 수신시장 브리핑",
+    `데이터 기준 : ${mobileDataBasis()} KST`,
     "",
-    `${label} ${period}개월`,
-    `우리금융 : ${wooriRate}`,
+    `📌 ${label} ${period}개월`,
+    `우리금융 : ${wooriRate} · ${rankText}`,
+    `대표상품 : ${wooriProduct}`,
     `시장 최고 : ${topBank} ${topRate}`,
-    `시장 순위 : ${rankText}`,
-    "",
-    `데이터 업데이트 : ${basis}`,
-    "",
-    "최신 금리 현황은 모바일 대시보드에서 확인하세요."
-  ].join("\n");
-}
+    `최고 대비 : ${gapText}`,
+  ];
 
+  if(MobileState.product === "deposit"){
+    const c = data?.changes || {};
+    lines.push(`전일 변동 : 상승 ${c.up_count ?? 0} / 하락 ${c.down_count ?? 0}`);
+  }else{
+    const disclosure = data?.woori?.disclosure_date || "미확인";
+    lines.push(`우리금융 공시일 : ${disclosure}`);
+  }
+
+  lines.push("", `🤖 ${buildBrief(data)}`, "", "상세 현황은 모바일 대시보드에서 확인하세요.");
+  return lines.join("\n");
+}
 
 function mobileDashboardShareUrl(){
   return "https://sbrate.onrender.com/mobile";

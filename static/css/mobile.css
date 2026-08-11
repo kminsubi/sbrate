@@ -788,3 +788,13 @@ button{cursor:pointer}
     font-size:7.3px !important;
   }
 }
+
+/* Mobile hero brand composition */
+.hero-main-grid{display:grid;grid-template-columns:minmax(105px,.9fr) minmax(150px,1.1fr);gap:12px;align-items:end;margin-top:10px;min-height:118px}
+.hero-wibee-wrap{display:flex;align-items:flex-end;justify-content:center;height:116px;overflow:hidden}
+.hero-wibee{display:block;max-width:112px;max-height:112px;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(5,42,104,.20))}
+.hero-rate-panel{text-align:right;align-self:center}
+.hero-product-name{display:block;color:#d9eaff;font-size:10px;font-weight:700;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-rate-panel .metric-label{margin-bottom:2px}
+.hero-rate-panel .hero-gap{margin-top:7px}
+@media(max-width:380px){.hero-main-grid{grid-template-columns:96px 1fr}.hero-wibee{max-width:94px;max-height:100px}.hero-wibee-wrap{height:104px}}

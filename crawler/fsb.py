@@ -7,7 +7,7 @@ import requests
 import re
 import html as html_module
 
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 
 urllib3.disable_warnings(
@@ -963,7 +963,9 @@ try:
 
         "last_update":
 
-            datetime.now().strftime(
+            datetime.now(
+                timezone(timedelta(hours=9))
+            ).strftime(
                 "%Y-%m-%d %H:%M:%S"
             ),
 
@@ -973,7 +975,10 @@ try:
 
 
         "bank_count":
-            len(bank_list)
+            len(bank_list),
+
+        "timezone":
+            "Asia/Seoul"
 
     }
 

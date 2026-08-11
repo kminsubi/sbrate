@@ -1,6 +1,6 @@
 import json,re
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import requests,urllib3
 from bs4 import BeautifulSoup
 
@@ -38,7 +38,7 @@ def blank(bank,kind,cfg,status):
         "rates":{f"{p}m":None for p in periods},
         "status":status,
         "source_url":cfg.get("url"),
-        "updated_at":datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "updated_at":datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M:%S")
     }
 
 
@@ -2912,7 +2912,7 @@ def attach_disclosure_date(item):
 
     item["collected_at"]=(
         item.get("updated_at")
-        or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        or datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M:%S")
     )
 
     return item
