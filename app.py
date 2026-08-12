@@ -10648,6 +10648,43 @@ def telegram_brief():
     dep_woori_rate = safe_float((dep["woori"] or {}).get("rate")) or 0
     dep_gap = dep_woori_rate - dep_top_rate if dep["woori"] else None
 
+    # Previous-day comparison reconstructed from each bank's current rate/change.
+    # build_products() already normalizes change against previous_rates.json.
+    dep_prev_rows = []
+    for item in dep["valid"]:
+        current_rate = safe_float(item.get("rate"))
+        change_value = safe_float(item.get("change")) or 0
+        if current_rate is None:
+            continue
+        dep_prev_rows.append({
+            "bank": item.get("bank", "-"),
+            "rate": round(current_rate - change_value, 4)
+        })
+    dep_prev_rows.sort(key=lambda x: safe_float(x.get("rate")) or 0, reverse=True)
+    dep_prev_top_rate = safe_float(dep_prev_rows[0].get("rate")) if dep_prev_rows else None
+    dep_woori_change = safe_float((dep["woori"] or {}).get("change")) if dep["woori"] else None
+    dep_prev_woori_rate = (
+        dep_woori_rate - (dep_woori_change or 0)
+        if dep["woori"] else None
+    )
+    dep_prev_woori_rank = None
+    if dep["woori"] and dep_prev_rows:
+        target = normalize((dep["woori"] or {}).get("bank") or "")
+        for idx, row in enumerate(dep_prev_rows, start=1):
+            if normalize(row.get("bank") or "") == target:
+                dep_prev_woori_rank = idx
+                break
+    dep_prev_gap = (
+        dep_prev_woori_rate - dep_prev_top_rate
+        if dep_prev_woori_rate is not None and dep_prev_top_rate is not None
+        else None
+    )
+    dep_gap_change = (
+        dep_gap - dep_prev_gap
+        if dep_gap is not None and dep_prev_gap is not None
+        else None
+    )
+
     # rate changes
     changes = {"up_all": [], "down_all": [], "up_count": 0, "down_count": 0}
     try:
@@ -10691,10 +10728,28 @@ def telegram_brief():
     ]
 
     if dep["woori"]:
+        rank_change_text = "-"
+        if dep_prev_woori_rank is not None and dep["woori_rank"] is not None:
+            rank_delta = dep_prev_woori_rank - dep["woori_rank"]
+            if rank_delta > 0:
+                rank_change_text = f"+{rank_delta}계단 상승"
+            elif rank_delta < 0:
+                rank_change_text = f"▲{abs(rank_delta)}계단 하락"
+
+        gap_change_text = "-"
+        if dep_gap_change is not None:
+            # Gap is negative when below market top. Moving toward zero is improvement.
+            if dep_gap_change > 0.00001:
+                gap_change_text = f"+{abs(dep_gap_change):.2f}%p 개선"
+            elif dep_gap_change < -0.00001:
+                gap_change_text = f"▲{abs(dep_gap_change):.2f}%p 악화"
+
         lines.extend([
-            f"우리금융 : {dep_woori_rate:.2f}% · {dep['woori_rank']}위 / {dep['count']}개",
+            f"우리금융 : {dep_woori_rate:.2f}% · {telegram_change_text(dep_woori_change)}",
+            f"시장 순위 : {dep['woori_rank']}위 / {dep['count']}개 · {rank_change_text}",
             f"대표상품 : {telegram_product_name(dep['woori'])}",
             f"시장 최고 대비 : {dep_gap:+.2f}%p" if dep_gap is not None and dep_gap >= 0 else f"시장 최고 대비 : ▲{abs(dep_gap or 0):.2f}%p",
+            f"Gap 전일비 : {gap_change_text}",
         ])
 
     lines.extend([
@@ -11945,7 +12000,9 @@ def telegram_morning_brief():
                 "TELEGRAM_CHAT_ID(S) missing"
         }), 503
 
-    message = telegram_morning_brief_text()
+    # Scheduled Morning Brief must use the same detailed formatter as /brief.
+    # This prevents the legacy compact formatter from being sent by GitHub Actions.
+    message = telegram_brief()
 
     failed = []
 

@@ -798,3 +798,35 @@ button{cursor:pointer}
 .hero-rate-panel .metric-label{margin-bottom:2px}
 .hero-rate-panel .hero-gap{margin-top:7px}
 @media(max-width:380px){.hero-main-grid{grid-template-columns:96px 1fr}.hero-wibee{max-width:94px;max-height:100px}.hero-wibee-wrap{height:104px}}
+
+/* 2026-08-12 compact hero correction
+   Keep the original compact card height while making Wibee visually prominent. */
+.hero-card{padding:16px 18px}
+.hero-main-grid{
+  grid-template-columns:minmax(118px,.92fr) minmax(150px,1.08fr);
+  gap:8px;
+  align-items:end;
+  margin-top:4px;
+  min-height:96px;
+}
+.hero-wibee-wrap{
+  height:96px;
+  overflow:visible;
+  align-items:flex-end;
+}
+.hero-wibee{
+  width:138px;
+  max-width:138px;
+  max-height:122px;
+  transform:scale(1.18);
+  transform-origin:center bottom;
+}
+.hero-rate-panel{align-self:center}
+.hero-product-name{margin-bottom:4px}
+.hero-rate-panel .hero-gap{margin-top:4px}
+.hero-card .ai-brief{margin-top:10px;padding-top:10px}
+@media(max-width:380px){
+  .hero-main-grid{grid-template-columns:108px 1fr;min-height:92px}
+  .hero-wibee-wrap{height:92px}
+  .hero-wibee{width:124px;max-width:124px;max-height:112px;transform:scale(1.16)}
+}
