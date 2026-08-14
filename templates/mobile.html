@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f4db8" />
   <title>SBRateBot Mobile</title>
-  <link rel="stylesheet" href="/static/css/mobile.css" />
-  <link rel="stylesheet" href="/static/css/v512-mobile.css" />
+  <link rel="stylesheet" href="/static/css/mobile.css?v=20260815" />
+  <link rel="stylesheet" href="/static/css/v512-mobile.css?v=20260815" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Kakao JavaScript SDK -->
   <script
@@ -41,7 +41,7 @@
         </div>
         <div class="data-meta-right">
           <span class="mobile-time-line">
-            <span class="mobile-update-label">데이터 업데이트 00:30</span>
+            <span class="mobile-update-label">데이터 업데이트 기준 00:30</span>
             <span class="mobile-time-divider">·</span>
             <span id="mobile-live-clock">현재 --:--:--</span>
           </span>
@@ -62,7 +62,7 @@
 
           <div class="hero-main-grid">
             <div class="hero-wibee-wrap" aria-hidden="true">
-              <img src="/static/images/wibee.png" alt="" class="hero-wibee" />
+              <img src="/static/images/wibee_v512.png?v=20260815" alt="" class="hero-wibee" />
             </div>
             <div class="hero-rate-panel">
               <span id="hero-woori-product" class="hero-product-name">대표상품 -</span>
@@ -196,7 +196,7 @@
 
         <article class="panel-card more-list">
           <button id="mobile-kakao-share" type="button">💬 카카오톡 공유</button>
-          <button id="mobile-error-report" type="button">📣 제보하기</button>
+          <button id="mobile-error-report" type="button">📣 오류 제보하기</button>
           <a href="/" class="more-link">🖥 PC 대시보드 열기</a>
           <div class="version-row"><span>Mobile Version</span><strong>V1.7</strong></div>
         </article>
@@ -219,7 +219,7 @@
           <div>
             <span class="eyebrow">AI REPORT</span>
             <h3 id="mobile-report-title">AI 보고서</h3>
-            <small id="mobile-report-basis" class="modal-basis">데이터 기준 -</small>
+            <small id="mobile-report-basis" class="modal-basis">데이터 업데이트 기준 -</small>
           </div>
           <button id="mobile-report-close" class="icon-btn">×</button>
         </div>
@@ -241,7 +241,7 @@
         <div class="modal-head">
           <div>
             <span class="eyebrow">FEEDBACK</span>
-            <h3>📣 제보하기</h3>
+            <h3>📣 오류 제보하기</h3>
           </div>
           <button id="mobile-error-close" class="icon-btn">×</button>
         </div>
@@ -254,12 +254,12 @@
             <option>기타</option>
           </select>
           <textarea id="mobile-error-message" rows="5" placeholder="오류 내용을 입력해주세요."></textarea>
-          <button id="mobile-error-submit" class="primary-btn full-btn">제보 등록</button>
+          <button id="mobile-error-submit" class="primary-btn full-btn">오류 제보 등록</button>
         </div>
       </div>
     </div>
 
   </div>
-  <script src="/static/js/mobile.js"></script>
+  <script src="/static/js/mobile.js?v=20260815"></script>
 </body>
 </html>

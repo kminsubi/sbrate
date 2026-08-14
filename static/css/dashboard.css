@@ -1138,3 +1138,31 @@ img[src$="/static/images/wibee.png"]{
   #market-product-tabs{margin-right:300px !important;}
   #market-product-tabs::after{font-size:9px;padding:4px 8px;}
 }
+
+
+/* =====================================================
+   SBRate V5.12 FINAL REGRESSION GUARD 2026-08-15
+===================================================== */
+
+/* Inline JS owns AI panel height. Do not override it with auto/max viewport. */
+#ai-analysis-center{
+  min-height:320px !important;
+  overflow:hidden !important;
+  contain:layout paint;
+}
+#ai-center-content{
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+/* Same Wibee asset on PC and mobile, with a calm micro-motion. */
+img[src*="wibee_v512.png"]{
+  filter:drop-shadow(0 9px 15px rgba(4,43,107,.16)) !important;
+  animation:sb-wibee-pc-final 4.4s ease-in-out infinite !important;
+  will-change:transform;
+}
+@keyframes sb-wibee-pc-final{
+  0%,100%{transform:translate3d(-18px,2px,0) rotate(-.3deg) scale(1)}
+  50%{transform:translate3d(-18px,-5px,0) rotate(.55deg) scale(1.012)}
+}

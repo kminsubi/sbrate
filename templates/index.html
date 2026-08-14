@@ -8,8 +8,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<link rel="stylesheet" href="/static/css/dashboard.css">
-<script defer src="/static/js/dashboard.js"></script>
+<link rel="stylesheet" href="/static/css/dashboard.css?v=20260815">
+<script defer src="/static/js/dashboard.js?v=20260815"></script>
 
 
 <style>
@@ -418,11 +418,11 @@
 
       <button id="error-report-open" type="button"
         class="inline-flex items-center gap-1 border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap">
-        📣 제보하기
+        📣 오류 제보하기
       </button>
 
       <div class="flex items-center gap-1.5 whitespace-nowrap">
-        <span>⏱️ 데이터 기준</span>
+        <span>⏱️ 데이터 업데이트 기준</span>
         <span id="header-data-update-time" class="font-semibold text-gray-700 whitespace-nowrap">-</span>
         <span id="header-data-status" class="hidden px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap">-</span>
         <button id="header-refresh-btn" type="button" title="데이터 새로고침" class="hover:rotate-180 transition-transform duration-300 ml-1">🔄</button>
@@ -897,7 +897,7 @@ class="text-xs text-gray-600 leading-5">
         <!-- 위비 캐릭터 : 존재감 유지 + 좌측 여백 확보 -->
         <div class="w-[35%] flex items-center justify-start overflow-visible self-stretch pl-1">
           <img
-            src="/static/images/wibee.png"
+            src="/static/images/wibee_v512.png?v=20260815"
             alt="위비 캐릭터"
             class="w-[180px] max-w-none h-[300px] object-contain object-center -translate-x-[25px] translate-y-[2px]"
           />
@@ -1510,17 +1510,23 @@ class="text-xs text-gray-600 leading-5">
         const targetHeight =
             Math.max(
                 320,
-                productRect.bottom - heroRect.top
+                productRect.top - heroRect.top
             );
 
         aside.style.marginTop =
             `${topOffset}px`;
 
-        aside.style.height =
-            `${targetHeight}px`;
+        aside.style.setProperty(
+            "height",
+            `${targetHeight}px`,
+            "important"
+        );
 
-        aside.style.maxHeight =
-            `${targetHeight}px`;
+        aside.style.setProperty(
+            "max-height",
+            `${targetHeight}px`,
+            "important"
+        );
 
     }
 
@@ -1598,7 +1604,7 @@ class="text-xs text-gray-600 leading-5">
     <div class="modal-drag-handle flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-white to-blue-50 cursor-move select-none" title="이 영역을 드래그해 창을 이동할 수 있습니다.">
       <div>
         <div class="text-[10px] tracking-[0.12em] text-blue-500 font-semibold">SBRateBot FEEDBACK</div>
-        <div class="font-bold text-gray-900 mt-0.5">제보센터</div>
+        <div class="font-bold text-gray-900 mt-0.5">오류 제보센터</div>
       </div>
       <button id="error-report-close" type="button" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
     </div>
@@ -1636,7 +1642,7 @@ class="text-xs text-gray-600 leading-5">
 
       <div class="flex justify-end gap-2">
         <button id="error-report-cancel" type="button" class="px-4 py-2 rounded-lg border border-gray-200 text-xs text-gray-600">취소</button>
-        <button type="submit" class="px-4 py-2 rounded-lg bg-[#1a58c8] text-white text-xs font-semibold">제보 등록</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-[#1a58c8] text-white text-xs font-semibold">오류 제보 등록</button>
       </div>
     </form>
   </div>

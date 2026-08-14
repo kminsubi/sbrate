@@ -1248,11 +1248,14 @@ function buildKakaoShareText(){
       ? `+${Math.abs(topGap).toFixed(2)}%p`
       : `▲${Math.abs(topGap).toFixed(2)}%p`;
 
+  const divider = "━━━━━━━━━━━━";
   const lines = [
-    "☀️ SBRate 오늘의 수신시장 브리핑",
-    `데이터 기준 : ${mobileDataBasis()} KST`,
+    "☀️ SBRate Morning Brief",
+    `데이터 업데이트 기준 : ${mobileDataBasis()} KST`,
     "",
+    divider,
     `📌 ${label} ${period}개월`,
+    divider,
     `우리금융 : ${wooriRate} · ${rankText}`,
     `대표상품 : ${wooriProduct}`,
     `시장 최고 : ${topBank} ${topRate}`,
@@ -1597,7 +1600,7 @@ function buildMobileExecutiveReport(data,aiText=""){
       <div class="mr-header">
         <div class="mr-header-top">
           <div class="eyebrow" style="color:#d7e7ff">EXECUTIVE INTELLIGENCE</div>
-          <h4>SBRateBot ${currentLabel()} AI Market Analysis Report</h4>
+          <h4>SBRateBot ${currentLabel()} AI 보고서</h4>
           <div class="mr-header-meta">
             ${currentLabel()} ${MobileState.period}개월 · 데이터 업데이트 시간 ${basis}
           </div>
