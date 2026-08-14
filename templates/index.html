@@ -8,8 +8,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<link rel="stylesheet" href="/static/css/dashboard.css?v=20260815">
-<script defer src="/static/js/dashboard.js?v=20260815"></script>
+<link rel="stylesheet" href="/static/css/dashboard.css?v=20260815v513">
+<script defer src="/static/js/dashboard.js?v=20260815v513"></script>
 
 
 <style>
@@ -897,7 +897,7 @@ class="text-xs text-gray-600 leading-5">
         <!-- 위비 캐릭터 : 존재감 유지 + 좌측 여백 확보 -->
         <div class="w-[35%] flex items-center justify-start overflow-visible self-stretch pl-1">
           <img
-            src="/static/images/wibee_v512.png?v=20260815"
+            src="/static/images/wibee.png?v=20260815v513"
             alt="위비 캐릭터"
             class="w-[180px] max-w-none h-[300px] object-contain object-center -translate-x-[25px] translate-y-[2px]"
           />
@@ -1150,7 +1150,7 @@ class="text-xs text-gray-600 leading-5">
 
       <div class="grid grid-cols-2 gap-2 border-t pt-3 mt-auto">
         <button type="button" id="ai-side-detail-btn" class="bg-blue-50 border border-blue-100 text-blue-700 py-2 rounded-lg text-[11px] font-semibold hover:bg-blue-100">📊 상세 분석</button>
-        <button type="button" id="ai-report-btn" class="bg-[#1a58c8] text-white py-2 rounded-lg text-[11px] font-semibold hover:bg-blue-700">📊 AI 시장분석</button>
+        <button type="button" id="ai-report-btn" class="bg-[#1a58c8] text-white py-2 rounded-lg text-[11px] font-semibold hover:bg-blue-700">📊 AI 보고서</button>
       </div>
     </aside>
 
@@ -1253,9 +1253,9 @@ class="text-xs text-gray-600 leading-5">
     <div class="bg-white w-full max-w-[760px] max-h-[88vh] rounded-2xl shadow-2xl border border-blue-100 overflow-hidden">
       <div class="modal-drag-handle flex justify-between items-center px-5 py-3 border-b border-gray-100 cursor-move select-none">
         <div>
-          <h3 class="text-sm font-bold text-gray-900">📊 AI 시장분석 보고서</h3>
+          <h3 class="text-sm font-bold text-gray-900">📊 AI 보고서</h3>
           <span class="text-[10px] text-blue-600">정기예금 시장 · 금융지주 저축은행 · 변동현황 종합</span>
-          <div id="ai-report-data-basis" class="text-[10px] text-gray-400 mt-0.5">데이터 기준 -</div>
+          <div id="ai-report-data-basis" class="text-[10px] text-gray-400 mt-0.5">데이터 업데이트 기준 -</div>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" id="ai-report-print" class="px-3 py-1.5 rounded-lg border border-gray-200 text-[11px] text-gray-600 hover:bg-gray-50">🖨 출력</button>
@@ -1264,7 +1264,7 @@ class="text-xs text-gray-600 leading-5">
         </div>
       </div>
       <div id="ai-report-content" class="px-5 py-4 text-[12px] text-gray-700 leading-[1.45] overflow-y-auto max-h-[calc(90vh-72px)]">
-        AI 시장분석 보고서를 준비하고 있습니다.
+        AI 보고서를 준비하고 있습니다.
       </div>
     </div>
   </div>
