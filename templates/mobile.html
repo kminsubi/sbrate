@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0f4db8" />
   <title>SBRateBot Mobile</title>
   <link rel="stylesheet" href="/static/css/mobile.css" />
+  <link rel="stylesheet" href="/static/css/v512-mobile.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Kakao JavaScript SDK -->
   <script
@@ -36,7 +37,7 @@
       <div class="data-meta">
         <div class="data-meta-left">
           <span id="mobile-market-label">12개월 시장현황</span>
-          <button id="mobile-report-open" class="top-report-btn">AI 시장분석</button>
+          <button id="mobile-report-open" class="top-report-btn">AI 보고서</button>
         </div>
         <div class="data-meta-right">
           <span class="mobile-time-line">
@@ -197,7 +198,7 @@
           <button id="mobile-kakao-share" type="button">💬 카카오톡 공유</button>
           <button id="mobile-error-report" type="button">📣 제보하기</button>
           <a href="/" class="more-link">🖥 PC 대시보드 열기</a>
-          <div class="version-row"><span>Mobile Version</span><strong>V1.6 Stable</strong></div>
+          <div class="version-row"><span>Mobile Version</span><strong>V1.7</strong></div>
         </article>
       </section>
     </main>
@@ -212,13 +213,12 @@
 
     <div id="mobile-toast" class="toast"></div>
 
-
     <div id="mobile-report-modal" class="modal-backdrop hidden">
       <div class="mobile-modal report-modal">
         <div class="modal-head">
           <div>
-            <span class="eyebrow">EXECUTIVE REPORT</span>
-            <h3 id="mobile-report-title">AI 시장분석 보고서</h3>
+            <span class="eyebrow">AI REPORT</span>
+            <h3 id="mobile-report-title">AI 보고서</h3>
             <small id="mobile-report-basis" class="modal-basis">데이터 기준 -</small>
           </div>
           <button id="mobile-report-close" class="icon-btn">×</button>
@@ -230,7 +230,7 @@
 
         <div class="modal-body report-body">
           <div id="mobile-report-content">
-            <div class="loading">AI 시장분석 보고서를 준비하고 있습니다.</div>
+            <div class="loading">AI 보고서를 준비하고 있습니다.</div>
           </div>
         </div>
       </div>
