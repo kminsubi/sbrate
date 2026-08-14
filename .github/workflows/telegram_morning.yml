@@ -28,12 +28,11 @@ jobs:
               ;;
           esac
 
-          # Lunar New Year / Chuseok / substitute-election holidays.
-          # Keep this compact list current when a new year's calendar is confirmed.
+          # 2026 lunar/substitute holidays and statutory election day.
           case "$KST_DATE" in
-            2026-02-16|2026-02-17|2026-02-18|2026-03-02|2026-05-25|2026-08-17|2026-09-24|2026-09-25|2026-09-28|2026-10-05)
+            2026-02-16|2026-02-17|2026-02-18|2026-03-02|2026-05-25|2026-06-03|2026-08-17|2026-09-24|2026-09-25|2026-09-28|2026-10-05)
               echo "run=false" >> "$GITHUB_OUTPUT"
-              echo "Korean public/substitute holiday: $KST_DATE"
+              echo "Korean public/substitute/election holiday: $KST_DATE"
               exit 0
               ;;
           esac
