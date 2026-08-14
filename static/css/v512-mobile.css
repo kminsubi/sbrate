@@ -1,0 +1,115 @@
+/* SBRate V5.12 mobile polish */
+
+/* Header meta: keep market context + source visible without growing header */
+.data-meta-left::after{
+  content:"";
+  display:inline-flex;
+  align-items:center;
+  margin-left:2px;
+  color:#8a96a7;
+  font-size:7.7px;
+  line-height:1.2;
+  white-space:nowrap;
+}
+#mobile-product-tabs:has(.product-tab.is-active[data-product="deposit"]) + .data-meta .data-meta-left::after{
+  content:"[출처 : 저축은행중앙회 비교공시]";
+}
+#mobile-product-tabs:has(.product-tab.is-active[data-product="isa"]) + .data-meta .data-meta-left::after,
+#mobile-product-tabs:has(.product-tab.is-active[data-product="irp"]) + .data-meta .data-meta-left::after{
+  content:"[출처 : 각 저축은행 공식 홈페이지]";
+}
+
+/* Hero: compact card, balanced 40/60 visual composition */
+.hero-card{
+  padding:15px 17px 14px !important;
+  border-radius:20px !important;
+  box-shadow:0 14px 32px rgba(15,76,174,.16) !important;
+}
+.hero-top{align-items:center !important;}
+.hero-main-grid{
+  display:grid !important;
+  grid-template-columns:minmax(0,42%) minmax(0,58%) !important;
+  gap:4px !important;
+  align-items:center !important;
+  margin-top:2px !important;
+  min-height:108px !important;
+}
+.hero-wibee-wrap{
+  height:108px !important;
+  min-width:0 !important;
+  overflow:visible !important;
+  display:flex !important;
+  justify-content:flex-start !important;
+  align-items:flex-end !important;
+  padding-left:1px !important;
+}
+.hero-wibee{
+  width:min(154px,42vw) !important;
+  max-width:none !important;
+  max-height:128px !important;
+  height:auto !important;
+  object-fit:contain !important;
+  transform:none !important;
+  transform-origin:center bottom !important;
+  filter:drop-shadow(0 8px 14px rgba(4,43,107,.18)) !important;
+  animation:sb-wibee-float 4.8s ease-in-out infinite !important;
+  will-change:transform;
+}
+.hero-rate-panel{
+  min-width:0 !important;
+  align-self:center !important;
+  text-align:right !important;
+  padding-left:4px !important;
+}
+.hero-product-name{
+  margin-bottom:3px !important;
+  color:#dcecff !important;
+  font-size:9.7px !important;
+  letter-spacing:-.01em;
+}
+.hero-rate{font-size:33px !important;}
+.hero-rate-panel .hero-gap{margin-top:4px !important;}
+.hero-card .ai-brief{
+  margin-top:7px !important;
+  padding-top:9px !important;
+  line-height:1.48 !important;
+}
+
+@keyframes sb-wibee-float{
+  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
+  50%{transform:translate3d(0,-4px,0) rotate(-.8deg)}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-wibee{animation:none !important;}
+}
+
+/* Professional card rhythm */
+.kpi-card,.panel-card{
+  border-color:#e6edf6 !important;
+  box-shadow:0 6px 22px rgba(23,32,51,.035) !important;
+}
+.kpi-card strong{letter-spacing:-.035em;}
+.section-heading h2{letter-spacing:-.035em;}
+
+/* Consistent movement semantics: up=blue +, down=red ▲, flat=gray */
+.change-up,.positive{color:#1556c0 !important;}
+.change-down,.negative{color:#e15151 !important;}
+.change-flat,.neutral{color:#7c8797 !important;}
+
+@media(max-width:380px){
+  .hero-card{padding:14px 15px 13px !important;}
+  .hero-main-grid{
+    grid-template-columns:minmax(0,40%) minmax(0,60%) !important;
+    min-height:100px !important;
+    gap:2px !important;
+  }
+  .hero-wibee-wrap{height:100px !important;}
+  .hero-wibee{width:min(138px,40vw) !important;max-height:116px !important;}
+  .hero-rate{font-size:31px !important;}
+  .data-meta-left::after{font-size:7px;}
+}
+
+@media(min-width:430px){
+  .hero-main-grid{grid-template-columns:40% 60% !important;}
+  .hero-wibee{width:160px !important;}
+}
