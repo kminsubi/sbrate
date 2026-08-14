@@ -1,6 +1,6 @@
-/* SBRate V5.12 mobile polish - authoritative override */
+/* SBRate V5.12 mobile final polish - 2026-08-15 */
 
-/* Header meta: keep market context + source visible without growing header */
+/* Header context */
 .data-meta-left::after{
   content:"";
   display:inline-flex;
@@ -19,33 +19,30 @@
   content:"[출처 : 각 저축은행 공식 홈페이지]";
 }
 
-/* Compact Hero: reduce overall height and close the center gap */
+/* Compact hero: preserve original card rhythm, reduce vertical bulk */
 .hero-card{
-  padding:12px 15px 11px !important;
+  padding:12px 14px 11px !important;
   border-radius:20px !important;
   box-shadow:0 12px 28px rgba(15,76,174,.15) !important;
 }
 .hero-top{
   align-items:center !important;
-  margin-bottom:0 !important;
+  min-height:34px !important;
 }
 .hero-card h1{
-  margin-top:2px !important;
+  margin-top:1px !important;
   font-size:14px !important;
-}
-.rank-pill{
-  padding:5px 9px !important;
 }
 .hero-main-grid{
   display:grid !important;
-  grid-template-columns:minmax(0,41%) minmax(0,59%) !important;
-  gap:0 !important;
+  grid-template-columns:minmax(0,43%) minmax(0,57%) !important;
+  gap:2px !important;
   align-items:center !important;
   margin-top:0 !important;
-  min-height:90px !important;
+  min-height:88px !important;
 }
 .hero-wibee-wrap{
-  height:90px !important;
+  height:88px !important;
   min-width:0 !important;
   overflow:visible !important;
   display:flex !important;
@@ -54,22 +51,21 @@
   padding:0 !important;
 }
 .hero-wibee{
-  width:min(138px,39vw) !important;
+  width:min(132px,38vw) !important;
   max-width:none !important;
-  max-height:112px !important;
+  max-height:108px !important;
   height:auto !important;
   object-fit:contain !important;
   transform-origin:center bottom !important;
-  filter:drop-shadow(0 7px 12px rgba(4,43,107,.18)) !important;
-  animation:sb-wibee-float-v512 3.4s ease-in-out infinite !important;
-  animation-play-state:running !important;
+  filter:drop-shadow(0 7px 11px rgba(4,43,107,.18)) !important;
+  animation:sb-wibee-float-final 3.8s ease-in-out infinite !important;
   will-change:transform;
 }
 .hero-rate-panel{
   min-width:0 !important;
   align-self:center !important;
   text-align:right !important;
-  padding-left:0 !important;
+  padding-left:1px !important;
 }
 .hero-product-name{
   margin-bottom:2px !important;
@@ -78,29 +74,25 @@
   letter-spacing:-.01em;
 }
 .hero-rate-panel .metric-label{
-  margin-bottom:0 !important;
+  margin-bottom:1px !important;
 }
 .hero-rate{
-  font-size:32px !important;
+  font-size:31px !important;
   line-height:1 !important;
 }
 .hero-rate-panel .hero-gap{
   margin-top:3px !important;
 }
 .hero-card .ai-brief{
-  margin-top:5px !important;
+  margin-top:6px !important;
   padding-top:7px !important;
-  font-size:10.3px !important;
-  line-height:1.42 !important;
+  line-height:1.43 !important;
+  font-size:10.5px !important;
 }
 
-/* Clearly visible but restrained micro-motion */
-@keyframes sb-wibee-float-v512{
-  0%,100%{transform:translate3d(0,1px,0) rotate(-.6deg) scale(1)}
-  50%{transform:translate3d(0,-7px,0) rotate(.7deg) scale(1.015)}
-}
-@media (prefers-reduced-motion:reduce){
-  .hero-wibee{animation:none !important;}
+@keyframes sb-wibee-float-final{
+  0%,100%{transform:translate3d(0,1px,0) rotate(-.4deg) scale(1)}
+  50%{transform:translate3d(0,-7px,0) rotate(.7deg) scale(1.018)}
 }
 
 /* Professional card rhythm */
@@ -117,19 +109,20 @@
 .change-flat,.neutral{color:#7c8797 !important;}
 
 @media(max-width:380px){
-  .hero-card{padding:11px 14px 10px !important;}
+  .hero-card{padding:11px 13px 10px !important;}
   .hero-main-grid{
-    grid-template-columns:minmax(0,39%) minmax(0,61%) !important;
-    min-height:84px !important;
+    grid-template-columns:minmax(0,41%) minmax(0,59%) !important;
+    min-height:82px !important;
+    gap:1px !important;
   }
-  .hero-wibee-wrap{height:84px !important;}
-  .hero-wibee{width:min(124px,36vw) !important;max-height:103px !important;}
-  .hero-rate{font-size:30px !important;}
+  .hero-wibee-wrap{height:82px !important;}
+  .hero-wibee{width:min(118px,36vw) !important;max-height:99px !important;}
+  .hero-rate{font-size:29px !important;}
+  .hero-product-name{font-size:9px !important;}
   .data-meta-left::after{font-size:7px;}
 }
 
 @media(min-width:430px){
-  .hero-main-grid{grid-template-columns:40% 60% !important;min-height:94px !important;}
-  .hero-wibee-wrap{height:94px !important;}
-  .hero-wibee{width:144px !important;max-height:116px !important;}
+  .hero-main-grid{grid-template-columns:42% 58% !important;}
+  .hero-wibee{width:138px !important;max-height:112px !important;}
 }
