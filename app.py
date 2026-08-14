@@ -10718,11 +10718,11 @@ def telegram_brief():
 
     lines = [
         "☀️ SBRate Morning Brief",
-        f"데이터 기준 : {telegram_read_update_time()} KST",
+        f"데이터 업데이트 기준 : {telegram_read_update_time()} KST",
         "",
-        "━━━━━━━━━━━━━━━━",
+        "━━━━━━━━━━━━",
         "📌 오늘의 핵심",
-        "━━━━━━━━━━━━━━━━",
+        "━━━━━━━━━━━━",
         f"시장 최고 : {dep_top_rate:.2f}%",
         f"시장 평균 : {dep_avg:.2f}%",
     ]
@@ -10755,9 +10755,9 @@ def telegram_brief():
     lines.extend([
         f"전일 변동 : 상승 {changes.get('up_count',0)} / 하락 {changes.get('down_count',0)}",
         "",
-        "━━━━━━━━━━━━━━━━",
+        "━━━━━━━━━━━━",
         "🏦 정기예금 12개월 TOP3",
-        "━━━━━━━━━━━━━━━━",
+        "━━━━━━━━━━━━",
     ])
 
     for idx, item in enumerate(dep["valid"][:3], start=1):
@@ -10796,9 +10796,9 @@ def telegram_brief():
 
     lines.extend([
         "",
-        "━━━━━━━━━━━━━━━━",
+        "━━━━━━━━━━━━",
         "🤖 AI Morning Insight",
-        "━━━━━━━━━━━━━━━━",
+        "━━━━━━━━━━━━",
         *insight,
         "",
         "🌐 PC 대시보드",
@@ -11073,7 +11073,7 @@ def telegram_main_menu():
                     "callback_data": "ai_help"
                 },
                 {
-                    "text": "📣 제보하기",
+                    "text": "📣 오류 제보하기",
                     "callback_data": "error_report"
                 }
             ],
@@ -12050,7 +12050,7 @@ def telegram_morning_brief_text():
     lines = [
         "☀️ SBRate Morning Brief",
         "",
-        f"데이터 업데이트 : {telegram_read_update_time()}",
+        f"데이터 업데이트 기준 : {telegram_read_update_time()}",
         "",
         "📊 정기예금 12개월 변동",
         f"상승 {len(up_items)}건 / 하락 {len(down_items)}건"
