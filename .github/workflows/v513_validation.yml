@@ -1,0 +1,95 @@
+name: SBRate V5.13 Validation
+
+on:
+  push:
+    branches:
+      - agent/v513-professional-polish
+    paths:
+      - .github/workflows/v513_validation.yml
+  workflow_dispatch:
+
+jobs:
+  browser-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v513-professional-polish
+
+      - name: Prepare headless browser
+        shell: bash
+        run: |
+          set -e
+          CHROME_BIN=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium not found"
+            exit 1
+          fi
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
+          google-chrome --version || "$CHROME_BIN" --version
+          npm install --no-save puppeteer-core@24
+
+      - name: Serve dashboard static shell
+        shell: bash
+        run: |
+          rm -rf .layout-test
+          mkdir -p .layout-test
+          cp templates/index.html .layout-test/index.html
+          cp templates/mobile.html .layout-test/mobile.html
+          cp -R static .layout-test/static
+          python -m http.server 8123 --directory .layout-test >/tmp/sbrate-layout-http.log 2>&1 &
+          echo $! > /tmp/sbrate-layout-http.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:8123/index.html >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/sbrate-layout-http.log
+          exit 1
+
+      - name: Validate PC and mobile layouts
+        run: node .github/v513_layout_validate.js
+
+  collector-live-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v513-professional-polish
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install collector dependencies including Selenium
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests urllib3 beautifulsoup4 selenium
+
+      - name: Run current ISA IRP collector against official sources
+        run: python crawler/pension_rates.py
+
+      - name: Summarize 12M results and anomalies
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          for filename in ("data/isa_rates.json", "data/irp_rates.json"):
+              rows=json.loads(Path(filename).read_text(encoding="utf-8"))
+              valid=[]
+              issues=[]
+              for row in rows:
+                  rate=(row.get("rates") or {}).get("12m")
+                  if isinstance(rate,(int,float)) and rate>0:
+                      valid.append((rate,row.get("bank"),row.get("product"),row.get("disclosure_date"),row.get("status")))
+                  if row.get("status") in ("fetch_or_parse_error","research_pending","parser_pending"):
+                      issues.append((row.get("bank"),row.get("status"),row.get("error"),row.get("note")))
+              valid.sort(reverse=True)
+              print("\n===",filename,"12M TOP ===")
+              for item in valid[:10]: print(item)
+              print("=== ISSUES ===")
+              for item in issues: print(item)
+          PY
