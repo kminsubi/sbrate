@@ -1,4 +1,4 @@
-/* SBRate V5.12 mobile polish */
+/* SBRate V5.12 mobile polish - authoritative override */
 
 /* Header meta: keep market context + source visible without growing header */
 .data-meta-left::after{
@@ -19,65 +19,85 @@
   content:"[출처 : 각 저축은행 공식 홈페이지]";
 }
 
-/* Hero: compact card, balanced 40/60 visual composition */
+/* Compact Hero: reduce overall height and close the center gap */
 .hero-card{
-  padding:15px 17px 14px !important;
+  padding:12px 15px 11px !important;
   border-radius:20px !important;
-  box-shadow:0 14px 32px rgba(15,76,174,.16) !important;
+  box-shadow:0 12px 28px rgba(15,76,174,.15) !important;
 }
-.hero-top{align-items:center !important;}
+.hero-top{
+  align-items:center !important;
+  margin-bottom:0 !important;
+}
+.hero-card h1{
+  margin-top:2px !important;
+  font-size:14px !important;
+}
+.rank-pill{
+  padding:5px 9px !important;
+}
 .hero-main-grid{
   display:grid !important;
-  grid-template-columns:minmax(0,42%) minmax(0,58%) !important;
-  gap:4px !important;
+  grid-template-columns:minmax(0,41%) minmax(0,59%) !important;
+  gap:0 !important;
   align-items:center !important;
-  margin-top:2px !important;
-  min-height:108px !important;
+  margin-top:0 !important;
+  min-height:90px !important;
 }
 .hero-wibee-wrap{
-  height:108px !important;
+  height:90px !important;
   min-width:0 !important;
   overflow:visible !important;
   display:flex !important;
-  justify-content:flex-start !important;
+  justify-content:center !important;
   align-items:flex-end !important;
-  padding-left:1px !important;
+  padding:0 !important;
 }
 .hero-wibee{
-  width:min(154px,42vw) !important;
+  width:min(138px,39vw) !important;
   max-width:none !important;
-  max-height:128px !important;
+  max-height:112px !important;
   height:auto !important;
   object-fit:contain !important;
-  transform:none !important;
   transform-origin:center bottom !important;
-  filter:drop-shadow(0 8px 14px rgba(4,43,107,.18)) !important;
-  animation:sb-wibee-float 4.8s ease-in-out infinite !important;
+  filter:drop-shadow(0 7px 12px rgba(4,43,107,.18)) !important;
+  animation:sb-wibee-float-v512 3.4s ease-in-out infinite !important;
+  animation-play-state:running !important;
   will-change:transform;
 }
 .hero-rate-panel{
   min-width:0 !important;
   align-self:center !important;
   text-align:right !important;
-  padding-left:4px !important;
+  padding-left:0 !important;
 }
 .hero-product-name{
-  margin-bottom:3px !important;
+  margin-bottom:2px !important;
   color:#dcecff !important;
-  font-size:9.7px !important;
+  font-size:9.5px !important;
   letter-spacing:-.01em;
 }
-.hero-rate{font-size:33px !important;}
-.hero-rate-panel .hero-gap{margin-top:4px !important;}
+.hero-rate-panel .metric-label{
+  margin-bottom:0 !important;
+}
+.hero-rate{
+  font-size:32px !important;
+  line-height:1 !important;
+}
+.hero-rate-panel .hero-gap{
+  margin-top:3px !important;
+}
 .hero-card .ai-brief{
-  margin-top:7px !important;
-  padding-top:9px !important;
-  line-height:1.48 !important;
+  margin-top:5px !important;
+  padding-top:7px !important;
+  font-size:10.3px !important;
+  line-height:1.42 !important;
 }
 
-@keyframes sb-wibee-float{
-  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
-  50%{transform:translate3d(0,-4px,0) rotate(-.8deg)}
+/* Clearly visible but restrained micro-motion */
+@keyframes sb-wibee-float-v512{
+  0%,100%{transform:translate3d(0,1px,0) rotate(-.6deg) scale(1)}
+  50%{transform:translate3d(0,-7px,0) rotate(.7deg) scale(1.015)}
 }
 @media (prefers-reduced-motion:reduce){
   .hero-wibee{animation:none !important;}
@@ -97,19 +117,19 @@
 .change-flat,.neutral{color:#7c8797 !important;}
 
 @media(max-width:380px){
-  .hero-card{padding:14px 15px 13px !important;}
+  .hero-card{padding:11px 14px 10px !important;}
   .hero-main-grid{
-    grid-template-columns:minmax(0,40%) minmax(0,60%) !important;
-    min-height:100px !important;
-    gap:2px !important;
+    grid-template-columns:minmax(0,39%) minmax(0,61%) !important;
+    min-height:84px !important;
   }
-  .hero-wibee-wrap{height:100px !important;}
-  .hero-wibee{width:min(138px,40vw) !important;max-height:116px !important;}
-  .hero-rate{font-size:31px !important;}
+  .hero-wibee-wrap{height:84px !important;}
+  .hero-wibee{width:min(124px,36vw) !important;max-height:103px !important;}
+  .hero-rate{font-size:30px !important;}
   .data-meta-left::after{font-size:7px;}
 }
 
 @media(min-width:430px){
-  .hero-main-grid{grid-template-columns:40% 60% !important;}
-  .hero-wibee{width:160px !important;}
+  .hero-main-grid{grid-template-columns:40% 60% !important;min-height:94px !important;}
+  .hero-wibee-wrap{height:94px !important;}
+  .hero-wibee{width:144px !important;max-height:116px !important;}
 }
