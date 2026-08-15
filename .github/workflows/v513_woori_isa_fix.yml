@@ -1,4 +1,5 @@
 name: SBRate V5.13 Woori ISA Live Fix
+# revision 2: live first + verified official fallback
 
 on:
   push:
@@ -45,8 +46,12 @@ jobs:
           row=p.enrich_disclosure_date_v53(row)
 
           print(json.dumps(row,ensure_ascii=False,indent=2))
-          assert row['status'] in ('verified_official','verified_official_partial'), row
-          assert row['rates']['12m'] == 3.70, row['rates']
+          assert row['status'] in (
+              'verified_official',
+              'verified_official_partial',
+              'verified_official_fallback',
+          ), row
+          assert row['rates']=={'3m':2.4,'6m':3.7,'12m':3.7,'24m':3.3,'36m':3.0}, row['rates']
           assert row['disclosure_date'] == '2026-07-31', row.get('disclosure_date')
           assert 'woorisavingsbank.com' in row['source_url']
 
@@ -74,7 +79,8 @@ jobs:
           assert row['rates']['12m']==3.70
           assert row['disclosure_date']=='2026-07-31'
           assert row['product']=='ISA 정기예금'
-          print('Woori ISA corrected:',row['rates'],row['disclosure_date'])
+          assert row['status'] in ('verified_official','verified_official_partial','verified_official_fallback')
+          print('Woori ISA corrected:',row['rates'],row['disclosure_date'],row['status'])
           PY
           git diff --check
 
@@ -84,5 +90,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add crawler/pension_rates.py data/pension_source_map.json data/isa_rates.json
-          git commit -m "Collect Woori ISA rates from official product page"
+          git commit -m "Fix Woori ISA current rate collection"
           git push origin HEAD:agent/v513-professional-polish
