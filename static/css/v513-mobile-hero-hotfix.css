@@ -87,17 +87,33 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   opacity:0;
 }
 
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::before,
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::before,
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::before{
+  content:"브리핑을 시작할게요";
+  animation:sb-v519-mobile-bubble-deposit 8s ease-in-out infinite both;
+}
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::before{
+  content:"브리핑을 시작할게요";
+  animation:sb-v519-mobile-bubble-isa 8s ease-in-out infinite both;
+}
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap::before{
   content:"브리핑을 시작할게요";
-  animation:sb-v516-bubble 2.9s ease 1 both;
+  animation:sb-v519-mobile-bubble-irp 8s ease-in-out infinite both;
 }
 
-@keyframes sb-v516-bubble{
-  0%,9%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
-  22%,74%{opacity:1;transform:translate3d(0,0,0) scale(1)}
-  100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
+@keyframes sb-v519-mobile-bubble-deposit{
+  0%,5%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
+  10%,34%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  42%,100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
+}
+@keyframes sb-v519-mobile-bubble-isa{
+  0%,5%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
+  10%,34%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  42%,100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
+}
+@keyframes sb-v519-mobile-bubble-irp{
+  0%,5%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
+  10%,34%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  42%,100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
 }
 
 .hero-wibee-wrap::after{

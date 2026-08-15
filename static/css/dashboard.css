@@ -1405,3 +1405,98 @@ div:has(> img[alt="위비 캐릭터"]){
     transform:none !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.19 PC MOBILE-WIBEE CONSISTENCY
+   - structural single-line header
+   - remove duplicated market-average card from Wibee visual grid
+   - mobile-like original Wibee ratio + repeating briefing bubble
+===================================================== */
+
+body > header,
+body > header > div:first-child{
+  flex-wrap:nowrap !important;
+}
+body > header > div:first-child{
+  min-width:0 !important;
+  white-space:nowrap !important;
+}
+body > header h1{
+  white-space:nowrap !important;
+  word-break:keep-all !important;
+  flex:0 0 auto !important;
+  min-width:max-content !important;
+}
+
+/* Use the same natural-looking Wibee proportions as mobile. */
+img[alt="위비 캐릭터"]{
+  width:142px !important;
+  height:auto !important;
+  max-height:160px !important;
+  max-width:none !important;
+  object-fit:contain !important;
+  filter:drop-shadow(0 7px 12px rgba(4,43,107,.16)) !important;
+}
+
+div:has(> img[alt="위비 캐릭터"]){
+  position:relative !important;
+  transform-origin:55% 82% !important;
+  animation:sb-v519-pc-idle 5s ease-in-out 1.4s infinite both !important;
+}
+
+@keyframes sb-v519-pc-idle{
+  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
+  25%{transform:translate3d(0,-1px,0) rotate(-.35deg)}
+  50%{transform:translate3d(1px,0,0) rotate(.3deg)}
+  75%{transform:translate3d(0,1px,0) rotate(-.15deg)}
+}
+
+/* Repeating briefing cue, same world-view as mobile. */
+div:has(> img[alt="위비 캐릭터"])::before{
+  content:"브리핑을 시작할게요";
+  position:absolute;
+  left:78px;
+  top:8px;
+  z-index:4;
+  padding:4px 8px;
+  border:1px solid rgba(255,255,255,.52);
+  border-radius:10px 10px 10px 3px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 5px 15px rgba(7,55,131,.12);
+  color:#25558f;
+  font-size:9px;
+  font-weight:800;
+  line-height:1.2;
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  animation:sb-v519-pc-bubble 8s ease-in-out infinite both;
+}
+
+@keyframes sb-v519-pc-bubble{
+  0%,5%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
+  10%,34%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  42%,100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
+}
+
+/* Notebook widths: protect the header title first, then compact tabs/context. */
+@media (max-width:1500px){
+  body > header{gap:.6rem !important;}
+  body > header > div:first-child{gap:.5rem !important;}
+  body > header h1{font-size:13px !important;}
+  #market-product-tabs{margin-left:.15rem !important;margin-right:235px !important;}
+  #market-product-tabs::after{font-size:8.5px !important;padding:4px 7px !important;}
+  #market-product-tabs .market-product-tab{padding-left:.6rem !important;padding-right:.6rem !important;}
+  body > header > div:last-child{gap:.45rem !important;}
+}
+
+@media (max-width:1365px){
+  #market-product-tabs{margin-right:205px !important;}
+  #market-product-tabs::after{font-size:8px !important;}
+  body > header h1{font-size:12.5px !important;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  div:has(> img[alt="위비 캐릭터"]){animation:none !important;transform:none !important;}
+  div:has(> img[alt="위비 캐릭터"])::before{display:none !important;animation:none !important;}
+}

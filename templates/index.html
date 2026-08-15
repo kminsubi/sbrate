@@ -8,7 +8,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<link rel="stylesheet" href="/static/css/dashboard.css?v=20260815v518">
+<link rel="stylesheet" href="/static/css/dashboard.css?v=20260815v519">
 <script defer src="/static/js/dashboard.js?v=20260815v513"></script>
 
 
@@ -402,7 +402,7 @@
         class="h-7 object-contain"
         onerror="this.onerror=null; this.src='https://via.placeholder.com/150x30?text=WOORI+SAVINGS+BANK';"
       />
-      <h1 class="text-base font-bold text-gray-900 border-l border-gray-300 pl-3">
+      <h1 class="text-base font-bold text-gray-900 border-l border-gray-300 pl-3 whitespace-nowrap shrink-0 leading-none">
         수신 모니터링 현황
       </h1>
       <div id="market-product-tabs" class="inline-flex items-center gap-1 bg-[#f4f7fb] border border-gray-100 rounded-xl p-1 ml-2">
@@ -903,11 +903,11 @@ class="text-xs text-gray-600 leading-5">
       <div class="flex items-stretch gap-1 h-full min-h-0">
 
         <!-- 위비 캐릭터 : 존재감 유지 + 좌측 여백 확보 -->
-        <div class="w-[35%] flex items-center justify-start overflow-visible self-stretch pl-1">
+        <div class="w-[31%] flex items-center justify-start overflow-visible self-stretch pl-1">
           <img
             src="/static/images/wibee.png?v=20260815v513"
             alt="위비 캐릭터"
-            class="w-[180px] max-w-none h-[300px] object-contain object-center -translate-x-[25px] translate-y-[2px]"
+            class="w-[142px] max-w-none h-auto max-h-[160px] object-contain object-center -translate-x-[12px] translate-y-[4px]"
           />
         </div>
 
@@ -933,7 +933,7 @@ class="text-xs text-gray-600 leading-5">
           </div>
 
           <!-- 핵심 시장 지표 : 아래 금리변동 카드와 동일 시작선 -->
-          <div class="mt-1 grid grid-cols-4 gap-1 w-full text-center">
+          <div class="mt-1 grid grid-cols-3 gap-1 w-full text-center">
             <div class="bg-white/90 border border-blue-100 rounded-md px-1 py-1">
               <div class="text-[8px] text-gray-400 whitespace-nowrap">우리금융 금리</div>
               <div id="wibee-woori-rate" class="text-[10px] font-bold text-blue-600 leading-tight">-</div>
@@ -946,7 +946,7 @@ class="text-xs text-gray-600 leading-5">
               <div class="text-[8px] text-gray-400 whitespace-nowrap">최고금리</div>
               <div id="wibee-best-rate" class="text-[10px] font-bold text-gray-800 leading-tight">-</div>
             </div>
-            <div class="bg-white/90 border border-blue-100 rounded-md px-1 py-1">
+            <div class="hidden bg-white/90 border border-blue-100 rounded-md px-1 py-1" aria-hidden="true">
               <div class="text-[8px] text-gray-400 whitespace-nowrap">시장평균</div>
               <div id="wibee-average-rate" class="text-[10px] font-bold text-gray-800 leading-tight">-</div>
             </div>
