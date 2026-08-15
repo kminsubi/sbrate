@@ -1603,3 +1603,19 @@ div:has(> img[alt="위비 캐릭터"])::before{
     display:none !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.25 PC BUBBLE POSITION
+   - move dashboard speech bubble one visual step right
+   - keep vertical position, motion, and Wibee position unchanged
+===================================================== */
+
+div:has(> img[alt="위비 캐릭터"])::before{
+  left:0px !important;
+}
+
+@media (max-width:1500px){
+  div:has(> img[alt="위비 캐릭터"])::before{
+    left:-2px !important;
+  }
+}

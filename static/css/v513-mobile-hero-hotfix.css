@@ -318,3 +318,20 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 @media(min-width:430px){
   .hero-wibee-wrap::before{left:100px;}
 }
+
+/* =====================================================
+   SBRate V5.25 MOBILE BUBBLE POSITION
+   Force the briefing bubble one more visible step right.
+===================================================== */
+
+.hero-wibee-wrap::before{
+  left:100px !important;
+}
+
+@media(max-width:380px){
+  .hero-wibee-wrap::before{left:88px !important;}
+}
+
+@media(min-width:430px){
+  .hero-wibee-wrap::before{left:104px !important;}
+}
