@@ -40,7 +40,7 @@ block = r'''
 
 if marker not in css:
     css += block
-css_path.write_text(css + '\n', encoding='utf-8')
+css_path.write_text(css.rstrip() + '\n', encoding='utf-8')
 
 html = html_path.read_text(encoding='utf-8')
 html = html.replace('/static/css/v513-mobile-hero-hotfix.css?v=20260815v526', '/static/css/v513-mobile-hero-hotfix.css?v=20260815v527', 1)
