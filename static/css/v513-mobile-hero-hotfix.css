@@ -437,3 +437,12 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 @media(min-width:430px){
   .hero-wibee-wrap::before{left:112px !important;}
 }
+
+/* =====================================================
+   SBRate V5.33 MOBILE WIBEE TITLE ALIGNMENT
+   Align Wibee more closely with the title's visual center axis.
+===================================================== */
+
+.hero-wibee{
+  margin-left:-12px !important;
+}
