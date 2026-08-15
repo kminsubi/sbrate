@@ -1,0 +1,75 @@
+name: SBRate Render Keep Alive
+
+on:
+  schedule:
+    # KST 07:30-18:30, every 10 minutes, weekdays only.
+    # GitHub Actions cron uses UTC, so the KST window spans two UTC dates.
+    - cron: "30,40,50 22 * * 0-4"
+    - cron: "0,10,20,30,40,50 23 * * 0-4"
+    - cron: "0,10,20,30,40,50 0-8 * * 1-5"
+    - cron: "0,10,20,30 9 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Korean business hours
+        id: business_hours
+        shell: bash
+        run: |
+          # Manual runs are allowed at any time for testing.
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Manual keep-alive run"
+            exit 0
+          fi
+
+          KST_DATE=$(TZ=Asia/Seoul date +%F)
+          KST_MD=$(TZ=Asia/Seoul date +%m-%d)
+          KST_WEEKDAY=$(TZ=Asia/Seoul date +%u)
+          KST_HM=$(TZ=Asia/Seoul date +%H%M)
+
+          # Defensive guard: weekdays, 07:30-18:30 KST only.
+          if [ "$KST_WEEKDAY" -gt 5 ] || [ "$KST_HM" -lt 0730 ] || [ "$KST_HM" -gt 1830 ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Outside Korean business hours: $KST_DATE $KST_HM"
+            exit 0
+          fi
+
+          # Fixed-date Korean public holidays.
+          case "$KST_MD" in
+            01-01|03-01|05-05|06-06|08-15|10-03|10-09|12-25)
+              echo "run=false" >> "$GITHUB_OUTPUT"
+              echo "Korean public holiday: $KST_DATE"
+              exit 0
+              ;;
+          esac
+
+          # 2026 lunar/substitute holidays and statutory election day.
+          case "$KST_DATE" in
+            2026-02-16|2026-02-17|2026-02-18|2026-03-02|2026-05-25|2026-06-03|2026-08-17|2026-09-24|2026-09-25|2026-09-28|2026-10-05)
+              echo "run=false" >> "$GITHUB_OUTPUT"
+              echo "Korean public/substitute/election holiday: $KST_DATE"
+              exit 0
+              ;;
+          esac
+
+          echo "run=true" >> "$GITHUB_OUTPUT"
+          echo "Keep-alive enabled: $KST_DATE $KST_HM KST"
+
+      - name: Keep Render awake
+        if: steps.business_hours.outputs.run == 'true'
+        shell: bash
+        run: |
+          curl --fail --show-error --silent --location \
+            --retry 2 \
+            --retry-all-errors \
+            --retry-delay 5 \
+            --connect-timeout 10 \
+            --max-time 120 \
+            -H "User-Agent: SBRate-KeepAlive/1.0" \
+            "https://sbrate.onrender.com/" > /dev/null
+
+          echo "Render keep-alive request completed at $(TZ=Asia/Seoul date '+%F %T KST')"
