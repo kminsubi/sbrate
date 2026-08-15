@@ -580,3 +580,28 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
     display:none !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.38 MOBILE WIBEE LOWER FOR ISA / IRP
+   Lower the whole Wibee briefing group slightly
+   for ISA and IRP to match the Deposit visual balance.
+===================================================== */
+
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
+  top:4px !important;
+}
+
+@media(max-width:380px){
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
+    top:3px !important;
+  }
+}
+
+@media(min-width:430px){
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
+    top:5px !important;
+  }
+}
