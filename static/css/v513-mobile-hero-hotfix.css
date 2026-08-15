@@ -390,3 +390,33 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 @media(min-width:430px){
   .hero-wibee-wrap::before{left:116px !important;}
 }
+
+/* =====================================================
+   SBRate V5.27 MOBILE RANK INLINE
+   Show market rank context on one line like the dashboard panel.
+===================================================== */
+
+.hero-rank-copy{
+  display:flex !important;
+  align-items:center !important;
+  gap:3px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+
+.hero-rank-copy .hero-rank-label,
+.hero-rank-copy small{
+  display:inline !important;
+  margin:0 !important;
+  white-space:nowrap !important;
+}
+
+.hero-rank-copy small{
+  color:#cfe1ff !important;
+  font-size:7.5px !important;
+}
+
+@media(max-width:380px){
+  .hero-rank-copy{gap:2px !important;}
+  .hero-rank-copy small{font-size:6.6px !important;}
+}
