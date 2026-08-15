@@ -301,3 +301,20 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
     display:none !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.24 MOBILE BUBBLE POSITION
+   Move the mobile briefing bubble one visual step right.
+===================================================== */
+
+.hero-wibee-wrap::before{
+  left:96px;
+}
+
+@media(max-width:380px){
+  .hero-wibee-wrap::before{left:84px;}
+}
+
+@media(min-width:430px){
+  .hero-wibee-wrap::before{left:100px;}
+}

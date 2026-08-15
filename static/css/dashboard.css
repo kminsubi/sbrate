@@ -1577,3 +1577,29 @@ div:has(> img[alt="위비 캐릭터"])::before{
     top:3px !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.24 PC BUBBLE MOTION
+   - make the repeating speech bubble motion clearly visible
+   - preserve current bubble coordinates and Wibee position
+===================================================== */
+
+div:has(> img[alt="위비 캐릭터"])::before{
+  animation:sb-v524-pc-bubble 7.2s cubic-bezier(.22,.72,.2,1) infinite both !important;
+  will-change:transform,opacity !important;
+}
+
+@keyframes sb-v524-pc-bubble{
+  0%,7%{opacity:0;transform:translate3d(-6px,7px,0) scale(.94) rotate(-1deg)}
+  12%{opacity:1;transform:translate3d(-2px,2px,0) scale(.99) rotate(-.3deg)}
+  22%{opacity:1;transform:translate3d(4px,-3px,0) scale(1.03) rotate(.5deg)}
+  31%{opacity:1;transform:translate3d(0,-5px,0) scale(1) rotate(0deg)}
+  40%,100%{opacity:0;transform:translate3d(7px,-8px,0) scale(.97) rotate(.3deg)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  div:has(> img[alt="위비 캐릭터"])::before{
+    animation:none !important;
+    display:none !important;
+  }
+}
