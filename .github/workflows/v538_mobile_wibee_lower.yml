@@ -2,9 +2,10 @@ name: SBRate V5.38 Mobile Wibee Lower
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
-      - '.github/workflows/v538_mobile_wibee_lower.yml'
+      - .github/workflows/v538_mobile_wibee_lower.yml
 
 permissions:
   contents: write
@@ -18,64 +19,20 @@ jobs:
           fetch-depth: 0
 
       - name: Apply patch
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          css_path = Path('static/css/v513-mobile-hero-hotfix.css')
-          html_path = Path('templates/mobile.html')
-
-          css = css_path.read_text(encoding='utf-8').rstrip() + '\n'
-          marker = 'SBRate V5.38 MOBILE WIBEE LOWER FOR ISA / IRP'
-          if marker not in css:
-              css += r'''
-
-/* =====================================================
-   SBRate V5.38 MOBILE WIBEE LOWER FOR ISA / IRP
-   Lower the whole Wibee briefing group slightly
-   for ISA and IRP to match the Deposit visual balance.
-===================================================== */
-
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
-  top:4px !important;
-}
-
-@media(max-width:380px){
-  body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
-  body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
-    top:3px !important;
-  }
-}
-
-@media(min-width:430px){
-  body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
-  body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
-    top:5px !important;
-  }
-}
-'''
-          css_path.write_text(css.rstrip() + '\n', encoding='utf-8')
-
-          html = html_path.read_text(encoding='utf-8')
-          html = html.replace('v513-mobile-hero-hotfix.css?v=20260815v537', 'v513-mobile-hero-hotfix.css?v=20260815v538')
-          html_path.write_text(html, encoding='utf-8')
-          PY
+        run: python .github/v538_mobile_wibee_lower.py
 
       - name: Validate
-        shell: bash
         run: |
           grep -q 'SBRate V5.38 MOBILE WIBEE LOWER FOR ISA / IRP' static/css/v513-mobile-hero-hotfix.css
           grep -q 'v513-mobile-hero-hotfix.css?v=20260815v538' templates/mobile.html
           git diff --check
 
       - name: Commit and clean
-        shell: bash
         run: |
           rm -f .github/workflows/v538_mobile_wibee_lower.yml
+          rm -f .github/v538_mobile_wibee_lower.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add static/css/v513-mobile-hero-hotfix.css templates/mobile.html .github/workflows/v538_mobile_wibee_lower.yml
+          git add -A
           git commit -m 'Lower ISA and IRP mobile Wibee group'
           git push origin main
