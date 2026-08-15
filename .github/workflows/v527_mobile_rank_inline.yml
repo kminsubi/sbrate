@@ -36,3 +36,5 @@ jobs:
           git add static/css/v513-mobile-hero-hotfix.css templates/mobile.html .github/v527_mobile_rank_inline_patch.py .github/workflows/v527_mobile_rank_inline.yml
           git commit -m 'Show mobile market rank context on one line'
           git push origin main
+
+# rerun after EOF validation fix
