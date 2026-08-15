@@ -39,3 +39,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'Polish mobile hero rate and PC period selector' || exit 0
           git push origin main
+
+# rerun after EOF validation fix
