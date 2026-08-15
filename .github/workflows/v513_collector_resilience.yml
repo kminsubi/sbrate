@@ -1,0 +1,90 @@
+name: SBRate V5.13 Collector Resilience
+
+on:
+  push:
+    branches:
+      - agent/v513-professional-polish
+    paths:
+      - .github/workflows/v513_collector_resilience.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v513-professional-polish
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Apply resilience patch
+        run: python .github/v513_collector_resilience.py
+
+      - name: Validate syntax and retention rules
+        shell: bash
+        run: |
+          python -m py_compile crawler/pension_rates.py
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path('crawler').resolve()))
+          import pension_rates as p
+
+          previous={
+              'bank':'테스트',
+              'category':'ISA',
+              'product':'정상상품',
+              'rates':{'3m':2.1,'6m':2.5,'12m':3.8,'24m':3.1,'36m':3.0},
+              'status':'verified_official',
+              'disclosure_date':'2026-08-01',
+              'updated_at':'2026-08-01 08:00:00',
+              'note':'직전 정상값',
+          }
+
+          failed={
+              'bank':'테스트',
+              'category':'ISA',
+              'rates':{'3m':None,'6m':None,'12m':None,'24m':None,'36m':None},
+              'status':'fetch_or_parse_error',
+              'error':'timeout',
+              'updated_at':'2026-08-15 09:00:00',
+          }
+          retained=p.retain_last_known_good_on_fetch_error(failed,previous)
+          assert retained['rates']['12m']==3.8
+          assert retained['status']=='stale_retained_after_fetch_error'
+          assert retained['stale'] is True
+          assert retained['last_fetch_error']=='timeout'
+          assert retained['updated_at']=='2026-08-01 08:00:00'
+
+          changed=dict(failed)
+          changed['status']='verified_official'
+          changed['rates']={'3m':2.0,'6m':2.4,'12m':3.6,'24m':3.0,'36m':2.9}
+          assert p.retain_last_known_good_on_fetch_error(changed,previous) is changed
+
+          partial=dict(failed)
+          partial['rates']={'3m':None,'6m':None,'12m':3.55,'24m':None,'36m':None}
+          assert p.retain_last_known_good_on_fetch_error(partial,previous) is partial
+
+          pending=dict(failed)
+          pending['status']='verified_source_rate_pending'
+          assert p.retain_last_known_good_on_fetch_error(pending,previous) is pending
+
+          print('Collector resilience unit checks OK')
+          PY
+          git diff --check
+
+      - name: Commit collector resilience
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crawler/pension_rates.py
+          git commit -m "Preserve last good pension rates on source outages"
+          git push origin HEAD:agent/v513-professional-polish
