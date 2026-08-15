@@ -1530,3 +1530,30 @@ div:has(> img[alt="위비 캐릭터"])::before{
     padding:4px 7px !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.21 PC WIBEE POSITION TUNE
+   - lower Wibee slightly without fighting transform animation
+   - move speech bubble clearly further left and upward
+===================================================== */
+
+img[alt="위비 캐릭터"]{
+  position:relative !important;
+  top:8px !important;
+}
+
+div:has(> img[alt="위비 캐릭터"])::before{
+  left:4px !important;
+  top:-6px !important;
+  z-index:6 !important;
+}
+
+@media (max-width:1500px){
+  img[alt="위비 캐릭터"]{
+    top:8px !important;
+  }
+  div:has(> img[alt="위비 캐릭터"])::before{
+    left:2px !important;
+    top:-5px !important;
+  }
+}
