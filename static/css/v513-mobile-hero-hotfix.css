@@ -420,3 +420,20 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   .hero-rank-copy{gap:2px !important;}
   .hero-rank-copy small{font-size:6.6px !important;}
 }
+
+/* =====================================================
+   SBRate V5.28 MOBILE BUBBLE LEFT TUNE
+   Move the mobile briefing bubble one visual step left.
+===================================================== */
+
+.hero-wibee-wrap::before{
+  left:108px !important;
+}
+
+@media(max-width:380px){
+  .hero-wibee-wrap::before{left:96px !important;}
+}
+
+@media(min-width:430px){
+  .hero-wibee-wrap::before{left:112px !important;}
+}
