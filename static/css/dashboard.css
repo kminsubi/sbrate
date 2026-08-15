@@ -1166,3 +1166,197 @@ img[src*="wibee_v512.png"]{
   0%,100%{transform:translate3d(-18px,2px,0) rotate(-.3deg) scale(1)}
   50%{transform:translate3d(-18px,-5px,0) rotate(.55deg) scale(1.012)}
 }
+
+
+/* =====================================================
+   SBRate V5.13 PROFESSIONAL CONSISTENCY
+   - structural AI-panel stretch (no fixed px matching)
+   - exact source vocabulary
+   - original Wibee, one-shot briefing micro-motion
+===================================================== */
+
+#market-product-tabs:has(button[data-market-product="deposit"][class*="text-white"])::after{
+  content:"정기예금 12개월 시장현황  ·  [출처 : 저축은행중앙회 비교공시]" !important;
+}
+#market-product-tabs:has(button[data-market-product="isa"][class*="text-white"])::after{
+  content:"ISA 12개월 시장현황  ·  [출처 : 각 저축은행 홈페이지]" !important;
+}
+#market-product-tabs:has(button[data-market-product="irp"][class*="text-white"])::after{
+  content:"퇴직연금(IRP) 12개월 시장현황  ·  [출처 : 각 저축은행 홈페이지]" !important;
+}
+
+/* Grid row owns the height. AI content scrolls inside rather than expanding the row. */
+#ai-analysis-center{
+  align-self:stretch !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:hidden !important;
+  contain:none !important;
+}
+#ai-center-content{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+
+/* Major-card geometry is consistent without redesigning the current layout. */
+#dashboard-hero-start > .col-span-4 > .bg-white,
+#market-ranking-row > .bg-white,
+#ai-analysis-center,
+#product-search-panel{
+  border-radius:16px !important;
+  border-color:#e4ebf4 !important;
+  box-shadow:0 6px 20px rgba(15,23,42,.035) !important;
+}
+
+/* Original Wibee: brief once on entry/product change, never float endlessly. */
+img[alt="위비 캐릭터"]{
+  filter:drop-shadow(0 9px 15px rgba(4,43,107,.15)) !important;
+  transform-origin:center bottom !important;
+  will-change:transform,opacity;
+}
+body:has(#market-product-tabs button[data-market-product="deposit"][class*="text-white"]) img[alt="위비 캐릭터"]{
+  animation:sb-wibee-brief-deposit 1.35s cubic-bezier(.22,.72,.2,1) 1 both !important;
+}
+body:has(#market-product-tabs button[data-market-product="isa"][class*="text-white"]) img[alt="위비 캐릭터"]{
+  animation:sb-wibee-brief-isa 1.35s cubic-bezier(.22,.72,.2,1) 1 both !important;
+}
+body:has(#market-product-tabs button[data-market-product="irp"][class*="text-white"]) img[alt="위비 캐릭터"]{
+  animation:sb-wibee-brief-irp 1.35s cubic-bezier(.22,.72,.2,1) 1 both !important;
+}
+@keyframes sb-wibee-brief-deposit{
+  0%{opacity:0;transform:translate3d(-25px,5px,0) rotate(-.5deg) scale(.985)}
+  38%{opacity:1;transform:translate3d(-25px,2px,0) rotate(-.9deg) scale(1)}
+  68%{transform:translate3d(-25px,2px,0) rotate(.65deg) scale(1)}
+  100%{opacity:1;transform:translate3d(-25px,2px,0) rotate(0) scale(1)}
+}
+@keyframes sb-wibee-brief-isa{
+  0%{opacity:0;transform:translate3d(-25px,5px,0) rotate(-.5deg) scale(.985)}
+  38%{opacity:1;transform:translate3d(-25px,2px,0) rotate(-.9deg) scale(1)}
+  68%{transform:translate3d(-25px,2px,0) rotate(.65deg) scale(1)}
+  100%{opacity:1;transform:translate3d(-25px,2px,0) rotate(0) scale(1)}
+}
+@keyframes sb-wibee-brief-irp{
+  0%{opacity:0;transform:translate3d(-25px,5px,0) rotate(-.5deg) scale(.985)}
+  38%{opacity:1;transform:translate3d(-25px,2px,0) rotate(-.9deg) scale(1)}
+  68%{transform:translate3d(-25px,2px,0) rotate(.65deg) scale(1)}
+  100%{opacity:1;transform:translate3d(-25px,2px,0) rotate(0) scale(1)}
+}
+
+/* Small cue toward briefing metrics; one-shot only. */
+div:has(> img[alt="위비 캐릭터"]){position:relative;}
+div:has(> img[alt="위비 캐릭터"])::after{
+  content:"";
+  position:absolute;
+  right:2px;
+  top:47%;
+  width:7px;
+  height:7px;
+  border-radius:999px;
+  background:#5b91df;
+  box-shadow:0 0 0 0 rgba(91,145,223,.20);
+  opacity:0;
+  animation:sb-wibee-pointer 1.25s ease-out .45s 1 both;
+}
+@keyframes sb-wibee-pointer{
+  0%{opacity:0;transform:translateX(-4px);box-shadow:0 0 0 0 rgba(91,145,223,.24)}
+  35%{opacity:.8;transform:translateX(0);box-shadow:0 0 0 5px rgba(91,145,223,.10)}
+  72%{opacity:.65;transform:translateX(2px);box-shadow:0 0 0 2px rgba(91,145,223,.07)}
+  100%{opacity:0;transform:translateX(7px);box-shadow:0 0 0 0 rgba(91,145,223,0)}
+}
+
+/* Deposit briefing explicitly names the representative Woori product. */
+body:has(#market-product-tabs button[data-market-product="deposit"][class*="text-white"]) #wibee-brief-text{
+  display:block !important;
+  margin-top:4px;
+  color:#1556c0;
+  font-size:9px;
+  line-height:1.2;
+  font-weight:700;
+  white-space:nowrap;
+}
+body:has(#market-product-tabs button[data-market-product="deposit"][class*="text-white"]) #wibee-brief-text::before{
+  content:"대표상품 · 회전정기예금";
+}
+body:has(#market-product-tabs button[data-market-product="isa"][class*="text-white"]) #wibee-brief-text,
+body:has(#market-product-tabs button[data-market-product="irp"][class*="text-white"]) #wibee-brief-text{
+  display:none !important;
+}
+
+@media (prefers-reduced-motion:reduce){
+  img[alt="위비 캐릭터"]{
+    animation:none !important;
+    opacity:1 !important;
+    transform:translate3d(-25px,2px,0) !important;
+  }
+  div:has(> img[alt="위비 캐릭터"])::after{
+    display:none !important;
+    animation:none !important;
+  }
+}
+
+
+/* =====================================================
+   SBRate V5.13 STRUCTURAL AI ROW
+   The left main column is the only intrinsic height owner.
+   The right AI panel fills that row without contributing
+   its content height back into the grid sizing algorithm.
+===================================================== */
+
+#dashboard-intelligence-row{
+  position:relative !important;
+  align-items:start !important;
+  min-width:0;
+}
+
+#dashboard-intelligence-row > main{
+  grid-column:1 / span 9 !important;
+  min-width:0;
+}
+
+#dashboard-intelligence-row > #ai-analysis-center{
+  position:absolute !important;
+  grid-column:10 / 13 !important;
+  grid-row:1 !important;
+  top:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  left:0 !important;
+  align-self:stretch !important;
+  width:auto !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+
+#dashboard-intelligence-row > #ai-analysis-center > #ai-center-content{
+  flex:1 1 0% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+}
+
+
+/* =====================================================
+   SBRate V5.13 REDUCED MOTION FINAL
+   Match active-state selector specificity so accessibility
+   preference always wins over the one-shot briefing motion.
+===================================================== */
+@media (prefers-reduced-motion:reduce){
+  body:has(#market-product-tabs button[data-market-product="deposit"][class*="text-white"]) img[alt="위비 캐릭터"],
+  body:has(#market-product-tabs button[data-market-product="isa"][class*="text-white"]) img[alt="위비 캐릭터"],
+  body:has(#market-product-tabs button[data-market-product="irp"][class*="text-white"]) img[alt="위비 캐릭터"]{
+    animation:none !important;
+    opacity:1 !important;
+    transform:translate3d(-25px,2px,0) !important;
+  }
+  body:has(#market-product-tabs) div:has(> img[alt="위비 캐릭터"])::after{
+    animation:none !important;
+    display:none !important;
+  }
+}

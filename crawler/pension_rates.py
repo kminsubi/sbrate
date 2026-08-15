@@ -48,13 +48,137 @@ def after(label,text,n=100):
     x=re.search(r"(\d{1,2}(?:\.\d{1,3})?)\s*%",text[m.end():m.end()+n])
     return float(x.group(1)) if x else None
 
-def woori_isa(bank,kind,cfg):
-    # 공식 금리공시 기준값.
-    # 페이지 구조가 안정적으로 파싱 가능해질 때까지 잘못된 근접 숫자 추출을 금지한다.
-    rates={"3m":2.40,"6m":4.21,"12m":4.21,"24m":3.30,"36m":3.00}
-    o=blank(bank,kind,cfg,"verified_official")
+WOORI_ISA_URL=(
+    "https://m.woorisavingsbank.com/product/deposite/view.do"
+    "?depositeOrder=high&page=1&prdSn=315"
+)
+WOORI_ISA_URLS=(
+    "https://www.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
+    WOORI_ISA_URL,
+)
+WOORI_ISA_VERIFIED_FALLBACK={
+    "rates":{"3m":2.40,"6m":3.70,"12m":3.70,"24m":3.30,"36m":3.00},
+    "disclosure_date":"2026-07-31",
+}
+
+
+def _woori_isa_parse_official(html,final_url,bank,kind,cfg):
+    soup=BeautifulSoup(html,"html.parser")
+    text_value=clean(" ".join(soup.stripped_strings))
+
+    if "ISA 정기예금" not in text_value:
+        raise ValueError("우리금융 ISA 공식 상품페이지 검증 실패")
+
+    start=text_value.find("금리안내")
+    if start < 0:
+        raise ValueError("우리금융 ISA 금리안내 영역 미확인")
+
+    end=text_value.find("중도해지이율",start)
+    if end < 0:
+        end=min(len(text_value),start+2200)
+
+    section=text_value[start:end]
+    rates={f"{p}m":None for p in ISA_PERIODS}
+
+    for period in ISA_PERIODS:
+        m=re.search(
+            rf"(?<!\d){period}\s*개월\s+"
+            rf"(\d{{1,2}}(?:\.\d{{1,4}})?)\s*%",
+            section,
+            re.I,
+        )
+        if not m:
+            continue
+
+        rate=float(m.group(1))
+        if 0 <= rate <= 10:
+            rates[f"{period}m"]=rate
+
+    found=sum(value is not None for value in rates.values())
+    if rates.get("12m") is None:
+        raise ValueError("우리금융 ISA 12개월 약정금리 미확인")
+
+    o=blank(
+        bank,
+        kind,
+        cfg,
+        "verified_official" if found==len(ISA_PERIODS) else "verified_official_partial",
+    )
+    o["product"]="ISA 정기예금"
     o["rates"]=rates
-    o["note"]="우리금융저축은행 공식 ISA 금리공시 기준값"
+    o["source_url"]=final_url
+    o["collector"]="woori_isa_official_product_page"
+
+    date_match=re.search(
+        r"기준\s*:\s*세전\s*,\s*연이율\s*,\s*"
+        r"(\d{4})[.](\d{1,2})[.](\d{1,2})",
+        section,
+        re.I,
+    )
+
+    if date_match:
+        year,month,day=map(int,date_match.groups())
+        o["disclosure_date"]=f"{year:04d}-{month:02d}-{day:02d}"
+        o["reference_date"]=o["disclosure_date"]
+        o["disclosure_date_source"]="woori_isa_rate_table_reference_date"
+        o["disclosure_date_url"]=final_url
+
+    o["note"]=(
+        "우리금융저축은행 공식 ISA 정기예금 상품페이지의 금리안내 표 자동수집. "
+        "기간별 단리(이율) 사용, 복리 수익률/중도해지이율 제외."
+    )
+    return o
+
+
+def woori_isa(bank,kind,cfg):
+    """
+    우리금융저축은행 ISA 정기예금.
+
+    1) 공식 상품페이지를 우선 실시간 수집한다.
+    2) GitHub Actions 네트워크에서 우리금융 도메인이 일시 차단/timeout이면
+       마지막으로 공식 페이지에서 검증한 기준값을 사용한다.
+    3) fallback 사용 여부와 기준일을 status/note에 명시해 새 데이터처럼 위장하지 않는다.
+    """
+    errors=[]
+
+    for url in WOORI_ISA_URLS:
+        try:
+            r=S.get(
+                url,
+                timeout=8,
+                verify=False,
+                allow_redirects=True,
+            )
+            r.raise_for_status()
+            if not r.encoding:
+                r.encoding=r.apparent_encoding
+            return _woori_isa_parse_official(
+                r.text,
+                r.url,
+                bank,
+                kind,
+                cfg,
+            )
+        except Exception as error:
+            errors.append(f"{url}: {error}")
+
+    fallback=WOORI_ISA_VERIFIED_FALLBACK
+    o=blank(bank,kind,cfg,"verified_official_fallback")
+    o["product"]="ISA 정기예금"
+    o["rates"]=dict(fallback["rates"])
+    o["source_url"]=WOORI_ISA_URL
+    o["collector"]="woori_isa_verified_fallback"
+    o["disclosure_date"]=fallback["disclosure_date"]
+    o["reference_date"]=fallback["disclosure_date"]
+    o["disclosure_date_source"]="verified_official_fallback_date"
+    o["disclosure_date_url"]=WOORI_ISA_URL
+    o["fetch_error"]=" | ".join(errors)
+    o["note"]=(
+        "우리금융 공식 ISA 상품페이지 접속 실패로 마지막 검증 공식값 유지. "
+        "공식 금리안내 기준일 2026-07-31: "
+        "3개월 2.40%, 6개월 3.70%, 12개월 3.70%, 24개월 3.30%, 36개월 3.00%. "
+        "공식 페이지 접속이 복구되면 자동수집값을 우선 사용."
+    )
     return o
 
 def woori_irp(bank,kind,cfg):
@@ -3277,7 +3401,7 @@ def collect_woori_disclosure_date(category):
     IRP는 상품목록에 명확한 날짜가 없으면 None.
     """
     if category=="ISA":
-        url="https://www.woorisavingsbank.com/deposite-interest/view.do"
+        url=WOORI_ISA_URL
     else:
         url="https://www.woorisavingsbank.com/product/deposite/list.do"
 
@@ -3753,7 +3877,8 @@ def enrich_disclosure_date_v53(item):
         ):
             item["disclosure_date"]=None
         else:
-            item["disclosure_date_source"]="existing_collector"
+            if not item.get("disclosure_date_source"):
+                item["disclosure_date_source"]="existing_collector"
             return item
 
     bank=clean(
@@ -3813,11 +3938,105 @@ def enrich_disclosure_date_v53(item):
 
 
 
+def _rates_have_value(item):
+    if not isinstance(item,dict):
+        return False
+
+    rates=item.get("rates")
+    if not isinstance(rates,dict):
+        return False
+
+    return any(
+        isinstance(value,(int,float)) and 0 < value <= 20
+        for value in rates.values()
+    )
+
+
+def _previous_rows_by_bank(path):
+    if not path.exists():
+        return {}
+
+    try:
+        rows=load(path)
+    except Exception:
+        return {}
+
+    if not isinstance(rows,list):
+        return {}
+
+    result={}
+    for row in rows:
+        if not isinstance(row,dict):
+            continue
+        bank=clean(row.get("bank"))
+        if bank:
+            result[bank]=row
+
+    return result
+
+
+def retain_last_known_good_on_fetch_error(current,previous):
+    """
+    일시적인 공식사이트 timeout/파싱실패가 기존 정상금리를 null로
+    덮어쓰는 것을 방지한다.
+
+    적용 조건은 매우 제한적이다.
+    - 이번 결과 status가 fetch_or_parse_error / rate_not_found
+    - 이번 결과에 유효 금리가 하나도 없음
+    - 직전 저장값에는 유효 금리가 있음
+
+    정상 수집, 실제 금리 변경, 의도적인 rate_pending/research_pending에는
+    관여하지 않는다. 보존 시 stale 상태와 마지막 실패 원인을 명시한다.
+    """
+    if not isinstance(current,dict):
+        return current
+
+    status=clean(current.get("status"))
+    if status not in ("fetch_or_parse_error","rate_not_found"):
+        return current
+
+    if _rates_have_value(current):
+        return current
+
+    if not isinstance(previous,dict) or not _rates_have_value(previous):
+        return current
+
+    retained=dict(previous)
+    retained["status"]="stale_retained_after_fetch_error"
+    retained["stale"]=True
+    retained["retained_last_good"]=True
+    retained["last_fetch_status"]=status
+    retained["last_attempt_at"]=(
+        current.get("collected_at")
+        or current.get("updated_at")
+        or datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M:%S")
+    )
+
+    error_text=clean(
+        current.get("error")
+        or current.get("fetch_error")
+        or current.get("note")
+    )
+    if error_text:
+        retained["last_fetch_error"]=error_text
+
+    previous_note=clean(retained.get("note"))
+    retained["note"]=(
+        previous_note
+        + (" | " if previous_note else "")
+        + "이번 공식소스 수집 실패로 직전 정상금리 유지"
+    )
+
+    return retained
+
+
 def main():
     mp=load(MAP)
     a=[]
     b=[]
     disclosure_banks=load_irp_disclosure()
+    previous_isa=_previous_rows_by_bank(ISA)
+    previous_irp=_previous_rows_by_bank(IRP)
 
     print("="*72)
     print("SBRateBot V5 ISA / IRP Collector v5.8 - Latest IRP Month")
@@ -3882,6 +4101,17 @@ def main():
 
         # IRP 최신 적용월 / IRP 기준 메타데이터 최종 확정
         y=apply_irp_latest_month_metadata(y)
+
+        # 공식사이트 일시 장애가 직전 정상 데이터를 null로 덮어쓰지 않도록
+        # '실패 + 신규 유효금리 0건'인 경우에만 마지막 정상값을 보존한다.
+        x=retain_last_known_good_on_fetch_error(
+            x,
+            previous_isa.get(bank)
+        )
+        y=retain_last_known_good_on_fetch_error(
+            y,
+            previous_irp.get(bank)
+        )
 
         # 한국투자 공시일은 공식 자동수집 안정성이 확보될 때까지 공란 유지.
         # 금리 수집 성공 여부와는 별개로 잘못된 날짜를 표시하지 않는다.

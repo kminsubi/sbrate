@@ -176,7 +176,7 @@ function mobileSourceLabel(){
   if(MobileState.product === "deposit"){
     return "저축은행중앙회 비교공시";
   }
-  return "각 저축은행 공식 공시·상품 페이지";
+  return "각 저축은행 홈페이지";
 }
 
 function renderMobileDataSource(data){
@@ -1506,7 +1506,7 @@ function mobileMovementSummary(data){
 function executiveReportSourceLabel(){
   return MobileState.product === "deposit"
     ? "저축은행중앙회 비교공시"
-    : "각 저축은행 공식 공시·상품 페이지";
+    : "각 저축은행 홈페이지";
 }
 
 function reportFinancialPeers(data){
@@ -1815,10 +1815,10 @@ async function openMobileExecutiveReport(){
   }
 
   $("mobile-report-title").textContent =
-    `${currentLabel()} AI 시장분석 보고서`;
+    `AI 보고서`;
 
   $("mobile-report-basis").textContent =
-    `데이터 업데이트 시간 ${mobileDataBasis()}`;
+    `데이터 업데이트 기준 ${mobileDataBasis()}`;
 
   modal.classList.remove("hidden");
 
@@ -1835,7 +1835,7 @@ async function openMobileExecutiveReport(){
     : (data.ranked || []).filter(item=>number(item.rate) > number(data.wr)).length;
 
   const question =
-    `데이터 업데이트 시간 ${mobileDataBasis()}. ${currentLabel()} ${MobileState.period}개월 AI 시장분석 보고서의 AI Management Insight를 작성해줘.
+    `데이터 업데이트 기준 ${mobileDataBasis()}. ${currentLabel()} ${MobileState.period}개월 AI 보고서의 AI Management Insight를 작성해줘.
 반드시 아래 제공 데이터만 사용하고 새로운 숫자를 만들거나 추정하지 마.
 우리금융 금리 ${data.wr ?? "-"}%, 시장순위 ${data.rank ?? "-"}위, 시장 최고 ${data.max ?? "-"}%, 시장 평균 ${data.avg ?? "-"}%, TOP5 경계 ${top5Boundary ?? "-"}%, 우리금융보다 높은 기관 ${higherCount ?? "-"}개.
 금융지주계 데이터: ${JSON.stringify(financial.slice(0,8))}.

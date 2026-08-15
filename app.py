@@ -10720,9 +10720,9 @@ def telegram_brief():
         "☀️ SBRate Morning Brief",
         f"데이터 업데이트 기준 : {telegram_read_update_time()} KST",
         "",
-        "━━━━━━━━━━━━",
+        "────────────",
         "📌 오늘의 핵심",
-        "━━━━━━━━━━━━",
+        "────────────",
         f"시장 최고 : {dep_top_rate:.2f}%",
         f"시장 평균 : {dep_avg:.2f}%",
     ]
@@ -10755,9 +10755,9 @@ def telegram_brief():
     lines.extend([
         f"전일 변동 : 상승 {changes.get('up_count',0)} / 하락 {changes.get('down_count',0)}",
         "",
-        "━━━━━━━━━━━━",
+        "────────────",
         "🏦 정기예금 12개월 TOP3",
-        "━━━━━━━━━━━━",
+        "────────────",
     ])
 
     for idx, item in enumerate(dep["valid"][:3], start=1):
@@ -10766,7 +10766,7 @@ def telegram_brief():
         )
 
     movement = (changes.get("up_all") or [])[:3] + (changes.get("down_all") or [])[:3]
-    lines.extend(["", "🔥 주요 변동"])
+    lines.extend(["", "────────────", "🔥 주요 변동", "────────────"])
     if movement:
         for item in movement[:5]:
             c = safe_float(item.get("change")) or 0
@@ -10776,7 +10776,16 @@ def telegram_brief():
     else:
         lines.append("• 전일 대비 주요 금리 변동 없음")
 
-    lines.extend(["", *pension_lines("ISA", isa), "", *pension_lines("퇴직연금(IRP)", irp)])
+    lines.extend([
+        "",
+        "────────────",
+        *pension_lines("ISA", isa),
+        "────────────",
+        "",
+        "────────────",
+        *pension_lines("퇴직연금(IRP)", irp),
+        "────────────",
+    ])
 
     # deterministic insight: no invented values
     insight = []
@@ -10796,9 +10805,9 @@ def telegram_brief():
 
     lines.extend([
         "",
-        "━━━━━━━━━━━━",
+        "────────────",
         "🤖 AI Morning Insight",
-        "━━━━━━━━━━━━",
+        "────────────",
         *insight,
         "",
         "🌐 PC 대시보드",

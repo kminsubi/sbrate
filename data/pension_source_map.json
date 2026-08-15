@@ -15,8 +15,8 @@
         "available": true,
         "status": "verified",
         "product": "ISA 정기예금",
-        "source_type": "official_rate_table",
-        "url": "https://www.woorisavingsbank.com/deposite-interest/view.do",
+        "source_type": "official_product",
+        "url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
         "parser": "woori_isa",
         "periods": [
           "3m",
@@ -24,7 +24,8 @@
           "12m",
           "24m",
           "36m"
-        ]
+        ],
+        "note": "공식 ISA 정기예금 상품페이지 금리안내 표 우선 자동수집. GitHub 네트워크 timeout 시 마지막 공식 검증값과 기준일을 명시해 유지."
       },
       "irp": {
         "available": true,
