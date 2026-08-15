@@ -1,0 +1,39 @@
+name: SBRate V5.22 PC Wibee Position
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v522_pc_wibee_position.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply patch
+        run: python .github/v522_pc_wibee_position.py
+
+      - name: Validate
+        run: |
+          grep -q 'SBRate V5.22 PC WIBEE POSITION TUNE' static/css/dashboard.css
+          grep -q 'top:16px !important' static/css/dashboard.css
+          grep -q 'left:-8px !important' static/css/dashboard.css
+          grep -q 'dashboard.css?v=20260815v522' templates/index.html
+          git diff --check
+
+      - name: Commit and clean
+        run: |
+          rm -f .github/v522_pc_wibee_position.py .github/workflows/v522_pc_wibee_position.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Fine tune PC Wibee and bubble position"
+          git push origin main
