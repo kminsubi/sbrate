@@ -1,0 +1,31 @@
+name: SBRate V5.13 Reduced Motion Fix
+
+on:
+  push:
+    branches:
+      - agent/v513-professional-polish
+    paths:
+      - .github/workflows/v513_motion_fix.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v513-professional-polish
+          fetch-depth: 0
+      - run: python .github/v513_motion_fix.py
+      - run: git diff --check
+      - name: Commit
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add static/css/dashboard.css static/css/v512-mobile.css
+          git commit -m "Honor reduced motion for Wibee briefing"
+          git push origin HEAD:agent/v513-professional-polish
