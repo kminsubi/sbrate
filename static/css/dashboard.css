@@ -1340,3 +1340,23 @@ body:has(#market-product-tabs button[data-market-product="irp"][class*="text-whi
   min-height:0 !important;
   max-height:100% !important;
 }
+
+
+/* =====================================================
+   SBRate V5.13 REDUCED MOTION FINAL
+   Match active-state selector specificity so accessibility
+   preference always wins over the one-shot briefing motion.
+===================================================== */
+@media (prefers-reduced-motion:reduce){
+  body:has(#market-product-tabs button[data-market-product="deposit"][class*="text-white"]) img[alt="위비 캐릭터"],
+  body:has(#market-product-tabs button[data-market-product="isa"][class*="text-white"]) img[alt="위비 캐릭터"],
+  body:has(#market-product-tabs button[data-market-product="irp"][class*="text-white"]) img[alt="위비 캐릭터"]{
+    animation:none !important;
+    opacity:1 !important;
+    transform:translate3d(-25px,2px,0) !important;
+  }
+  body:has(#market-product-tabs) div:has(> img[alt="위비 캐릭터"])::after{
+    animation:none !important;
+    display:none !important;
+  }
+}
