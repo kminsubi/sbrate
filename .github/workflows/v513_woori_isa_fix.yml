@@ -1,5 +1,5 @@
 name: SBRate V5.13 Woori ISA Live Fix
-# revision 2: live first + verified official fallback
+# revision 3: fixed patch escaping, live first + verified official fallback
 
 on:
   push:
