@@ -30,7 +30,7 @@ div:has(> img[alt="위비 캐릭터"])::before{
 
 if marker not in css:
     css += block
-css_path.write_text(css + '\n', encoding='utf-8')
+css_path.write_text(css.rstrip() + '\n', encoding='utf-8')
 
 html = html_path.read_text(encoding='utf-8')
 html = html.replace('/static/css/dashboard.css?v=20260815v522', '/static/css/dashboard.css?v=20260815v523', 1)
