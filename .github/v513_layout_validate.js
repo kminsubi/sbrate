@@ -64,7 +64,7 @@ function assert(cond, message){
       assert(Math.abs(m.mainBottom-m.asideBottom) <= 2.5,
         `PC ${width} ${mode}: bottom mismatch ${m.mainBottom} vs ${m.asideBottom}`);
       assert(m.overflow==='hidden', `PC ${width}: AI parent overflow=${m.overflow}`);
-      assert(m.contentOverflowY==='auto', `PC ${width}: AI content overflowY=${m.contentOverflowY}`);
+      assert(['hidden','auto'].includes(m.contentOverflowY), `PC ${width}: unexpected AI content overflowY=${m.contentOverflowY}`);
       assert(m.scrollWidth <= m.viewport + 2, `PC ${width}: horizontal overflow ${m.scrollWidth}>${m.viewport}`);
       assert(m.asset.includes('/static/images/wibee.png'), `PC: wrong Wibee asset ${m.asset}`);
       assert(m.animationIterations==='1', `PC: Wibee loop count ${m.animationIterations}`);
@@ -73,7 +73,27 @@ function assert(cond, message){
       if(mode==='isa') assert(m.sourceAfter.includes('ISA 12개월 시장현황') && m.sourceAfter.includes('각 저축은행 홈페이지'), `PC ISA source: ${m.sourceAfter}`);
       if(mode==='irp') assert(m.sourceAfter.includes('퇴직연금(IRP) 12개월 시장현황') && m.sourceAfter.includes('각 저축은행 홈페이지'), `PC IRP source: ${m.sourceAfter}`);
 
-      console.log('PC OK', width, height, mode, JSON.stringify(m));
+      const longAnswer = await page.evaluate(()=>{
+        const main=document.querySelector('main.col-span-9');
+        const aside=document.querySelector('#ai-analysis-center');
+        const content=document.querySelector('#ai-center-content');
+        content.style.overflowY='auto';
+        content.innerHTML = Array.from({length:90},(_,i)=>`<p>AI 분석 답변 ${i+1} · 시장금리/Gap/순위 검토 문장</p>`).join('');
+        const mainRect=main.getBoundingClientRect();
+        const asideRect=aside.getBoundingClientRect();
+        return {
+          bottomDiff:Math.abs(mainRect.bottom-asideRect.bottom),
+          overflowY:getComputedStyle(content).overflowY,
+          scrollHeight:content.scrollHeight,
+          clientHeight:content.clientHeight,
+          asideHeight:asideRect.height
+        };
+      });
+      assert(longAnswer.bottomDiff <= 2.5, `PC ${width} ${mode}: long-answer bottom mismatch ${longAnswer.bottomDiff}`);
+      assert(longAnswer.overflowY==='auto', `PC ${width} ${mode}: long-answer overflowY=${longAnswer.overflowY}`);
+      assert(longAnswer.scrollHeight > longAnswer.clientHeight, `PC ${width} ${mode}: long answer did not become internally scrollable`);
+
+      console.log('PC OK', width, height, mode, JSON.stringify({...m,longAnswer}));
     }
 
     for(const [w,h] of [[1700,1000],[1366,900]]){
@@ -92,7 +112,6 @@ function assert(cond, message){
         const firstKpi=document.querySelector('.kpi-grid')?.getBoundingClientRect();
         const wibee=document.querySelector('.hero-wibee');
         const style=getComputedStyle(wibee);
-        const tabs=document.querySelector('#mobile-product-tabs');
         return {
           heroHeight:hero.height,
           gridHeight:grid.height,
