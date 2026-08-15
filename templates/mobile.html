@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f4db8" />
   <title>SBRateBot Mobile</title>
-  <link rel="stylesheet" href="/static/css/mobile.css?v=20260815v513" />
+  <link rel="stylesheet" href="/static/css/mobile.css?v=20260815v529" />
   <link rel="stylesheet" href="/static/css/v512-mobile.css?v=20260815v513" />
   <link rel="stylesheet" href="/static/css/v513-mobile-hero-hotfix.css?v=20260815v528" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -187,8 +187,15 @@
         </div>
 
         <article class="panel-card">
-          <div class="product-filter-row">
+          <div class="product-filter-row product-explorer-filter-row">
             <input id="mobile-product-search" type="search" placeholder="저축은행명 또는 실제 상품명 검색" />
+            <select id="mobile-product-period" class="product-period-select" aria-label="조회 기간">
+              <option value="3">3개월</option>
+              <option value="6">6개월</option>
+              <option value="12" selected>12개월</option>
+              <option value="24">24개월</option>
+              <option value="36">36개월</option>
+            </select>
           </div>
           <div id="mobile-product-list" class="product-list"></div>
           <div id="mobile-source-note" class="source-note">
@@ -209,7 +216,7 @@
           <button id="mobile-kakao-share" type="button">💬 카카오톡 공유</button>
           <button id="mobile-error-report" type="button">📣 오류 제보하기</button>
           <a href="/" class="more-link">🖥 PC 대시보드 열기</a>
-          <div class="version-row"><span>Mobile Version</span><strong>V2.1</strong></div>
+          <div class="version-row"><span>Mobile Version</span><strong>V2.2</strong></div>
         </article>
       </section>
     </main>
@@ -271,6 +278,6 @@
     </div>
 
   </div>
-  <script src="/static/js/mobile.js?v=20260815v513"></script>
+  <script src="/static/js/mobile.js?v=20260815v529"></script>
 </body>
 </html>

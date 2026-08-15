@@ -830,3 +830,56 @@ button{cursor:pointer}
   .hero-wibee-wrap{height:92px}
   .hero-wibee{width:124px;max-width:124px;max-height:112px;transform:scale(1.16)}
 }
+
+/* =========================================================
+   SBRate V5.29 MOBILE PRODUCT PERIOD
+   Product explorer search + independent period selector
+========================================================= */
+.product-explorer-filter-row{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 88px !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+
+.product-explorer-filter-row input,
+.product-explorer-filter-row .product-period-select{
+  min-width:0 !important;
+  height:42px !important;
+  border:1px solid #dfe6ef !important;
+  border-radius:12px !important;
+  background:#fafcff !important;
+  color:#5f6c7e !important;
+  font-size:10px !important;
+  outline:none !important;
+}
+
+.product-explorer-filter-row input{
+  width:100% !important;
+  padding:0 12px !important;
+}
+
+.product-explorer-filter-row .product-period-select{
+  width:88px !important;
+  padding:0 8px !important;
+  font-weight:700 !important;
+  color:#1556c0 !important;
+}
+
+.product-explorer-filter-row input:focus,
+.product-explorer-filter-row .product-period-select:focus{
+  border-color:#92b9f2 !important;
+  box-shadow:0 0 0 3px rgba(21,86,192,.06) !important;
+}
+
+@media(max-width:380px){
+  .product-explorer-filter-row{
+    grid-template-columns:minmax(0,1fr) 82px !important;
+    gap:6px !important;
+  }
+  .product-explorer-filter-row .product-period-select{
+    width:82px !important;
+    padding:0 6px !important;
+    font-size:9.5px !important;
+  }
+}

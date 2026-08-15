@@ -7,6 +7,7 @@ const MobileState = {
     irp: null
   },
   topExpanded: false,
+  productPeriod: "12",
   products: [],
   dataBasis: null,
   dataBasisKind: "확인시각",
@@ -290,7 +291,7 @@ function normalizeAlternativeItem(item,index=0){
     disclosure_date:item?.disclosure_date ?? null,
     rate_month:item?.rate_month ?? null,
     source:item?.source ?? item?.source_url ?? item?.url ?? null,
-    period:item?.period ?? `${MobileState.period}개월`,
+    period:item?.period ?? `${MobileState.productPeriod || MobileState.period}개월`,
     rank:item?.rank ?? index+1,
     change:Number(item?.change ?? item?.diff ?? 0) || 0
   };
@@ -927,6 +928,13 @@ async function loadProducts(){
       MobileState.product
     ];
 
+  const explorerPeriod =
+    String(
+      MobileState.productPeriod ||
+      MobileState.period ||
+      "12"
+    );
+
   if(MobileState.product === "deposit"){
     try{
       const payload =
@@ -941,10 +949,6 @@ async function loadProducts(){
               []
             );
 
-      /*
-       * 모바일 기본 시장 화면은 12개월.
-       * PC 시장판과 같은 기준으로 12개월 상품만 노출.
-       */
       MobileState.products =
         source.filter(item=>{
           const period =
@@ -956,7 +960,7 @@ async function loadProducts(){
 
           return (
             !period ||
-            period === MobileState.period
+            period === explorerPeriod
           );
         });
     }catch(error){
@@ -966,11 +970,38 @@ async function loadProducts(){
       );
 
       MobileState.products =
-        data?.ranked || [];
+        explorerPeriod === MobileState.period
+          ? (data?.ranked || [])
+          : [];
     }
   }else{
-    MobileState.products =
-      data?.items || [];
+    try{
+      const payload =
+        await api(
+          `/api/${MobileState.product}?period=${encodeURIComponent(explorerPeriod)}`
+        );
+
+      const source =
+        Array.isArray(payload)
+          ? payload
+          : (payload?.items || []);
+
+      MobileState.products =
+        source.map(
+          (item,index) =>
+            normalizeAlternativeItem(item,index)
+        );
+    }catch(error){
+      console.error(
+        "MOBILE ALTERNATIVE PRODUCTS ERROR",
+        error
+      );
+
+      MobileState.products =
+        explorerPeriod === MobileState.period
+          ? (data?.items || [])
+          : [];
+    }
   }
 
   renderProducts();
@@ -2012,6 +2043,17 @@ document.addEventListener(
       .addEventListener(
         "input",
         renderProducts
+      );
+
+    $("mobile-product-period")
+      ?.addEventListener(
+        "change",
+        async event=>{
+          MobileState.productPeriod =
+            String(event.target.value || "12");
+
+          await loadProducts();
+        }
       );
 
     $("mobile-report-open")
