@@ -1,10 +1,8 @@
 /* SBRate V5.15 mobile hero briefing polish - 2026-08-15
    - keep original Wibee asset
-   - move Wibee down and anchor it to the lower-left
-   - restore right-side data balance
    - briefing bubble moved upward
    - slightly enlarge Wibee
-   - keep a subtle idle motion after initial briefing
+   - intro gesture once, subtle idle motion continuously
 */
 
 .hero-card{
@@ -29,6 +27,7 @@
   padding:0 !important;
   overflow:visible !important;
   z-index:1;
+  transform-origin:58% 88% !important;
 }
 
 .hero-wibee{
@@ -42,13 +41,17 @@
   will-change:transform,opacity;
 }
 
-/* Intro briefing + subtle continuous idle motion */
+/* Intro on the image; ongoing idle on the wrapper so animations never fight. */
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee{
-  animation:
-    sb-v515-brief-intro 1.55s cubic-bezier(.22,.72,.2,1) 1 both,
-    sb-v515-idle 4.8s ease-in-out 1.6s infinite both !important;
+  animation:sb-v515-brief-intro 1.55s cubic-bezier(.22,.72,.2,1) 1 both !important;
+}
+
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap,
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
+  animation:sb-v515-idle 4.8s ease-in-out 1.6s infinite both !important;
 }
 
 @keyframes sb-v515-brief-intro{
@@ -59,10 +62,10 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 }
 
 @keyframes sb-v515-idle{
-  0%,100%{transform:translate3d(8px,11px,0) rotate(0deg) scale(1)}
-  25%{transform:translate3d(8px,10px,0) rotate(-0.55deg) scale(1.004)}
-  50%{transform:translate3d(9px,11px,0) rotate(0.4deg) scale(1.006)}
-  75%{transform:translate3d(8px,12px,0) rotate(-0.25deg) scale(1.002)}
+  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
+  25%{transform:translate3d(0,-1px,0) rotate(-0.45deg)}
+  50%{transform:translate3d(1px,0,0) rotate(.35deg)}
+  75%{transform:translate3d(0,1px,0) rotate(-.2deg)}
 }
 
 /* Brief speech cue: appears once on entry/tab switch, then disappears. */
@@ -220,6 +223,12 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
     animation:none !important;
     opacity:1 !important;
     transform:translate3d(8px,11px,0) !important;
+  }
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap,
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
+    animation:none !important;
+    transform:none !important;
   }
   .hero-wibee-wrap::before,
   .hero-wibee-wrap::after,
