@@ -37,3 +37,5 @@ jobs:
           git add static/css/dashboard.css templates/index.html .github/v523_pc_bubble_patch.py .github/workflows/v523_pc_bubble.yml
           git commit -m 'Fine tune PC Wibee bubble right and down'
           git push origin main
+
+# rerun after EOF formatting fix
