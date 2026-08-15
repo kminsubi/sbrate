@@ -1,8 +1,8 @@
-/* SBRate V5.15 mobile hero briefing polish - 2026-08-15
+/* SBRate V5.16 mobile hero layout - 2026-08-15
    - keep original Wibee asset
-   - briefing bubble moved upward
-   - slightly enlarge Wibee
-   - intro gesture once, subtle idle motion continuously
+   - place Woori rate and market-top gap side by side
+   - shorten the metric panel and enlarge Wibee
+   - keep briefing bubble + subtle continuous idle motion
 */
 
 .hero-card{
@@ -10,16 +10,16 @@
 }
 
 .hero-main-grid{
-  grid-template-columns:minmax(0,43%) minmax(0,57%) !important;
-  min-height:98px !important;
+  grid-template-columns:minmax(0,44%) minmax(0,56%) !important;
+  min-height:91px !important;
   gap:0 !important;
   align-items:end !important;
-  margin-top:1px !important;
+  margin-top:0 !important;
 }
 
 .hero-wibee-wrap{
   position:relative !important;
-  height:98px !important;
+  height:91px !important;
   min-width:0 !important;
   display:flex !important;
   justify-content:flex-start !important;
@@ -31,9 +31,9 @@
 }
 
 .hero-wibee{
-  width:min(158px,44vw) !important;
+  width:min(168px,46vw) !important;
   max-width:none !important;
-  max-height:118px !important;
+  max-height:126px !important;
   height:auto !important;
   object-fit:contain !important;
   transform-origin:58% 88% !important;
@@ -41,40 +41,38 @@
   will-change:transform,opacity;
 }
 
-/* Intro on the image; ongoing idle on the wrapper so animations never fight. */
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee{
-  animation:sb-v515-brief-intro 1.55s cubic-bezier(.22,.72,.2,1) 1 both !important;
+  animation:sb-v516-brief-intro 1.5s cubic-bezier(.22,.72,.2,1) 1 both !important;
 }
 
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap{
-  animation:sb-v515-idle 4.8s ease-in-out 1.6s infinite both !important;
+  animation:sb-v516-idle 4.8s ease-in-out 1.55s infinite both !important;
 }
 
-@keyframes sb-v515-brief-intro{
-  0%{opacity:0;transform:translate3d(8px,15px,0) rotate(-1.3deg) scale(.97)}
-  34%{opacity:1;transform:translate3d(8px,11px,0) rotate(-1.6deg) scale(1)}
-  62%{transform:translate3d(9px,11px,0) rotate(1.1deg) scale(1.008)}
-  100%{opacity:1;transform:translate3d(8px,11px,0) rotate(0) scale(1)}
+@keyframes sb-v516-brief-intro{
+  0%{opacity:0;transform:translate3d(7px,15px,0) rotate(-1.3deg) scale(.97)}
+  34%{opacity:1;transform:translate3d(7px,11px,0) rotate(-1.5deg) scale(1)}
+  62%{transform:translate3d(8px,11px,0) rotate(1deg) scale(1.008)}
+  100%{opacity:1;transform:translate3d(7px,11px,0) rotate(0) scale(1)}
 }
 
-@keyframes sb-v515-idle{
+@keyframes sb-v516-idle{
   0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
-  25%{transform:translate3d(0,-1px,0) rotate(-0.45deg)}
+  25%{transform:translate3d(0,-1px,0) rotate(-.4deg)}
   50%{transform:translate3d(1px,0,0) rotate(.35deg)}
   75%{transform:translate3d(0,1px,0) rotate(-.2deg)}
 }
 
-/* Brief speech cue: appears once on entry/tab switch, then disappears. */
 .hero-wibee-wrap::before{
   position:absolute;
-  left:92px;
-  top:-3px;
+  left:96px;
+  top:-8px;
   z-index:4;
-  max-width:112px;
+  max-width:118px;
   padding:4px 8px;
   border:1px solid rgba(255,255,255,.42);
   border-radius:10px 10px 10px 3px;
@@ -88,26 +86,26 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   pointer-events:none;
   opacity:0;
 }
+
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::before,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::before,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap::before{
   content:"브리핑을 시작할게요";
-  animation:sb-v515-bubble 2.9s ease 1 both;
+  animation:sb-v516-bubble 2.9s ease 1 both;
 }
 
-@keyframes sb-v515-bubble{
+@keyframes sb-v516-bubble{
   0%,9%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
   22%,74%{opacity:1;transform:translate3d(0,0,0) scale(1)}
   100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
 }
 
-/* Pointer beam from Wibee/tablet toward the rate block. */
 .hero-wibee-wrap::after{
   content:"" !important;
   position:absolute !important;
-  right:-13px !important;
-  top:58px !important;
-  width:36px !important;
+  right:-11px !important;
+  top:55px !important;
+  width:34px !important;
   height:2px !important;
   border-radius:999px !important;
   background:linear-gradient(90deg,rgba(189,220,255,0),rgba(235,246,255,.98)) !important;
@@ -119,101 +117,148 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::after,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::after,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap::after{
-  animation:sb-v515-pointer 1.45s ease-out .42s 1 both !important;
+  animation:sb-v516-pointer 1.4s ease-out .42s 1 both !important;
 }
 
-@keyframes sb-v515-pointer{
+@keyframes sb-v516-pointer{
   0%{opacity:0;transform:scaleX(.15)}
   32%,66%{opacity:.9;transform:scaleX(1)}
   100%{opacity:0;transform:scaleX(.55) translateX(5px)}
 }
 
-/* Rate block owns the right side of the card. */
 .hero-rate-panel{
   min-width:0 !important;
   align-self:end !important;
-  text-align:right !important;
-  padding:0 8px 4px 4px !important;
+  padding:0 7px 8px 2px !important;
   transform:none !important;
   z-index:2;
 }
-.hero-product-name,
-.hero-rate-panel .metric-label,
-.hero-rate-panel .hero-gap{
-  text-align:right !important;
-}
+
 .hero-product-name{
   display:block !important;
-  margin-bottom:2px !important;
+  margin:0 0 7px !important;
+  text-align:right !important;
   white-space:nowrap !important;
   overflow:visible !important;
-  font-size:9.2px !important;
+  font-size:9px !important;
+  line-height:1.1 !important;
 }
-.hero-rate-panel .metric-label{
-  margin-bottom:1px !important;
+
+.hero-metrics-row{
+  display:grid !important;
+  grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr) !important;
+  align-items:end !important;
+  gap:8px !important;
+  width:100% !important;
 }
+
+.hero-rate-metric,
+.hero-gap-metric{
+  min-width:0 !important;
+}
+
+.hero-rate-metric{
+  text-align:left !important;
+}
+
+.hero-rate-metric .metric-label{
+  display:block !important;
+  margin:0 0 3px !important;
+  text-align:left !important;
+  font-size:8.8px !important;
+  line-height:1.1 !important;
+  opacity:.92;
+}
+
 .hero-rate{
   display:block !important;
-  font-size:31px !important;
-  line-height:1 !important;
+  font-size:30px !important;
+  line-height:.98 !important;
+  text-align:left !important;
+  white-space:nowrap !important;
 }
-.hero-rate-panel .hero-gap{
-  margin-top:4px !important;
+
+.hero-gap-metric{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-end !important;
+  justify-content:flex-end !important;
+  margin:0 !important;
+  padding:0 !important;
+  text-align:right !important;
+}
+
+.hero-gap-metric > span{
+  display:block !important;
+  margin:0 0 4px !important;
+  font-size:8.2px !important;
+  line-height:1.1 !important;
+  white-space:nowrap !important;
+  opacity:.92;
+}
+
+.hero-gap-metric > strong{
+  display:block !important;
+  margin:0 !important;
+  font-size:18px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
 }
 
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-rate,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-rate,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-rate{
-  animation:sb-v515-rate-cue 1.15s ease-out .78s 1 both;
+  animation:sb-v516-rate-cue 1.1s ease-out .76s 1 both;
 }
-@keyframes sb-v515-rate-cue{
+
+@keyframes sb-v516-rate-cue{
   0%,100%{text-shadow:none;transform:translateZ(0)}
   45%{text-shadow:0 0 18px rgba(220,239,255,.55);transform:scale(1.025)}
 }
 
 @media(max-width:380px){
   .hero-main-grid{
-    grid-template-columns:minmax(0,42%) minmax(0,58%) !important;
-    min-height:93px !important;
+    grid-template-columns:minmax(0,43%) minmax(0,57%) !important;
+    min-height:88px !important;
   }
-  .hero-wibee-wrap{height:93px !important;}
+  .hero-wibee-wrap{height:88px !important;}
   .hero-wibee{
-    width:min(145px,42vw) !important;
-    max-height:109px !important;
+    width:min(152px,44vw) !important;
+    max-height:114px !important;
   }
   .hero-wibee-wrap::before{
     left:84px;
-    top:-1px;
-    font-size:6.9px;
+    top:-5px;
+    font-size:6.8px;
     padding:3px 6px;
   }
-  .hero-wibee-wrap::after{
-    right:-10px !important;
-    top:56px !important;
-    width:29px !important;
-  }
-  .hero-rate-panel{padding-right:5px !important;}
-  .hero-product-name{font-size:8.5px !important;}
-  .hero-rate{font-size:28.5px !important;}
+  .hero-rate-panel{padding-right:4px !important;}
+  .hero-product-name{font-size:8.2px !important; margin-bottom:6px !important;}
+  .hero-metrics-row{gap:5px !important;}
+  .hero-rate-metric .metric-label{font-size:8px !important;}
+  .hero-rate{font-size:26.5px !important;}
+  .hero-gap-metric > span{font-size:7.3px !important;}
+  .hero-gap-metric > strong{font-size:15.5px !important;}
 }
 
 @media(min-width:430px){
   .hero-main-grid{
-    grid-template-columns:minmax(0,42%) minmax(0,58%) !important;
-    min-height:103px !important;
+    grid-template-columns:minmax(0,43%) minmax(0,57%) !important;
+    min-height:96px !important;
   }
-  .hero-wibee-wrap{height:103px !important;}
+  .hero-wibee-wrap{height:96px !important;}
   .hero-wibee{
-    width:166px !important;
-    max-height:123px !important;
+    width:176px !important;
+    max-height:132px !important;
   }
   .hero-wibee-wrap::before{
-    left:98px;
-    top:-5px;
+    left:102px;
+    top:-10px;
     font-size:7.8px;
   }
-  .hero-rate-panel{padding-right:10px !important;}
-  .hero-rate{font-size:32px !important;}
+  .hero-rate-panel{padding-right:9px !important;}
+  .hero-rate{font-size:31px !important;}
+  .hero-gap-metric > strong{font-size:19px !important;}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -222,7 +267,7 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee{
     animation:none !important;
     opacity:1 !important;
-    transform:translate3d(8px,11px,0) !important;
+    transform:translate3d(7px,11px,0) !important;
   }
   body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap,
   body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap,
