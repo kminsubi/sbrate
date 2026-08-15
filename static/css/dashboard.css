@@ -1558,3 +1558,22 @@ div:has(> img[alt="위비 캐릭터"])::before{
     top:-5px !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.23 PC WIBEE BUBBLE FINE TUNE
+   - move bubble one visual step right
+   - move bubble two visual steps down
+   - keep Wibee position unchanged
+===================================================== */
+
+div:has(> img[alt="위비 캐릭터"])::before{
+  left:-4px !important;
+  top:2px !important;
+}
+
+@media (max-width:1500px){
+  div:has(> img[alt="위비 캐릭터"])::before{
+    left:-6px !important;
+    top:3px !important;
+  }
+}
