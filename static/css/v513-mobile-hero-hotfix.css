@@ -1,8 +1,10 @@
-/* SBRate V5.14 mobile hero briefing polish - 2026-08-15
+/* SBRate V5.15 mobile hero briefing polish - 2026-08-15
    - keep original Wibee asset
    - move Wibee down and anchor it to the lower-left
    - restore right-side data balance
-   - replace floating with one-shot briefing gesture + speech cue + pointer
+   - briefing bubble moved upward
+   - slightly enlarge Wibee
+   - keep a subtle idle motion after initial briefing
 */
 
 .hero-card{
@@ -11,7 +13,7 @@
 
 .hero-main-grid{
   grid-template-columns:minmax(0,43%) minmax(0,57%) !important;
-  min-height:96px !important;
+  min-height:98px !important;
   gap:0 !important;
   align-items:end !important;
   margin-top:1px !important;
@@ -19,7 +21,7 @@
 
 .hero-wibee-wrap{
   position:relative !important;
-  height:96px !important;
+  height:98px !important;
   min-width:0 !important;
   display:flex !important;
   justify-content:flex-start !important;
@@ -30,9 +32,9 @@
 }
 
 .hero-wibee{
-  width:min(150px,42vw) !important;
+  width:min(158px,44vw) !important;
   max-width:none !important;
-  max-height:112px !important;
+  max-height:118px !important;
   height:auto !important;
   object-fit:contain !important;
   transform-origin:58% 88% !important;
@@ -40,127 +42,90 @@
   will-change:transform,opacity;
 }
 
-/* One-shot briefing gesture. No infinite vertical floating. */
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee{
-  animation:sb-v514-brief-deposit 1.55s cubic-bezier(.22,.72,.2,1) 1 both !important;
-}
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee{
-  animation:sb-v514-brief-isa 1.55s cubic-bezier(.22,.72,.2,1) 1 both !important;
-}
+/* Intro briefing + subtle continuous idle motion */
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee,
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee{
-  animation:sb-v514-brief-irp 1.55s cubic-bezier(.22,.72,.2,1) 1 both !important;
+  animation:
+    sb-v515-brief-intro 1.55s cubic-bezier(.22,.72,.2,1) 1 both,
+    sb-v515-idle 4.8s ease-in-out 1.6s infinite both !important;
 }
 
-@keyframes sb-v514-brief-deposit{
+@keyframes sb-v515-brief-intro{
   0%{opacity:0;transform:translate3d(8px,15px,0) rotate(-1.3deg) scale(.97)}
-  34%{opacity:1;transform:translate3d(8px,10px,0) rotate(-1.6deg) scale(1)}
-  62%{transform:translate3d(9px,10px,0) rotate(1.1deg) scale(1.006)}
-  100%{opacity:1;transform:translate3d(8px,10px,0) rotate(0) scale(1)}
+  34%{opacity:1;transform:translate3d(8px,11px,0) rotate(-1.6deg) scale(1)}
+  62%{transform:translate3d(9px,11px,0) rotate(1.1deg) scale(1.008)}
+  100%{opacity:1;transform:translate3d(8px,11px,0) rotate(0) scale(1)}
 }
-@keyframes sb-v514-brief-isa{
-  0%{opacity:0;transform:translate3d(8px,15px,0) rotate(-1.3deg) scale(.97)}
-  34%{opacity:1;transform:translate3d(8px,10px,0) rotate(-1.6deg) scale(1)}
-  62%{transform:translate3d(9px,10px,0) rotate(1.1deg) scale(1.006)}
-  100%{opacity:1;transform:translate3d(8px,10px,0) rotate(0) scale(1)}
-}
-@keyframes sb-v514-brief-irp{
-  0%{opacity:0;transform:translate3d(8px,15px,0) rotate(-1.3deg) scale(.97)}
-  34%{opacity:1;transform:translate3d(8px,10px,0) rotate(-1.6deg) scale(1)}
-  62%{transform:translate3d(9px,10px,0) rotate(1.1deg) scale(1.006)}
-  100%{opacity:1;transform:translate3d(8px,10px,0) rotate(0) scale(1)}
+
+@keyframes sb-v515-idle{
+  0%,100%{transform:translate3d(8px,11px,0) rotate(0deg) scale(1)}
+  25%{transform:translate3d(8px,10px,0) rotate(-0.55deg) scale(1.004)}
+  50%{transform:translate3d(9px,11px,0) rotate(0.4deg) scale(1.006)}
+  75%{transform:translate3d(8px,12px,0) rotate(-0.25deg) scale(1.002)}
 }
 
 /* Brief speech cue: appears once on entry/tab switch, then disappears. */
 .hero-wibee-wrap::before{
   position:absolute;
-  left:88px;
-  top:4px;
+  left:92px;
+  top:-3px;
   z-index:4;
-  max-width:104px;
-  padding:4px 7px;
+  max-width:112px;
+  padding:4px 8px;
   border:1px solid rgba(255,255,255,.42);
-  border-radius:9px 9px 9px 3px;
-  background:rgba(255,255,255,.94);
+  border-radius:10px 10px 10px 3px;
+  background:rgba(255,255,255,.95);
   box-shadow:0 5px 16px rgba(7,55,131,.13);
   color:#25558f;
-  font-size:7.4px;
+  font-size:7.6px;
   font-weight:800;
   line-height:1.25;
   white-space:nowrap;
   pointer-events:none;
   opacity:0;
 }
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::before{
-  content:"시장 Gap을 볼게요";
-  animation:sb-v514-bubble-deposit 2.75s ease 1 both;
-}
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::before{
-  content:"ISA 순위를 볼게요";
-  animation:sb-v514-bubble-isa 2.75s ease 1 both;
-}
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::before,
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::before,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap::before{
-  content:"IRP 금리를 볼게요";
-  animation:sb-v514-bubble-irp 2.75s ease 1 both;
+  content:"브리핑을 시작할게요";
+  animation:sb-v515-bubble 2.9s ease 1 both;
 }
 
-@keyframes sb-v514-bubble-deposit{
+@keyframes sb-v515-bubble{
   0%,9%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
-  22%,72%{opacity:1;transform:translate3d(0,0,0) scale(1)}
-  100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
-}
-@keyframes sb-v514-bubble-isa{
-  0%,9%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
-  22%,72%{opacity:1;transform:translate3d(0,0,0) scale(1)}
-  100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
-}
-@keyframes sb-v514-bubble-irp{
-  0%,9%{opacity:0;transform:translate3d(-3px,3px,0) scale(.97)}
-  22%,72%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  22%,74%{opacity:1;transform:translate3d(0,0,0) scale(1)}
   100%{opacity:0;transform:translate3d(3px,-2px,0) scale(.99)}
 }
 
-/* Short pointer beam from Wibee/tablet toward the rate block. */
+/* Pointer beam from Wibee/tablet toward the rate block. */
 .hero-wibee-wrap::after{
   content:"" !important;
   position:absolute !important;
-  right:-11px !important;
-  top:55px !important;
-  width:30px !important;
+  right:-13px !important;
+  top:58px !important;
+  width:36px !important;
   height:2px !important;
   border-radius:999px !important;
-  background:linear-gradient(90deg,rgba(189,220,255,0),rgba(235,246,255,.96)) !important;
+  background:linear-gradient(90deg,rgba(189,220,255,0),rgba(235,246,255,.98)) !important;
   transform-origin:left center !important;
   opacity:0;
   box-shadow:none !important;
   pointer-events:none;
 }
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::after{
-  animation:sb-v514-pointer-deposit 1.45s ease-out .42s 1 both !important;
-}
-body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::after{
-  animation:sb-v514-pointer-isa 1.45s ease-out .42s 1 both !important;
-}
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-wibee-wrap::after,
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-wibee-wrap::after,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee-wrap::after{
-  animation:sb-v514-pointer-irp 1.45s ease-out .42s 1 both !important;
+  animation:sb-v515-pointer 1.45s ease-out .42s 1 both !important;
 }
 
-@keyframes sb-v514-pointer-deposit{
-  0%{opacity:0;transform:scaleX(.15)}
-  32%,66%{opacity:.9;transform:scaleX(1)}
-  100%{opacity:0;transform:scaleX(.55) translateX(5px)}
-}
-@keyframes sb-v514-pointer-isa{
-  0%{opacity:0;transform:scaleX(.15)}
-  32%,66%{opacity:.9;transform:scaleX(1)}
-  100%{opacity:0;transform:scaleX(.55) translateX(5px)}
-}
-@keyframes sb-v514-pointer-irp{
+@keyframes sb-v515-pointer{
   0%{opacity:0;transform:scaleX(.15)}
   32%,66%{opacity:.9;transform:scaleX(1)}
   100%{opacity:0;transform:scaleX(.55) translateX(5px)}
 }
 
-/* Rate block owns the right side of the card again. */
+/* Rate block owns the right side of the card. */
 .hero-rate-panel{
   min-width:0 !important;
   align-self:end !important;
@@ -193,13 +158,12 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   margin-top:4px !important;
 }
 
-/* Make the rate itself react briefly when Wibee points to the data. */
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-rate,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-rate,
 body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-rate{
-  animation:sb-v514-rate-cue 1.15s ease-out .78s 1 both;
+  animation:sb-v515-rate-cue 1.15s ease-out .78s 1 both;
 }
-@keyframes sb-v514-rate-cue{
+@keyframes sb-v515-rate-cue{
   0%,100%{text-shadow:none;transform:translateZ(0)}
   45%{text-shadow:0 0 18px rgba(220,239,255,.55);transform:scale(1.025)}
 }
@@ -207,23 +171,23 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 @media(max-width:380px){
   .hero-main-grid{
     grid-template-columns:minmax(0,42%) minmax(0,58%) !important;
-    min-height:91px !important;
+    min-height:93px !important;
   }
-  .hero-wibee-wrap{height:91px !important;}
+  .hero-wibee-wrap{height:93px !important;}
   .hero-wibee{
-    width:min(137px,39vw) !important;
-    max-height:104px !important;
+    width:min(145px,42vw) !important;
+    max-height:109px !important;
   }
   .hero-wibee-wrap::before{
-    left:80px;
-    top:5px;
-    font-size:6.8px;
+    left:84px;
+    top:-1px;
+    font-size:6.9px;
     padding:3px 6px;
   }
   .hero-wibee-wrap::after{
-    right:-9px !important;
-    top:53px !important;
-    width:25px !important;
+    right:-10px !important;
+    top:56px !important;
+    width:29px !important;
   }
   .hero-rate-panel{padding-right:5px !important;}
   .hero-product-name{font-size:8.5px !important;}
@@ -233,17 +197,17 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 @media(min-width:430px){
   .hero-main-grid{
     grid-template-columns:minmax(0,42%) minmax(0,58%) !important;
-    min-height:101px !important;
+    min-height:103px !important;
   }
-  .hero-wibee-wrap{height:101px !important;}
+  .hero-wibee-wrap{height:103px !important;}
   .hero-wibee{
-    width:158px !important;
-    max-height:117px !important;
+    width:166px !important;
+    max-height:123px !important;
   }
   .hero-wibee-wrap::before{
-    left:94px;
-    top:3px;
-    font-size:7.6px;
+    left:98px;
+    top:-5px;
+    font-size:7.8px;
   }
   .hero-rate-panel{padding-right:10px !important;}
   .hero-rate{font-size:32px !important;}
@@ -255,7 +219,7 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-wibee{
     animation:none !important;
     opacity:1 !important;
-    transform:translate3d(8px,10px,0) !important;
+    transform:translate3d(8px,11px,0) !important;
   }
   .hero-wibee-wrap::before,
   .hero-wibee-wrap::after,
