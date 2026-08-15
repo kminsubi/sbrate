@@ -459,3 +459,36 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 .hero-wibee-wrap{
   left:-20px !important;
 }
+
+/* =====================================================
+   SBRate V5.35 MOBILE HERO RATE EMPHASIS
+   - use the open vertical space in the hero
+   - strengthen Woori rate hierarchy without changing the gap metric
+===================================================== */
+
+.hero-rate-metric{
+  transform:translateY(-3px) !important;
+}
+
+.hero-rate-metric .metric-label{
+  font-size:10.4px !important;
+  margin-bottom:4px !important;
+  font-weight:700 !important;
+}
+
+.hero-rate{
+  font-size:35.5px !important;
+  line-height:.96 !important;
+  letter-spacing:-.045em !important;
+}
+
+@media(max-width:380px){
+  .hero-rate-metric{transform:translateY(-2px) !important;}
+  .hero-rate-metric .metric-label{font-size:9.4px !important;}
+  .hero-rate{font-size:31.5px !important;}
+}
+
+@media(min-width:430px){
+  .hero-rate-metric .metric-label{font-size:10.7px !important;}
+  .hero-rate{font-size:36.5px !important;}
+}

@@ -1634,3 +1634,26 @@ div:has(> img[alt="위비 캐릭터"])::before{
     top:7px !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.35 PC PRODUCT PERIOD EMPHASIS
+   Match the mobile product explorer's blue period control.
+===================================================== */
+
+#product-period-select{
+  border-color:#bfd6f6 !important;
+  background:#f3f8ff !important;
+  color:#1556c0 !important;
+  font-weight:800 !important;
+}
+
+#product-period-select:hover{
+  border-color:#9fc4f4 !important;
+  background:#eef6ff !important;
+}
+
+#product-period-select:focus{
+  border-color:#7eadeb !important;
+  box-shadow:0 0 0 3px rgba(21,86,192,.07) !important;
+  outline:none !important;
+}
