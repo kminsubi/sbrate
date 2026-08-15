@@ -1500,3 +1500,33 @@ div:has(> img[alt="위비 캐릭터"])::before{
   div:has(> img[alt="위비 캐릭터"]){animation:none !important;transform:none !important;}
   div:has(> img[alt="위비 캐릭터"])::before{display:none !important;animation:none !important;}
 }
+
+/* =====================================================
+   SBRate V5.20 PC WIBEE BUBBLE ABOVE HEAD
+   Keep the speech cue entirely inside the Wibee visual area
+   so it never covers briefing text or metrics.
+===================================================== */
+
+div:has(> img[alt="위비 캐릭터"])::before{
+  left:18px !important;
+  top:1px !important;
+  transform-origin:center bottom !important;
+  border-radius:11px !important;
+  padding:4px 9px !important;
+  box-shadow:0 4px 12px rgba(7,55,131,.11) !important;
+}
+
+@keyframes sb-v519-pc-bubble{
+  0%,5%{opacity:0;transform:translate3d(0,4px,0) scale(.97)}
+  10%,34%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  42%,100%{opacity:0;transform:translate3d(0,-3px,0) scale(.99)}
+}
+
+@media (max-width:1500px){
+  div:has(> img[alt="위비 캐릭터"])::before{
+    left:14px !important;
+    top:2px !important;
+    font-size:8.5px !important;
+    padding:4px 7px !important;
+  }
+}
