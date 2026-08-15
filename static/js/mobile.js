@@ -2102,3 +2102,30 @@ document.addEventListener(
     );
   }
 );
+
+/* SBRate V5.32 MOBILE PRODUCT PERIOD AVAILABILITY */
+function syncMobileProductPeriodAvailability(type = MobileState.product){
+  const select = document.getElementById("mobile-product-period");
+  const oneMonth = select?.querySelector('option[value="1"]');
+  if(!select || !oneMonth) return;
+
+  const allowOneMonth = type === "deposit";
+  oneMonth.hidden = !allowOneMonth;
+  oneMonth.disabled = !allowOneMonth;
+
+  if(!allowOneMonth && select.value === "1"){
+    select.value = "12";
+    MobileState.productPeriod = "12";
+  }
+}
+
+document.addEventListener("click", event => {
+  const tab = event.target.closest("#mobile-product-tabs .product-tab[data-product]");
+  if(tab){
+    syncMobileProductPeriodAvailability(tab.dataset.product);
+  }
+}, true);
+
+document.addEventListener("DOMContentLoaded", () => {
+  syncMobileProductPeriodAvailability("deposit");
+});

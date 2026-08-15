@@ -5216,3 +5216,30 @@ document.addEventListener("click", function(event){
         modal.classList.remove("flex");
     }
 });
+
+/* SBRate V5.32 PRODUCT PERIOD AVAILABILITY */
+function syncProductPeriodAvailability(mode = activeMarketProduct){
+    const select = document.getElementById("product-period-select");
+    const oneMonth = select?.querySelector('option[value="1"]');
+    if(!select || !oneMonth) return;
+
+    const allowOneMonth = mode === "deposit";
+    oneMonth.hidden = !allowOneMonth;
+    oneMonth.disabled = !allowOneMonth;
+
+    if(!allowOneMonth && select.value === "1"){
+        select.value = "12";
+        currentMarketPeriod = "12";
+    }
+}
+
+document.addEventListener("click", event => {
+    const tab = event.target.closest("[data-market-product]");
+    if(tab){
+        syncProductPeriodAvailability(tab.dataset.marketProduct);
+    }
+}, true);
+
+document.addEventListener("DOMContentLoaded", () => {
+    syncProductPeriodAvailability("deposit");
+});
