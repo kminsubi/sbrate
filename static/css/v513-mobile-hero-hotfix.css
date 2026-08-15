@@ -1,7 +1,7 @@
-/* SBRate V5.16 mobile hero layout - 2026-08-15
+/* SBRate V5.17 mobile hero layout - 2026-08-15
    - keep original Wibee asset
    - place Woori rate and market-top gap side by side
-   - shorten the metric panel and enlarge Wibee
+   - slightly reduce Wibee so antenna clears the title comfortably
    - keep briefing bubble + subtle continuous idle motion
 */
 
@@ -31,9 +31,9 @@
 }
 
 .hero-wibee{
-  width:min(168px,46vw) !important;
+  width:min(160px,44vw) !important;
   max-width:none !important;
-  max-height:126px !important;
+  max-height:120px !important;
   height:auto !important;
   object-fit:contain !important;
   transform-origin:58% 88% !important;
@@ -69,7 +69,7 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 
 .hero-wibee-wrap::before{
   position:absolute;
-  left:96px;
+  left:92px;
   top:-8px;
   z-index:4;
   max-width:118px;
@@ -223,11 +223,11 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   }
   .hero-wibee-wrap{height:88px !important;}
   .hero-wibee{
-    width:min(152px,44vw) !important;
-    max-height:114px !important;
+    width:min(145px,42vw) !important;
+    max-height:109px !important;
   }
   .hero-wibee-wrap::before{
-    left:84px;
+    left:80px;
     top:-5px;
     font-size:6.8px;
     padding:3px 6px;
@@ -248,11 +248,11 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   }
   .hero-wibee-wrap{height:96px !important;}
   .hero-wibee{
-    width:176px !important;
-    max-height:132px !important;
+    width:166px !important;
+    max-height:124px !important;
   }
   .hero-wibee-wrap::before{
-    left:102px;
+    left:96px;
     top:-10px;
     font-size:7.8px;
   }
