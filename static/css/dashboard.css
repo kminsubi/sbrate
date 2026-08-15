@@ -1619,3 +1619,18 @@ div:has(> img[alt="위비 캐릭터"])::before{
     left:-2px !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.26 PC BUBBLE POSITION
+   Move the dashboard briefing bubble one visual step down only.
+===================================================== */
+
+div:has(> img[alt="위비 캐릭터"])::before{
+  top:6px !important;
+}
+
+@media (max-width:1500px){
+  div:has(> img[alt="위비 캐릭터"])::before{
+    top:7px !important;
+  }
+}

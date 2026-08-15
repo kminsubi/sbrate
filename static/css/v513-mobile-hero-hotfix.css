@@ -335,3 +335,58 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 @media(min-width:430px){
   .hero-wibee-wrap::before{left:104px !important;}
 }
+
+/* =====================================================
+   SBRate V5.26 MOBILE RANK CONTEXT + BUBBLE POSITION
+   - explain market rank basis next to the rank pill
+   - move mobile briefing bubble three visual steps right
+===================================================== */
+
+.hero-rank-context{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  min-width:0;
+}
+
+.hero-rank-copy{
+  min-width:0;
+  text-align:right;
+  line-height:1.05;
+  white-space:nowrap;
+}
+
+.hero-rank-label{
+  display:block;
+  color:#edf5ff;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+
+.hero-rank-copy small{
+  display:block;
+  margin-top:3px;
+  color:#bdd7ff;
+  font-size:7px;
+  font-weight:600;
+  letter-spacing:-.02em;
+}
+
+.hero-wibee-wrap::before{
+  left:112px !important;
+}
+
+@media(max-width:380px){
+  .hero-rank-context{gap:5px;}
+  .hero-rank-label{font-size:8.2px;}
+  .hero-rank-copy small{font-size:6.4px;}
+  .rank-pill{padding-left:7px !important;padding-right:7px !important;}
+  .hero-wibee-wrap::before{left:100px !important;}
+}
+
+@media(min-width:430px){
+  .hero-wibee-wrap::before{left:116px !important;}
+}
