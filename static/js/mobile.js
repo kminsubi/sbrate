@@ -1057,7 +1057,7 @@ function renderProducts(){
               <small>
                 ${
                   MobileState.product === "deposit"
-                    ? `${MobileState.period}개월`
+                    ? `${MobileState.productPeriod || MobileState.period}개월`
                     : disclosure(
                         item.disclosure_date ||
                         item.rate_month
