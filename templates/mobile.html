@@ -7,7 +7,7 @@
   <title>SBRateBot Mobile</title>
   <link rel="stylesheet" href="/static/css/mobile.css?v=20260815v513" />
   <link rel="stylesheet" href="/static/css/v512-mobile.css?v=20260815v513" />
-  <link rel="stylesheet" href="/static/css/v513-mobile-hero-hotfix.css?v=20260815v515" />
+  <link rel="stylesheet" href="/static/css/v513-mobile-hero-hotfix.css?v=20260815v516" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Kakao JavaScript SDK -->
   <script
@@ -67,11 +67,15 @@
             </div>
             <div class="hero-rate-panel">
               <span id="hero-woori-product" class="hero-product-name">대표상품 -</span>
-              <span class="metric-label">우리금융 금리</span>
-              <strong id="hero-woori-rate" class="hero-rate">-</strong>
-              <div class="hero-gap">
-                <span>시장 최고 대비</span>
-                <strong id="hero-gap-top">-</strong>
+              <div class="hero-metrics-row">
+                <div class="hero-rate-metric">
+                  <span class="metric-label">우리금융 금리</span>
+                  <strong id="hero-woori-rate" class="hero-rate">-</strong>
+                </div>
+                <div class="hero-gap hero-gap-metric">
+                  <span>시장 최고 대비</span>
+                  <strong id="hero-gap-top">-</strong>
+                </div>
               </div>
             </div>
           </div>
@@ -199,7 +203,7 @@
           <button id="mobile-kakao-share" type="button">💬 카카오톡 공유</button>
           <button id="mobile-error-report" type="button">📣 오류 제보하기</button>
           <a href="/" class="more-link">🖥 PC 대시보드 열기</a>
-          <div class="version-row"><span>Mobile Version</span><strong>V1.9</strong></div>
+          <div class="version-row"><span>Mobile Version</span><strong>V2.0</strong></div>
         </article>
       </section>
     </main>
