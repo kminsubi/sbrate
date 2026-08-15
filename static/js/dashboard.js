@@ -4043,7 +4043,7 @@ async function renderAIAnalysisCenter(tab){
     if(!target) return;
 
     target.classList.toggle("ai-market-compact", tab === "market");
-    target.style.overflowY = tab === "market" ? "hidden" : "auto";
+    target.style.overflowY = "auto";
 
     target.innerHTML = '<div class="py-10 text-center text-gray-400">분석 데이터를 불러오는 중입니다.</div>';
 
