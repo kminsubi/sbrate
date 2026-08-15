@@ -1,0 +1,60 @@
+name: SBRate V5.13 Structural AI Fix
+
+on:
+  push:
+    branches:
+      - agent/v513-professional-polish
+    paths:
+      - .github/workflows/v513_structural_fix.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v513-professional-polish
+          fetch-depth: 0
+
+      - name: Apply structural fix
+        run: python .github/v513_structural_fix.py
+
+      - name: Static validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile app.py
+          node --check static/js/dashboard.js
+          node --check static/js/mobile.js
+          python - <<'PY'
+          from pathlib import Path
+          html=Path('templates/index.html').read_text(encoding='utf-8')
+          css=Path('static/css/dashboard.css').read_text(encoding='utf-8')
+          assert html.count('id="dashboard-intelligence-row"') == 1
+          assert html.count('id="ai-analysis-center"') == 1
+          assert html.count('id="ai-center-content"') == 1
+          assert 'function alignAIAnalysisCenter' not in html
+          assert 'targetHeight' not in html
+          assert '#dashboard-intelligence-row > #ai-analysis-center' in css
+          assert 'position:absolute !important' in css
+          assert 'grid-column:10 / 13 !important' in css
+          print('Structural invariants OK')
+          PY
+          git diff --check
+
+      - name: Commit structural fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add templates/index.html static/css/dashboard.css
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "Fix AI analysis panel structural height"
+          git push origin HEAD:agent/v513-professional-polish
