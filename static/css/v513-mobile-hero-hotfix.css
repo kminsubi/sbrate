@@ -1,0 +1,116 @@
+/* SBRate V5.13 mobile hero balance hotfix - 2026-08-15
+   Goal: keep the compact hero height, enlarge original Wibee, and remove
+   the dead space between Wibee and the Woori rate block. */
+
+.hero-main-grid{
+  grid-template-columns:minmax(0,46%) minmax(0,54%) !important;
+  min-height:82px !important;
+  gap:0 !important;
+  align-items:center !important;
+}
+
+.hero-wibee-wrap{
+  height:82px !important;
+  justify-content:flex-end !important;
+  align-items:flex-end !important;
+  padding-right:0 !important;
+  transform:translateX(5px);
+  z-index:1;
+}
+
+.hero-wibee{
+  width:min(156px,44vw) !important;
+  max-width:none !important;
+  max-height:124px !important;
+  height:auto !important;
+}
+
+.hero-rate-panel{
+  min-width:0 !important;
+  text-align:left !important;
+  padding-left:8px !important;
+  transform:translateX(-2px);
+  z-index:2;
+}
+
+.hero-product-name,
+.hero-rate-panel .metric-label{
+  text-align:left !important;
+}
+
+.hero-product-name{
+  display:block !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+}
+
+.hero-rate-panel .hero-gap{
+  text-align:left !important;
+  margin-top:3px !important;
+}
+
+.hero-rate{
+  display:block !important;
+  font-size:31px !important;
+}
+
+@media(max-width:380px){
+  .hero-main-grid{
+    grid-template-columns:minmax(0,47%) minmax(0,53%) !important;
+    min-height:80px !important;
+  }
+
+  .hero-wibee-wrap{
+    height:80px !important;
+    transform:translateX(4px);
+  }
+
+  .hero-wibee{
+    width:min(144px,42vw) !important;
+    max-height:116px !important;
+  }
+
+  .hero-rate-panel{
+    padding-left:5px !important;
+    transform:translateX(-1px);
+  }
+
+  .hero-product-name{
+    font-size:8.8px !important;
+  }
+
+  .hero-rate{
+    font-size:28.5px !important;
+  }
+}
+
+@media(min-width:430px){
+  .hero-main-grid{
+    grid-template-columns:minmax(0,45%) minmax(0,55%) !important;
+    min-height:86px !important;
+  }
+
+  .hero-wibee-wrap{
+    height:86px !important;
+    transform:translateX(6px);
+  }
+
+  .hero-wibee{
+    width:170px !important;
+    max-height:132px !important;
+  }
+
+  .hero-rate-panel{
+    padding-left:10px !important;
+  }
+
+  .hero-rate{
+    font-size:32px !important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-wibee-wrap{
+    transform:translateX(5px) !important;
+  }
+}
