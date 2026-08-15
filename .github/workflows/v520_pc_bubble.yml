@@ -1,0 +1,41 @@
+name: SBRate V5.20 PC Wibee Bubble
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v520_pc_bubble.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply patch
+        run: python .github/v520_pc_bubble_patch.py
+
+      - name: Validate
+        shell: bash
+        run: |
+          grep -q 'SBRate V5.20 PC WIBEE BUBBLE ABOVE HEAD' static/css/dashboard.css
+          grep -q 'left:18px !important' static/css/dashboard.css
+          grep -q 'dashboard.css?v=20260815v520' templates/index.html
+          git diff --check
+
+      - name: Commit and clean
+        shell: bash
+        run: |
+          rm -f .github/v520_pc_bubble_patch.py .github/workflows/v520_pc_bubble.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Move PC Wibee speech bubble above head"
+          git push origin main
