@@ -434,6 +434,13 @@
   <!-- 메인 레이아웃 (대시보드 + 우측 AI 분석센터) -->
   <div class="p-6 max-w-[1700px] mx-auto grid grid-cols-12 gap-6 items-start">
 
+    <!--
+      V5.13 structural row:
+      좌측 main만 행 높이를 결정하고, 우측 AI 패널은 같은 행의 top/bottom에 고정된다.
+      긴 AI 답변은 우측 내부 스크롤만 발생하며 전체 행 높이를 늘리지 않는다.
+    -->
+    <div id="dashboard-intelligence-row" class="col-span-12 relative grid grid-cols-12 gap-6 items-start">
+
     <!-- 좌측 메인 영역 (9컬럼) -->
     <main class="col-span-9 space-y-5">
 
@@ -1154,6 +1161,8 @@ class="text-xs text-gray-600 leading-5">
       </div>
     </aside>
 
+    </div><!-- /#dashboard-intelligence-row -->
+
     <section id="fullwidth-product-row" class="col-span-12">
       <!-- 하단 전체 상품 조회 검색 영역 -->
       <div id="product-search-panel" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -1460,140 +1469,6 @@ class="text-xs text-gray-600 leading-5">
   </div>
 </div>
 
-<script>
-(function () {
-
-    function alignAIAnalysisCenter() {
-
-        const main =
-            document.querySelector("main");
-
-        const hero =
-            document.getElementById(
-                "dashboard-hero-start"
-            );
-
-        const product =
-            document.getElementById(
-                "product-search-panel"
-            );
-
-        const aside =
-            document.getElementById(
-                "ai-analysis-center"
-            );
-
-        if (
-            !main ||
-            !hero ||
-            !product ||
-            !aside
-        ) {
-            return;
-        }
-
-        const mainRect =
-            main.getBoundingClientRect();
-
-        const heroRect =
-            hero.getBoundingClientRect();
-
-        const productRect =
-            product.getBoundingClientRect();
-
-        const topOffset =
-            Math.max(
-                0,
-                heroRect.top - mainRect.top
-            );
-
-        const targetHeight =
-            Math.max(
-                320,
-                productRect.top - heroRect.top
-            );
-
-        aside.style.marginTop =
-            `${topOffset}px`;
-
-        aside.style.setProperty(
-            "height",
-            `${targetHeight}px`,
-            "important"
-        );
-
-        aside.style.setProperty(
-            "max-height",
-            `${targetHeight}px`,
-            "important"
-        );
-
-    }
-
-
-    function scheduleAlign() {
-
-        requestAnimationFrame(
-            () => {
-                requestAnimationFrame(
-                    alignAIAnalysisCenter
-                );
-            }
-        );
-
-    }
-
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        scheduleAlign
-    );
-
-
-    window.addEventListener(
-        "load",
-        scheduleAlign
-    );
-
-
-    window.addEventListener(
-        "resize",
-        scheduleAlign
-    );
-
-
-    if (
-        "ResizeObserver"
-        in window
-    ) {
-
-        const observer =
-            new ResizeObserver(
-                scheduleAlign
-            );
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            () => {
-
-                const main =
-                    document.querySelector(
-                        "main"
-                    );
-
-                if (main) {
-                    observer.observe(
-                        main
-                    );
-                }
-
-            }
-        );
-
-    }
-
-})();
-</script>
 
 
 <!-- =========================================================

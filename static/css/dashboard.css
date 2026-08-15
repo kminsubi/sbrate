@@ -1298,3 +1298,45 @@ body:has(#market-product-tabs button[data-market-product="irp"][class*="text-whi
     animation:none !important;
   }
 }
+
+
+/* =====================================================
+   SBRate V5.13 STRUCTURAL AI ROW
+   The left main column is the only intrinsic height owner.
+   The right AI panel fills that row without contributing
+   its content height back into the grid sizing algorithm.
+===================================================== */
+
+#dashboard-intelligence-row{
+  position:relative !important;
+  align-items:start !important;
+  min-width:0;
+}
+
+#dashboard-intelligence-row > main{
+  grid-column:1 / span 9 !important;
+  min-width:0;
+}
+
+#dashboard-intelligence-row > #ai-analysis-center{
+  position:absolute !important;
+  grid-column:10 / 13 !important;
+  grid-row:1 !important;
+  top:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  left:0 !important;
+  align-self:stretch !important;
+  width:auto !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+
+#dashboard-intelligence-row > #ai-analysis-center > #ai-center-content{
+  flex:1 1 0% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+}
