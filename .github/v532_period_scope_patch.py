@@ -36,8 +36,8 @@ document.addEventListener("click", event => {
 document.addEventListener("DOMContentLoaded", () => {
     syncProductPeriodAvailability("deposit");
 });
-''' + "\n"
-pc_js.write_text(pc, encoding="utf-8")
+'''
+pc_js.write_text(pc.rstrip("\n") + "\n", encoding="utf-8")
 
 mj = mobile_js.read_text(encoding="utf-8")
 if MARKER_MOBILE not in mj:
@@ -67,8 +67,8 @@ document.addEventListener("click", event => {
 document.addEventListener("DOMContentLoaded", () => {
   syncMobileProductPeriodAvailability("deposit");
 });
-''' + "\n"
-mobile_js.write_text(mj, encoding="utf-8")
+'''
+mobile_js.write_text(mj.rstrip("\n") + "\n", encoding="utf-8")
 
 html = index.read_text(encoding="utf-8")
 html = html.replace('/static/js/dashboard.js?v=20260815v513', '/static/js/dashboard.js?v=20260815v532')
