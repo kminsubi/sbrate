@@ -6,9 +6,7 @@ html_path=Path('templates/index.html')
 css=css_path.read_text(encoding='utf-8')
 marker='SBRate V5.18 PC HEADER + WIBEE HOTFIX'
 
-block='''
-
-/* =====================================================
+block='''/* =====================================================
    SBRate V5.18 PC HEADER + WIBEE HOTFIX
    - keep dashboard header title on one line
    - slightly reduce PC Wibee size
@@ -51,11 +49,10 @@ div:has(> img[alt="위비 캐릭터"]){
     animation:none !important;
     transform:none !important;
   }
-}
-'''
+}'''
 
 if marker not in css:
-    css=css.rstrip()+block+'\n'
+    css=css.rstrip()+'\n\n'+block.strip()+'\n'
     css_path.write_text(css,encoding='utf-8')
 
 html=html_path.read_text(encoding='utf-8')
