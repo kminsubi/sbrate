@@ -143,7 +143,7 @@ def woori_isa(bank,kind,cfg):
 
 '''
 
-text,new_count=pattern.subn(replacement,text,count=1)
+text,new_count=pattern.subn(lambda _m: replacement,text,count=1)
 if new_count != 1:
     raise SystemExit(f'woori_isa function replacement failed: {new_count}')
 
@@ -153,8 +153,6 @@ if old not in text:
     raise SystemExit('collect_woori_disclosure_date ISA URL marker not found')
 text=text.replace(old,new,1)
 
-# Preserve a specific collector-provided date source instead of overwriting it
-# with the generic existing_collector label.
 old_source='''        else:\n            item["disclosure_date_source"]="existing_collector"\n            return item'''
 new_source='''        else:\n            if not item.get("disclosure_date_source"):\n                item["disclosure_date_source"]="existing_collector"\n            return item'''
 if old_source not in text:
