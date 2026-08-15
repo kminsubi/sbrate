@@ -1,0 +1,38 @@
+name: SBRate V5.27 Mobile Rank Inline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v527_mobile_rank_inline.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply patch
+        run: python .github/v527_mobile_rank_inline_patch.py
+
+      - name: Validate
+        run: |
+          grep -q 'SBRate V5.27 MOBILE RANK INLINE' static/css/v513-mobile-hero-hotfix.css
+          grep -q 'display:flex !important' static/css/v513-mobile-hero-hotfix.css
+          grep -q 'v513-mobile-hero-hotfix.css?v=20260815v527' templates/mobile.html
+          git diff --check
+
+      - name: Commit and clean
+        run: |
+          rm -f .github/v527_mobile_rank_inline_patch.py .github/workflows/v527_mobile_rank_inline.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add static/css/v513-mobile-hero-hotfix.css templates/mobile.html .github/v527_mobile_rank_inline_patch.py .github/workflows/v527_mobile_rank_inline.yml
+          git commit -m 'Show mobile market rank context on one line'
+          git push origin main
