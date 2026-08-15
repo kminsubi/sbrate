@@ -492,3 +492,46 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
   .hero-rate-metric .metric-label{font-size:10.7px !important;}
   .hero-rate{font-size:36.5px !important;}
 }
+
+/* =====================================================
+   SBRate V5.36 MOBILE RATE CUE PER PRODUCT
+   Replay the same one-shot Woori-rate highlight whenever
+   Deposit / ISA / IRP becomes the active product tab.
+===================================================== */
+
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-rate{
+  animation:sb-v536-rate-cue-deposit 1.1s ease-out .30s 1 both !important;
+}
+
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-rate{
+  animation:sb-v536-rate-cue-isa 1.1s ease-out .30s 1 both !important;
+}
+
+body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-rate{
+  animation:sb-v536-rate-cue-irp 1.1s ease-out .30s 1 both !important;
+}
+
+@keyframes sb-v536-rate-cue-deposit{
+  0%,100%{text-shadow:none;transform:translateZ(0)}
+  45%{text-shadow:0 0 20px rgba(220,239,255,.62);transform:scale(1.028)}
+}
+
+@keyframes sb-v536-rate-cue-isa{
+  0%,100%{text-shadow:none;transform:translateZ(0)}
+  45%{text-shadow:0 0 20px rgba(220,239,255,.62);transform:scale(1.028)}
+}
+
+@keyframes sb-v536-rate-cue-irp{
+  0%,100%{text-shadow:none;transform:translateZ(0)}
+  45%{text-shadow:0 0 20px rgba(220,239,255,.62);transform:scale(1.028)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="deposit"]) .hero-rate,
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="isa"]) .hero-rate,
+  body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-rate{
+    animation:none !important;
+    transform:none !important;
+    text-shadow:none !important;
+  }
+}
