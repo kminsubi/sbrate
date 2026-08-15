@@ -45,7 +45,7 @@ if MOBILE_MARKER not in mcss:
   .hero-rate{font-size:36.5px !important;}
 }
 '''
-mobile_css.write_text(mcss + '\n', encoding='utf-8')
+mobile_css.write_text(mcss.rstrip() + '\n', encoding='utf-8')
 
 dcss = dashboard_css.read_text(encoding='utf-8').rstrip()
 if PC_MARKER not in dcss:
@@ -74,7 +74,7 @@ if PC_MARKER not in dcss:
   outline:none !important;
 }
 '''
-dashboard_css.write_text(dcss + '\n', encoding='utf-8')
+dashboard_css.write_text(dcss.rstrip() + '\n', encoding='utf-8')
 
 mhtml = mobile_html.read_text(encoding='utf-8')
 mhtml = mhtml.replace('v513-mobile-hero-hotfix.css?v=20260815v534', 'v513-mobile-hero-hotfix.css?v=20260815v535')
