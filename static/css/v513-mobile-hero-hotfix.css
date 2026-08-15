@@ -446,3 +446,16 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
 .hero-wibee{
   margin-left:-12px !important;
 }
+
+/* =====================================================
+   SBRate V5.34 MOBILE WIBEE GROUP ALIGNMENT
+   Move Wibee and its briefing bubble together as one visual group.
+===================================================== */
+
+.hero-wibee{
+  margin-left:0 !important;
+}
+
+.hero-wibee-wrap{
+  left:-20px !important;
+}
