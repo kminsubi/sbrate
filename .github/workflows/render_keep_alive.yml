@@ -2,12 +2,14 @@ name: SBRate Render Keep Alive
 
 on:
   schedule:
-    # KST 07:30-18:30, every 10 minutes, weekdays only.
+    # KST 06:00-23:00, every 10 minutes, weekdays only.
     # GitHub Actions cron uses UTC, so the KST window spans two UTC dates.
-    - cron: "30,40,50 22 * * 0-4"
-    - cron: "0,10,20,30,40,50 23 * * 0-4"
-    - cron: "0,10,20,30,40,50 0-8 * * 1-5"
-    - cron: "0,10,20,30 9 * * 1-5"
+    # 06:00-08:50 KST = 21:00-23:50 UTC on the previous date (Sun-Thu).
+    - cron: "0,10,20,30,40,50 21-23 * * 0-4"
+    # 09:00-22:50 KST = 00:00-13:50 UTC on the same date (Mon-Fri).
+    - cron: "0,10,20,30,40,50 0-13 * * 1-5"
+    # Final 23:00 KST keep-alive = 14:00 UTC (Mon-Fri).
+    - cron: "0 14 * * 1-5"
   workflow_dispatch:
 
 jobs:
@@ -31,8 +33,8 @@ jobs:
           KST_WEEKDAY=$(TZ=Asia/Seoul date +%u)
           KST_HM=$(TZ=Asia/Seoul date +%H%M)
 
-          # Defensive guard: weekdays, 07:30-18:30 KST only.
-          if [ "$KST_WEEKDAY" -gt 5 ] || [ "$KST_HM" -lt 0730 ] || [ "$KST_HM" -gt 1830 ]; then
+          # Defensive guard: weekdays, 06:00-23:00 KST only.
+          if [ "$KST_WEEKDAY" -gt 5 ] || [ "$KST_HM" -lt 0600 ] || [ "$KST_HM" -gt 2300 ]; then
             echo "run=false" >> "$GITHUB_OUTPUT"
             echo "Outside Korean business hours: $KST_DATE $KST_HM"
             exit 0
