@@ -2,9 +2,9 @@ name: SBRateBot Telegram Morning Brief
 
 on:
   schedule:
-    # 07:05 KST target. GitHub scheduled workflows can start later under load.
+    # 07:30 KST target. GitHub scheduled workflows can start later under load.
     # Weekdays only; Korean public holidays are filtered in the job below.
-    - cron: "5 22 * * 0-4"
+    - cron: "30 22 * * 0-4"
   workflow_dispatch:
 
 jobs:
@@ -52,8 +52,8 @@ jobs:
       - name: Send Telegram morning brief
         if: steps.business_day.outputs.run == 'true'
         run: |
-          # Wake request above blocks until Render responds, so a fixed 60-second
-          # sleep is unnecessary. Brief request itself still retries transient starts.
+          # Keep-alive starts at 06:00 KST, and this wake request provides an
+          # additional guard before sending the 07:30 KST Morning Brief.
           curl --fail --show-error --silent \
             --retry 4 \
             --retry-delay 5 \
