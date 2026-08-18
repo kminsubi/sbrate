@@ -2,12 +2,16 @@ name: SBRate Render Keep Alive
 
 on:
   schedule:
-    # KST 06:00-23:00, every 10 minutes, weekdays only.
+    # KST 06:00-23:00, weekdays only.
     # GitHub Actions cron uses UTC, so the KST window spans two UTC dates.
-    # 06:00-08:50 KST = 21:00-23:50 UTC on the previous date (Sun-Thu).
-    - cron: "0,10,20,30,40,50 21-23 * * 0-4"
-    # 09:00-22:50 KST = 00:00-13:50 UTC on the same date (Mon-Fri).
-    - cron: "0,10,20,30,40,50 0-13 * * 1-5"
+    # Start exactly at 06:00 KST.
+    - cron: "0 21 * * 0-4"
+    # Then keep Render warm every 5 minutes at off-peak minute offsets
+    # (03,08,13,...,58) to avoid common :00/:05 scheduler congestion.
+    # 06:03-08:58 KST = 21:03-23:58 UTC on the previous date (Sun-Thu).
+    - cron: "3,8,13,18,23,28,33,38,43,48,53,58 21-23 * * 0-4"
+    # 09:03-22:58 KST = 00:03-13:58 UTC on the same date (Mon-Fri).
+    - cron: "3,8,13,18,23,28,33,38,43,48,53,58 0-13 * * 1-5"
     # Final 23:00 KST keep-alive = 14:00 UTC (Mon-Fri).
     - cron: "0 14 * * 1-5"
   workflow_dispatch:
