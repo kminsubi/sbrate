@@ -1777,3 +1777,38 @@ html body div.wibee-pc-stage::before{
     animation:sb-v524-pc-bubble 7.2s cubic-bezier(.22,.72,.2,1) infinite both !important;
   }
 }
+
+/* =====================================================
+   SBRate V5.42 PC WIBEE MOTION WRAPPER
+   Move the image through a dedicated <span> so enterprise
+   reduced-motion rules targeting div/img transforms cannot pin it.
+===================================================== */
+
+.wibee-pc-stage{
+  animation:none !important;
+  transform:none !important;
+}
+
+.wibee-pc-motion{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  width:100% !important;
+  height:100% !important;
+  transform-origin:55% 82% !important;
+  animation:sb-v542-pc-wibee-idle 4.8s ease-in-out 1.1s infinite both !important;
+  will-change:transform !important;
+}
+
+@keyframes sb-v542-pc-wibee-idle{
+  0%,100%{transform:translate3d(0,0,0) rotate(-.18deg)}
+  25%{transform:translate3d(0,-2px,0) rotate(-.42deg)}
+  50%{transform:translate3d(2px,-4px,0) rotate(.42deg)}
+  75%{transform:translate3d(1px,-1px,0) rotate(-.16deg)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .wibee-pc-motion{
+    animation:sb-v542-pc-wibee-idle 4.8s ease-in-out 1.1s infinite both !important;
+  }
+}
