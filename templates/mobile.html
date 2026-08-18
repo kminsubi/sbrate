@@ -20,7 +20,13 @@
 
     <header class="mobile-header">
       <div class="brand-row">
-        <div class="brand">
+        <div class="brand"
+             title="대시보드 새로고침"
+             role="button"
+             tabindex="0"
+             onclick="window.location.reload()"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.reload();}"
+             style="cursor:pointer;">
           <img src="/static/images/ci.png" alt="우리금융저축은행" class="brand-logo" />
           <div class="brand-text">
             <strong>수신 모니터링 현황</strong>

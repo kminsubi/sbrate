@@ -399,10 +399,20 @@
       <img 
         src="/static/images/ci.png"
         alt="우리금융저축은행"
-        class="h-7 object-contain"
+        class="h-7 object-contain cursor-pointer select-none"
+        title="대시보드 새로고침"
+        role="button"
+        tabindex="0"
+        onclick="window.location.reload()"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.reload();}"
         onerror="this.onerror=null; this.src='https://via.placeholder.com/150x30?text=WOORI+SAVINGS+BANK';"
       />
-      <h1 class="text-base font-bold text-gray-900 border-l border-gray-300 pl-3 whitespace-nowrap shrink-0 leading-none">
+      <h1 class="text-base font-bold text-gray-900 border-l border-gray-300 pl-3 whitespace-nowrap shrink-0 leading-none cursor-pointer select-none"
+          title="대시보드 새로고침"
+          role="button"
+          tabindex="0"
+          onclick="window.location.reload()"
+          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.reload();}">
         수신 모니터링 현황
       </h1>
       <div id="market-product-tabs" class="inline-flex items-center gap-1 bg-[#f4f7fb] border border-gray-100 rounded-xl p-1 ml-2">
