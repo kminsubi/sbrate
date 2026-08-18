@@ -1744,3 +1744,36 @@ div:has(> img[alt="위비 캐릭터"])::before{
     animation:sb-v524-pc-bubble 7.2s cubic-bezier(.22,.72,.2,1) infinite both !important;
   }
 }
+
+
+/* =====================================================
+   SBRate V5.41 PC WIBEE REDUCED-MOTION PRIORITY FIX
+   Earlier :has() reduced-motion rules have higher specificity.
+   This PC-only rule deliberately outranks them so the enterprise
+   dashboard keeps Wibee idle motion + repeating bubble visible.
+===================================================== */
+
+html body div.wibee-pc-stage{
+  animation:sb-v519-pc-idle 5s ease-in-out 1.4s infinite both !important;
+  transform-origin:55% 82% !important;
+  will-change:transform !important;
+}
+
+html body div.wibee-pc-stage::before{
+  display:block !important;
+  animation:sb-v524-pc-bubble 7.2s cubic-bezier(.22,.72,.2,1) infinite both !important;
+  will-change:transform,opacity !important;
+}
+
+@media(prefers-reduced-motion:reduce){
+  html body div.wibee-pc-stage{
+    animation:sb-v519-pc-idle 5s ease-in-out 1.4s infinite both !important;
+    transform-origin:55% 82% !important;
+    transform:none;
+  }
+
+  html body div.wibee-pc-stage::before{
+    display:block !important;
+    animation:sb-v524-pc-bubble 7.2s cubic-bezier(.22,.72,.2,1) infinite both !important;
+  }
+}
