@@ -1,0 +1,35 @@
+name: V5.42 PC Wibee Wrapper Patch
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/v542_pc_wibee_wrapper_patch.py'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply patch
+        run: python .github/v542_pc_wibee_wrapper_patch.py
+      - name: Validate
+        run: |
+          git diff --check
+          grep -q 'wibee-pc-motion' templates/index.html
+          grep -q 'SBRate V5.42 PC WIBEE MOTION WRAPPER' static/css/dashboard.css
+          grep -q 'dashboard.css?v=20260818v542' templates/index.html
+      - name: Commit and clean
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add templates/index.html static/css/dashboard.css
+          git rm .github/v542_pc_wibee_wrapper_patch.py .github/workflows/v542_pc_wibee_wrapper_patch.yml
+          git commit -m "Move PC Wibee motion to dedicated wrapper"
+          git push
