@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '.github/v542_pc_wibee_wrapper_patch.py'
+      - '.github/workflows/v542_pc_wibee_wrapper_patch.yml'
 
 permissions:
   contents: write
