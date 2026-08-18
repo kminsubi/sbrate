@@ -10699,10 +10699,7 @@ def telegram_brief():
         w = data["woori"] or {}
         top_rate = safe_float(top.get("rate")) or 0
         wr = safe_float(w.get("rate")) if w else None
-        lines = [
-            f"📌 {label} 12개월",
-            f"🥇 {top.get('bank','-')} {top_rate:.2f}%"
-        ]
+        lines = [f"📌 {label} 12개월"]
         if w:
             product = telegram_product_name(w)
             gap = (wr or 0) - top_rate
@@ -10714,6 +10711,7 @@ def telegram_brief():
             ])
         else:
             lines.append("🔵 우리금융 : 유효금리 미확인")
+        lines.append(f"🥇 {top.get('bank','-')} {top_rate:.2f}%")
         return lines
 
     lines = [
@@ -10723,8 +10721,6 @@ def telegram_brief():
         "────────────",
         "📌 오늘의 핵심",
         "────────────",
-        f"시장 최고 : {dep_top_rate:.2f}%",
-        f"시장 평균 : {dep_avg:.2f}%",
     ]
 
     if dep["woori"]:
@@ -10751,8 +10747,12 @@ def telegram_brief():
             f"시장 최고 대비 : {dep_gap:+.2f}%p" if dep_gap is not None and dep_gap >= 0 else f"시장 최고 대비 : ▲{abs(dep_gap or 0):.2f}%p",
             f"Gap 전일비 : {gap_change_text}",
         ])
+    else:
+        lines.append("우리금융 : 유효금리 미확인")
 
     lines.extend([
+        f"시장 최고 : {dep_top_rate:.2f}%",
+        f"시장 평균 : {dep_avg:.2f}%",
         f"전일 변동 : 상승 {changes.get('up_count',0)} / 하락 {changes.get('down_count',0)}",
         "",
         "────────────",
