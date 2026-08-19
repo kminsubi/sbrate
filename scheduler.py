@@ -12,6 +12,7 @@ from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
+from rate_simulator import install_rate_simulator
 from visitor_platform import enable_mobile_platform_detection
 from visitor_stats import install_visitor_stats_hooks
 
@@ -129,3 +130,4 @@ def start_scheduler():
 enable_mobile_platform_detection()
 install_visitor_stats_hooks()
 install_data_quality_endpoint()
+install_rate_simulator()
