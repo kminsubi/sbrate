@@ -1,0 +1,43 @@
+/* SBRate Rate Simulation V5 - mobile selector alignment
+   Match period/product cards to the rate cards directly below.
+*/
+@media (max-width:640px){
+  /* Rate row center lane = 8px gap + 22px arrow + 8px gap = 38px.
+     Use the same center lane above so left/right card edges align exactly. */
+  .rate-simulation-controls{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:38px !important;
+    align-items:stretch !important;
+  }
+
+  .rate-simulation-field{
+    min-width:0 !important;
+    min-height:82px !important;
+    height:82px !important;
+    padding:10px 11px !important;
+    box-sizing:border-box !important;
+    border-radius:14px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:space-between !important;
+  }
+
+  .rate-simulation-field label{
+    margin:0 0 5px !important;
+    line-height:1.2 !important;
+  }
+
+  .rate-simulation-field select{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:34px !important;
+    height:34px !important;
+    line-height:34px !important;
+    padding:0 !important;
+    box-sizing:border-box !important;
+  }
+
+  .rate-simulation-rate-box{
+    border-radius:14px !important;
+  }
+}
