@@ -1,6 +1,7 @@
 # SBRate Rate Simulation V3 runtime wiring
 # - Direct stable assets for PC dashboard
 # - Prevent stale dashboard HTML after deploy
+# - Load V4 layout/label polish on both PC and mobile
 import sys
 
 
@@ -24,13 +25,16 @@ def install_rate_simulation_v3_runtime():
                 response.headers["Expires"] = "0"
 
             if (
-                request.path == "/"
+                request.path in ("/", "/mobile")
                 and response.status_code == 200
                 and "text/html" in str(response.content_type or "")
             ):
                 html = response.get_data(as_text=True)
-                marker = "data-sbrate-rate-simulation-v2=\"v3\""
-                if marker not in html:
+
+                # PC receives V3 assets here. Mobile already has the V3 assets
+                # directly in its template, so the marker prevents duplication.
+                v3_marker = "data-sbrate-rate-simulation-v2=\"v3\""
+                if request.path == "/" and v3_marker not in html:
                     css = (
                         '<link data-sbrate-rate-simulation-v2="v3" '
                         'rel="stylesheet" '
@@ -46,8 +50,25 @@ def install_rate_simulation_v3_runtime():
                     )
                     html = html.replace("</head>", css + "\n</head>", 1)
                     html = html.replace("</body>", js + "\n" + guard + "\n</body>", 1)
-                    response.set_data(html)
-                    response.headers.pop("Content-Length", None)
+
+                # V4 is deliberately a separate cache-busted override so a
+                # previously cached V3 asset cannot hide the latest UI polish.
+                v4_marker = "data-sbrate-rate-simulation-v4=\"1\""
+                if v4_marker not in html:
+                    v4_css = (
+                        '<link data-sbrate-rate-simulation-v4="1" '
+                        'rel="stylesheet" '
+                        'href="/static/css/rate_simulation_v4_polish.css?v=20260820v1">'
+                    )
+                    v4_js = (
+                        '<script data-sbrate-rate-simulation-v4="1" '
+                        'src="/static/js/rate_simulation_v4_polish.js?v=20260820v1"></script>'
+                    )
+                    html = html.replace("</head>", v4_css + "\n</head>", 1)
+                    html = html.replace("</body>", v4_js + "\n</body>", 1)
+
+                response.set_data(html)
+                response.headers.pop("Content-Length", None)
         except Exception as error:
             print("Rate Simulation V3 runtime error:", error)
         return response
