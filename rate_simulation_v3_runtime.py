@@ -4,6 +4,7 @@
 # - Load V4 layout/label polish on both PC and mobile
 # - Load V5 mobile selector alignment polish
 # - Load V6 market-basis selector and readable layout polish
+# - Load V7 unified period/product condition subpanel
 import sys
 
 
@@ -80,8 +81,8 @@ def install_rate_simulation_v3_runtime():
                     )
                     html = html.replace("</head>", v5_css + "\n</head>", 1)
 
-                # V6 is loaded last so its smaller selector cards, larger PC
-                # text and market-basis selector win over previous polish layers.
+                # V6 is loaded after earlier layers so its smaller selector cards,
+                # larger PC text and market-basis selector win over old polish.
                 v6_marker = "data-sbrate-rate-simulation-v6=\"1\""
                 if v6_marker not in html:
                     v6_css = (
@@ -95,6 +96,22 @@ def install_rate_simulation_v3_runtime():
                     )
                     html = html.replace("</head>", v6_css + "\n</head>", 1)
                     html = html.replace("</body>", v6_js + "\n</body>", 1)
+
+                # V7 groups period/product into one secondary condition panel.
+                # It is loaded last and only changes layout, not simulation math.
+                v7_marker = "data-sbrate-rate-simulation-v7=\"1\""
+                if v7_marker not in html:
+                    v7_css = (
+                        '<link data-sbrate-rate-simulation-v7="1" '
+                        'rel="stylesheet" '
+                        'href="/static/css/rate_simulation_v7_condition_panel.css?v=20260820v1">'
+                    )
+                    v7_js = (
+                        '<script data-sbrate-rate-simulation-v7="1" '
+                        'src="/static/js/rate_simulation_v7_condition_panel.js?v=20260820v1"></script>'
+                    )
+                    html = html.replace("</head>", v7_css + "\n</head>", 1)
+                    html = html.replace("</body>", v7_js + "\n</body>", 1)
 
                 response.set_data(html)
                 response.headers.pop("Content-Length", None)
