@@ -11,6 +11,7 @@ import sys
 from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from data_quality_runtime import install_data_quality_endpoint
 from visitor_platform import enable_mobile_platform_detection
 from visitor_stats import install_visitor_stats_hooks
 
@@ -123,7 +124,8 @@ def start_scheduler():
 
 
 # app.py가 scheduler를 import하는 시점에 PC/모바일/Telegram route는
-# 이미 등록되어 있으므로 방문통계 hook만 연결한다.
+# 이미 등록되어 있으므로 런타임 hook/endpoint를 연결한다.
 # 휴대폰이 루트(/) 주소로 접속해도 실제 기기 기준으로 모바일 집계한다.
 enable_mobile_platform_detection()
 install_visitor_stats_hooks()
+install_data_quality_endpoint()
