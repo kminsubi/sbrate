@@ -91,7 +91,7 @@ def install_rate_simulation_v3_runtime():
                     )
                     v6_js = (
                         '<script data-sbrate-rate-simulation-v6="1" '
-                        'src="/static/js/rate_simulation_v6.js?v=20260820v1"></script>'
+                        'src="/static/js/rate_simulation_v6.js?v=20260820v2"></script>'
                     )
                     html = html.replace("</head>", v6_css + "\n</head>", 1)
                     html = html.replace("</body>", v6_js + "\n</body>", 1)
