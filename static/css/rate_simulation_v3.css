@@ -1,0 +1,217 @@
+/* SBRate Rate Simulation V3 - direct template asset */
+
+/* Hide legacy V1/V2 triggers. V3 owns the visible entry points. */
+#rate-sim-open-pc,
+#rate-sim-open-mobile,
+#rate-sim-v2-open-pc,
+#rate-sim-v2-open-mobile,
+.sb2-mobile-row {
+  display:none !important;
+}
+
+:root{
+  --sim-blue:#1556c0;
+  --sim-blue-soft:#f3f8ff;
+  --sim-red:#e15151;
+  --sim-ink:#172033;
+  --sim-muted:#7f8b9c;
+  --sim-line:#e4ebf4;
+}
+
+.rate-simulation-open{
+  border:1px solid #b9d4f8;
+  background:#f5f9ff;
+  color:var(--sim-blue);
+  border-radius:10px;
+  padding:6px 9px;
+  font-size:10px;
+  line-height:1;
+  font-weight:800;
+  white-space:nowrap;
+  box-shadow:0 2px 8px rgba(21,86,192,.06);
+}
+.rate-simulation-open:hover{background:#edf5ff;border-color:#93bdf1}
+
+/* Mobile: exactly one row below update-time row. */
+.mobile-simulation-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  width:100%;
+  margin-top:5px;
+  min-height:24px;
+}
+.mobile-simulation-source{
+  min-width:0;
+  color:#8a96a7;
+  font-size:7.7px;
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#rate-simulation-open-mobile{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:8.5px;
+  background:#fff;
+}
+/* existing pseudo source is replaced by explicit source row */
+.app-shell .data-meta-left::after{display:none !important;content:"" !important}
+
+/* PC floating module */
+#rate-simulation-v3-layer{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:220;
+  pointer-events:none;
+}
+#rate-simulation-v3-layer.is-open{display:block}
+.rate-simulation-panel{
+  position:fixed;
+  width:min(560px,calc(100vw - 30px));
+  max-height:calc(100vh - 30px);
+  overflow:hidden;
+  background:#fff;
+  border:1px solid #dbe5f2;
+  border-radius:18px;
+  box-shadow:0 24px 70px rgba(22,35,60,.22);
+  color:var(--sim-ink);
+  pointer-events:auto;
+}
+.rate-simulation-panel.is-minimized{width:340px}
+.rate-simulation-panel.is-minimized .rate-simulation-body{display:none}
+
+/* Mobile bottom sheet */
+#rate-simulation-v3-mobile{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:230;
+  align-items:flex-end;
+  justify-content:center;
+  background:rgba(12,20,35,.42);
+  backdrop-filter:blur(2px);
+}
+#rate-simulation-v3-mobile.is-open{display:flex}
+.rate-simulation-sheet{
+  width:min(720px,100%);
+  max-height:86vh;
+  overflow:hidden;
+  background:#fff;
+  border-radius:22px 22px 0 0;
+  box-shadow:0 -18px 55px rgba(20,32,53,.24);
+}
+.rate-simulation-handle{
+  width:42px;height:4px;border-radius:999px;background:#d6dde7;margin:8px auto 2px;
+}
+
+.rate-simulation-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  border-bottom:1px solid var(--sim-line);
+  background:linear-gradient(90deg,#f8fbff,#fff);
+  cursor:move;
+  user-select:none;
+  touch-action:none;
+}
+.rate-simulation-sheet .rate-simulation-head{cursor:default}
+.rate-simulation-title{font-size:14px;font-weight:850;letter-spacing:-.02em}
+.rate-simulation-basis{margin-top:2px;color:#8793a5;font-size:9px}
+.rate-simulation-head-actions{display:flex;align-items:center;gap:5px}
+.rate-simulation-progress{min-width:40px;text-align:right;color:#8793a5;font-size:8px}
+.rate-simulation-head-btn{
+  width:29px;height:29px;border:1px solid var(--sim-line);border-radius:9px;background:#fff;color:#677489;font-size:16px;line-height:1;
+}
+
+.rate-simulation-body{
+  max-height:calc(100vh - 96px);
+  overflow:auto;
+  padding:14px;
+}
+.rate-simulation-sheet .rate-simulation-body{
+  max-height:calc(86vh - 66px);
+  padding-bottom:calc(18px + env(safe-area-inset-bottom));
+}
+
+.rate-simulation-controls{
+  display:grid;
+  grid-template-columns:110px minmax(0,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+.rate-simulation-field{
+  min-width:0;
+  border:1px solid var(--sim-line);
+  border-radius:12px;
+  background:#fafcff;
+  padding:7px 9px;
+}
+.rate-simulation-field label{display:block;margin-bottom:4px;color:#8995a6;font-size:8px}
+.rate-simulation-field select{
+  width:100%;min-width:0;border:0;outline:0;background:transparent;color:#344054;font-size:10px;font-weight:750;
+}
+
+.rate-simulation-rate-row{display:grid;grid-template-columns:1fr 24px 1fr;align-items:end;gap:8px}
+.rate-simulation-rate-box{border:1px solid #e7edf5;border-radius:14px;padding:10px 11px;background:#fbfcfe}
+.rate-simulation-rate-box.is-target{background:#f5f9ff;border-color:#b9d4f8}
+.rate-simulation-label{display:block;margin-bottom:5px;color:#8792a3;font-size:8.5px}
+.rate-simulation-big{font-size:24px;font-weight:850;letter-spacing:-.04em}
+.rate-simulation-target{display:flex;align-items:center;gap:4px}
+.rate-simulation-target input{
+  width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--sim-blue);font-size:24px;font-weight:850;letter-spacing:-.04em;padding:0;
+}
+.rate-simulation-target b{color:var(--sim-blue);font-size:16px}
+.rate-simulation-arrow{text-align:center;color:#738198;font-size:18px;padding-bottom:4px}
+.rate-simulation-delta{margin-top:7px;font-size:9px;font-weight:800}
+
+.rate-simulation-presets{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:8px}
+.rate-simulation-presets button{
+  min-height:30px;border:1px solid #e2e8f1;border-radius:9px;background:#f8fafc;color:#5e6a7d;font-size:8.5px;font-weight:800;
+}
+.rate-simulation-presets .is-up{color:var(--sim-blue);background:#f2f7ff;border-color:#cfe1fb}
+.rate-simulation-presets .is-down{color:var(--sim-red);background:#fff7f7;border-color:#f4d1d1}
+
+.rate-simulation-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
+.rate-simulation-card{min-width:0;border:1px solid #e8edf4;border-radius:12px;padding:9px;background:#fff}
+.rate-simulation-transition{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:10px}
+.rate-simulation-transition b{color:#1f2d44}
+.rate-simulation-pill{display:inline-flex;border-radius:999px;padding:3px 6px;font-size:7.5px;font-weight:800;background:#f1f3f6;color:#667387}
+.rate-simulation-pill.good{background:#edf5ff;color:var(--sim-blue)}
+.rate-simulation-pill.bad{background:#fff1f1;color:#d94c4c}
+.sim-up{color:var(--sim-blue)!important;font-weight:800}
+.sim-down{color:var(--sim-red)!important;font-weight:800}
+.sim-flat{color:#6f7b8c!important;font-weight:800}
+
+.rate-simulation-note{
+  margin-top:9px;padding:8px 10px;border:1px solid #dce9fb;border-radius:11px;background:#f7fbff;color:#526174;font-size:9px;line-height:1.45;
+}
+.rate-simulation-zone{margin-top:9px;border:1px solid #dce9fb;border-radius:12px;background:#f7fbff;padding:9px}
+.rate-simulation-neighbor{display:flex;justify-content:space-between;gap:8px;padding:5px 2px;border-top:1px solid #e5eefb;font-size:9px}
+.rate-simulation-neighbor:first-child{border-top:0}
+.rate-simulation-neighbor.is-woori{
+  margin:3px -2px;padding:6px;border:1px solid #9fc6fb;border-radius:8px;background:#eaf3ff;color:var(--sim-blue);font-weight:800;
+}
+.rate-simulation-foot{
+  display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid #edf1f6;color:#8b96a6;font-size:8px;line-height:1.4;
+}
+
+@media(max-width:640px){
+  .rate-simulation-controls{grid-template-columns:92px minmax(0,1fr)}
+  .rate-simulation-presets{grid-template-columns:repeat(3,1fr)}
+  .rate-simulation-grid{grid-template-columns:1fr 1fr}
+  .rate-simulation-big,.rate-simulation-target input{font-size:22px}
+  .rate-simulation-foot{flex-direction:column}
+  .rate-simulation-body{padding:12px}
+}
+@media(max-width:380px){
+  .mobile-simulation-source{font-size:7px}
+  #rate-simulation-open-mobile{font-size:8px;padding:5px 7px}
+  .rate-simulation-grid{grid-template-columns:1fr}
+}
