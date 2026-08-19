@@ -31,12 +31,12 @@
         <span class="rate-simulation-basis-caption">비교기준</span>
         <div class="rate-simulation-basis-options">
           <label class="rate-simulation-basis-option">
-            <input type="radio" name="rate-sim-market-${suffix}" value="bank_best" checked>
-            <span>은행별 최고금리</span>
-          </label>
-          <label class="rate-simulation-basis-option">
             <input type="radio" name="rate-sim-market-${suffix}" value="all_products">
             <span>전체상품</span>
+          </label>
+          <label class="rate-simulation-basis-option">
+            <input type="radio" name="rate-sim-market-${suffix}" value="bank_best" checked>
+            <span>은행별 최고금리</span>
           </label>
         </div>
       </div>`;
@@ -47,7 +47,10 @@
     const controls=$('.rate-simulation-controls',root);
     if(!controls) return;
 
-    controls.insertAdjacentHTML('afterend',pickerMarkup(root));
+    // Comparison basis is the first decision in the simulator, so place it
+    // above period/product selection. Visual order is all-products first,
+    // bank-best second, while bank-best remains the default calculation basis.
+    controls.insertAdjacentHTML('beforebegin',pickerMarkup(root));
     root.dataset.marketBasis=root.dataset.marketBasis||'bank_best';
 
     $$('[data-sim-market-picker] input[type="radio"]',root).forEach(input=>{
