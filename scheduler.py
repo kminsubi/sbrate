@@ -15,6 +15,7 @@ from data_quality_runtime import install_data_quality_endpoint
 from rate_simulator import install_rate_simulator
 from rate_simulator_v2 import install_rate_simulator_v2
 from rate_simulator_v2_polish import install_rate_simulator_v2_polish
+from rate_simulation_v3_runtime import install_rate_simulation_v3_runtime
 from visitor_platform import enable_mobile_platform_detection
 from visitor_stats import install_visitor_stats_hooks
 
@@ -135,3 +136,4 @@ install_data_quality_endpoint()
 install_rate_simulator()
 install_rate_simulator_v2()
 install_rate_simulator_v2_polish()
+install_rate_simulation_v3_runtime()
