@@ -15,12 +15,15 @@ on:
     # Final 23:00 KST keep-alive = 14:00 UTC (Mon-Fri).
     - cron: "0 14 * * 1-5"
   workflow_dispatch:
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   keep-alive:
+    if: github.event_name != 'issues' || github.event.issue.title == 'V5.45 APPLY VISITOR STATS'
     runs-on: ubuntu-latest
 
     steps:
@@ -38,10 +41,10 @@ jobs:
         id: business_hours
         shell: bash
         run: |
-          # Manual runs are allowed at any time for testing.
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+          # Manual and one-shot issue runs are allowed at any time for testing/patching.
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] || [ "$GITHUB_EVENT_NAME" = "issues" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Manual keep-alive run"
+            echo "Manual/issue keep-alive run"
             exit 0
           fi
 
@@ -91,8 +94,8 @@ jobs:
           python -m py_compile app.py
           git diff --check
 
-          # Restore both production workflows to their pre-patch state.
-          git show HEAD^:.github/workflows/render_keep_alive.yml > .github/workflows/render_keep_alive.yml
+          # Restore both production workflows to their clean pre-patch state.
+          git show 96c938fda70136d5c505edcff413e99ebadff211:.github/workflows/render_keep_alive.yml > .github/workflows/render_keep_alive.yml
           git show 96c938fda70136d5c505edcff413e99ebadff211:.github/workflows/telegram_morning.yml > .github/workflows/telegram_morning.yml
           rm -f .github/v545_visitor_stats_patch.py
           rm -f .github/workflows/v545_visitor_stats_patch.yml
