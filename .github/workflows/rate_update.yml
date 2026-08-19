@@ -51,18 +51,79 @@ jobs:
           echo "Fixed deposit: ${{ steps.deposit.outcome }}"
           echo "ISA/IRP      : ${{ steps.pension.outcome }}"
 
+      - name: Run Data Quality Guard
+        id: quality
+        if: always()
+        env:
+          DEPOSIT_OUTCOME: ${{ steps.deposit.outcome }}
+          PENSION_OUTCOME: ${{ steps.pension.outcome }}
+        run: |
+          python data_quality.py \
+            --deposit-outcome "$DEPOSIT_OUTCOME" \
+            --pension-outcome "$PENSION_OUTCOME" \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Show quality result
+        if: always() && steps.quality.outcome == 'success'
+        run: |
+          echo "Quality status : ${{ steps.quality.outputs.status }}"
+          echo "Block publish  : ${{ steps.quality.outputs.block }}"
+          echo "Notify admin   : ${{ steps.quality.outputs.notify }}"
+          echo "Issue count    : ${{ steps.quality.outputs.issue_count }}"
+
+      - name: Notify Data Quality warning
+        if: always() && steps.quality.outcome == 'success' && steps.quality.outputs.notify == 'true'
+        continue-on-error: true
+        run: |
+          curl --fail --show-error --silent \
+            --retry 2 \
+            --retry-delay 5 \
+            --connect-timeout 10 \
+            --max-time 120 \
+            "https://sbrate.onrender.com/" > /dev/null
+
+          curl --fail --show-error --silent \
+            --retry 3 \
+            --retry-delay 5 \
+            --connect-timeout 10 \
+            --max-time 120 \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "X-SBRate-Secret: ${{ secrets.TELEGRAM_BRIEF_SECRET }}" \
+            --data-binary @data/data_quality_status.json \
+            "https://sbrate.onrender.com/telegram/data-quality"
+
       - name: Save daily history snapshot
-        if: always() && steps.deposit.outcome == 'success' && steps.pension.outcome == 'success'
+        if: >-
+          always() &&
+          steps.deposit.outcome == 'success' &&
+          steps.pension.outcome == 'success' &&
+          steps.quality.outcome == 'success' &&
+          steps.quality.outputs.block != 'true'
         run: |
           python crawler/snapshot_history.py
 
-      - name: Commit updated data
-        if: always()
+      - name: Commit verified data
+        if: >-
+          always() &&
+          steps.deposit.outcome == 'success' &&
+          steps.pension.outcome == 'success' &&
+          steps.quality.outcome == 'success' &&
+          steps.quality.outputs.block != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          for f in             data/latest_rates.json             data/previous_rates.json             data/update_info.json             data/banks.json             data/isa_rates.json             data/irp_rates.json             data/pension_sources.json             data/history/*.json
+          for f in \
+            data/latest_rates.json \
+            data/previous_rates.json \
+            data/update_info.json \
+            data/banks.json \
+            data/isa_rates.json \
+            data/irp_rates.json \
+            data/pension_sources.json \
+            data/data_quality_status.json \
+            data/history/*.json
           do
             if [ -f "$f" ]; then
               git add "$f"
@@ -74,16 +135,25 @@ jobs:
           fi
 
           if git diff --cached --quiet; then
-            echo "No data changes to commit"
+            echo "No verified data changes to commit"
           else
-            git commit -m "Auto update deposit ISA IRP rates"
+            git commit -m "Auto update verified deposit ISA IRP rates"
             git push
           fi
 
-      - name: Fail if a collector failed
-        if: always() && (steps.deposit.outcome != 'success' || steps.pension.outcome != 'success')
+      - name: Fail if collection or validation blocked publish
+        if: >-
+          always() &&
+          (
+            steps.deposit.outcome != 'success' ||
+            steps.pension.outcome != 'success' ||
+            steps.quality.outcome != 'success' ||
+            steps.quality.outputs.block == 'true'
+          )
         run: |
-          echo "One or more collectors failed."
+          echo "Daily rate update was not published."
           echo "Fixed deposit: ${{ steps.deposit.outcome }}"
           echo "ISA/IRP      : ${{ steps.pension.outcome }}"
+          echo "Quality      : ${{ steps.quality.outputs.status }}"
+          echo "Block        : ${{ steps.quality.outputs.block }}"
           exit 1
