@@ -19,7 +19,6 @@ def install_rate_simulation_v3_runtime():
     def wire_rate_simulation_v3(response):
         try:
             if request.path in ("/", "/mobile"):
-                # Dashboard shell should always refresh after a new deployment.
                 response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
                 response.headers["Pragma"] = "no-cache"
                 response.headers["Expires"] = "0"
@@ -41,8 +40,12 @@ def install_rate_simulation_v3_runtime():
                         '<script data-sbrate-rate-simulation-v2="v3" '
                         'src="/static/js/rate_simulation_v3.js?v=20260819v3"></script>'
                     )
+                    guard = (
+                        '<script data-sbrate-rate-simulation-v3-guard="1" '
+                        'src="/static/js/rate_simulation_v3_guard.js?v=20260819v1"></script>'
+                    )
                     html = html.replace("</head>", css + "\n</head>", 1)
-                    html = html.replace("</body>", js + "\n</body>", 1)
+                    html = html.replace("</body>", js + "\n" + guard + "\n</body>", 1)
                     response.set_data(html)
                     response.headers.pop("Content-Length", None)
         except Exception as error:
