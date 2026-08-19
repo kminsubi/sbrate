@@ -1,0 +1,408 @@
+/* =========================================
+   SBRate Woori Rate Simulator V1
+========================================= */
+
+:root{
+  --sb-sim-blue:#1556c0;
+  --sb-sim-blue-soft:#eef5ff;
+  --sb-sim-red:#e15151;
+  --sb-sim-ink:#172033;
+  --sb-sim-muted:#7c8798;
+  --sb-sim-line:#e5ebf3;
+}
+
+.sb-sim-open-btn{
+  border:1px solid #b9d4f8;
+  background:#f5f9ff;
+  color:#1556c0;
+  border-radius:10px;
+  padding:6px 9px;
+  font-size:10px;
+  line-height:1;
+  font-weight:800;
+  white-space:nowrap;
+  box-shadow:0 2px 8px rgba(21,86,192,.06);
+}
+
+.sb-sim-open-btn:hover{
+  background:#edf5ff;
+  border-color:#93bdf1;
+}
+
+.sb-sim-pc-layer{
+  position:fixed;
+  inset:0;
+  z-index:120;
+  pointer-events:none;
+  display:none;
+}
+
+.sb-sim-pc-layer.is-open{display:block}
+
+.sb-sim-panel{
+  position:fixed;
+  width:min(520px,calc(100vw - 32px));
+  max-height:calc(100vh - 40px);
+  overflow:hidden;
+  background:#fff;
+  border:1px solid #dbe5f2;
+  border-radius:18px;
+  box-shadow:0 24px 70px rgba(22,35,60,.22);
+  color:var(--sb-sim-ink);
+  pointer-events:auto;
+}
+
+.sb-sim-panel.is-minimized{
+  width:330px;
+}
+
+.sb-sim-panel.is-minimized .sb-sim-content{
+  display:none;
+}
+
+.sb-sim-drag{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:13px 15px;
+  border-bottom:1px solid var(--sb-sim-line);
+  background:linear-gradient(90deg,#f8fbff,#fff);
+  cursor:move;
+  user-select:none;
+  touch-action:none;
+}
+
+.sb-sim-title-wrap{min-width:0}
+.sb-sim-title{
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  color:#233047;
+}
+.sb-sim-basis{
+  display:block;
+  margin-top:2px;
+  font-size:9px;
+  color:#8793a5;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.sb-sim-head-actions{
+  display:flex;
+  gap:5px;
+  flex:0 0 auto;
+}
+
+.sb-sim-head-btn{
+  width:29px;
+  height:29px;
+  border:1px solid var(--sb-sim-line);
+  border-radius:9px;
+  background:#fff;
+  color:#677489;
+  display:grid;
+  place-items:center;
+  font-size:16px;
+  line-height:1;
+}
+
+.sb-sim-content{
+  max-height:calc(100vh - 120px);
+  overflow:auto;
+  padding:15px;
+}
+
+.sb-sim-rate-row{
+  display:grid;
+  grid-template-columns:1fr 28px 1fr;
+  align-items:end;
+  gap:9px;
+}
+
+.sb-sim-rate-box{
+  border:1px solid #e7edf5;
+  background:#fbfcfe;
+  border-radius:14px;
+  padding:11px 12px;
+}
+
+.sb-sim-rate-box.is-target{
+  border-color:#b9d4f8;
+  background:#f5f9ff;
+}
+
+.sb-sim-label{
+  display:block;
+  font-size:9px;
+  color:#8792a3;
+  margin-bottom:5px;
+}
+
+.sb-sim-current-rate{
+  font-size:25px;
+  font-weight:850;
+  letter-spacing:-.04em;
+}
+
+.sb-sim-target-wrap{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.sb-sim-target-input{
+  width:100%;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#1556c0;
+  font-size:25px;
+  font-weight:850;
+  letter-spacing:-.04em;
+  padding:0;
+}
+
+.sb-sim-percent{
+  font-size:17px;
+  font-weight:800;
+  color:#1556c0;
+}
+
+.sb-sim-arrow{
+  align-self:center;
+  text-align:center;
+  color:#738198;
+  font-size:20px;
+  padding-bottom:4px;
+}
+
+.sb-sim-delta{
+  margin-top:8px;
+  font-size:10px;
+  font-weight:800;
+}
+
+.sb-sim-presets{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:5px;
+  margin-top:9px;
+}
+
+.sb-sim-preset{
+  border:1px solid #e2e8f1;
+  background:#f8fafc;
+  border-radius:9px;
+  min-height:31px;
+  padding:5px 3px;
+  color:#5e6a7d;
+  font-size:9px;
+  font-weight:800;
+}
+.sb-sim-preset.is-up{color:#1556c0;background:#f2f7ff;border-color:#cfe1fb}
+.sb-sim-preset.is-down{color:#e15151;background:#fff7f7;border-color:#f4d1d1}
+.sb-sim-preset.is-current{color:#4e5c70;background:#eef1f5}
+
+.sb-sim-result-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:12px;
+}
+
+.sb-sim-result-card{
+  border:1px solid #e8edf4;
+  border-radius:12px;
+  padding:10px;
+  background:#fff;
+}
+
+.sb-sim-result-card strong{
+  display:block;
+  margin-top:4px;
+  font-size:13px;
+  letter-spacing:-.02em;
+}
+
+.sb-sim-transition{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:wrap;
+}
+
+.sb-sim-transition .from{color:#7b8798}
+.sb-sim-transition .to{color:#1f2d44;font-weight:850}
+.sb-sim-transition .arrow{color:#a1aab7}
+
+.sb-sim-status{
+  display:inline-flex;
+  align-items:center;
+  margin-left:2px;
+  border-radius:999px;
+  padding:3px 6px;
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.sb-sim-status.good{background:#edf5ff;color:#1556c0}
+.sb-sim-status.bad{background:#fff1f1;color:#d94c4c}
+.sb-sim-status.flat{background:#f1f3f6;color:#667387}
+
+.sb-sim-up{color:#1556c0!important;font-weight:800}
+.sb-sim-down{color:#e15151!important;font-weight:800}
+.sb-sim-flat{color:#6f7b8c!important;font-weight:800}
+
+.sb-sim-zone{
+  margin-top:10px;
+  border:1px solid #dce9fb;
+  border-radius:13px;
+  background:#f7fbff;
+  padding:10px 11px;
+}
+
+.sb-sim-zone-title{
+  font-size:9px;
+  color:#6f7d92;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.sb-sim-neighbor-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:center;
+  min-height:27px;
+  font-size:10px;
+  border-top:1px solid rgba(220,233,251,.7);
+}
+.sb-sim-neighbor-row:first-of-type{border-top:0}
+.sb-sim-neighbor-row.is-woori{
+  margin:4px -4px;
+  padding:6px 7px;
+  border:1px solid #9fc6fb;
+  border-radius:9px;
+  background:#eaf3ff;
+  color:#1556c0;
+  font-weight:850;
+}
+
+.sb-sim-thresholds{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:9px;
+}
+.sb-sim-threshold{
+  border-radius:11px;
+  background:#f7f9fc;
+  border:1px solid #e7ecf3;
+  padding:8px 10px;
+}
+.sb-sim-threshold strong{
+  display:block;
+  margin-top:3px;
+  color:#1556c0;
+  font-size:13px;
+}
+
+.sb-sim-foot{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-top:11px;
+  padding-top:10px;
+  border-top:1px solid #edf1f6;
+  color:#8b96a6;
+  font-size:8.5px;
+  line-height:1.45;
+}
+
+.sb-sim-loading,
+.sb-sim-error{
+  padding:28px 12px;
+  text-align:center;
+  color:#8d98a8;
+  font-size:11px;
+}
+.sb-sim-error{color:#d65353}
+
+/* Mobile placement: below update time, in the empty right-side line. */
+.data-meta-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+}
+
+#rate-sim-open-mobile{
+  margin-top:5px;
+  padding:5px 8px;
+  font-size:8.5px;
+  border-radius:999px;
+  background:#fff;
+}
+
+.sb-sim-mobile-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:150;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  background:rgba(12,20,35,.42);
+  backdrop-filter:blur(2px);
+}
+.sb-sim-mobile-backdrop.is-open{display:flex}
+
+.sb-sim-sheet{
+  width:min(720px,100%);
+  max-height:min(82vh,760px);
+  overflow:hidden;
+  border-radius:22px 22px 0 0;
+  background:#fff;
+  box-shadow:0 -18px 55px rgba(20,32,53,.24);
+  transform:translateY(0);
+  transition:transform .18s ease;
+  touch-action:none;
+}
+
+.sb-sim-sheet-handle{
+  width:42px;
+  height:4px;
+  border-radius:999px;
+  background:#d6dde7;
+  margin:8px auto 2px;
+}
+
+.sb-sim-sheet .sb-sim-drag{
+  cursor:default;
+  padding-top:9px;
+  touch-action:none;
+}
+
+.sb-sim-sheet .sb-sim-content{
+  max-height:calc(82vh - 66px);
+  overflow:auto;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom));
+}
+
+@media(max-width:640px){
+  .sb-sim-rate-row{grid-template-columns:1fr 24px 1fr}
+  .sb-sim-current-rate,
+  .sb-sim-target-input{font-size:23px}
+  .sb-sim-presets{grid-template-columns:repeat(3,1fr)}
+  .sb-sim-result-grid{grid-template-columns:1fr 1fr}
+  .sb-sim-content{padding:13px}
+  .sb-sim-foot{align-items:flex-start;flex-direction:column}
+}
+
+@media(max-width:380px){
+  #rate-sim-open-mobile{font-size:8px;padding:5px 7px}
+  .sb-sim-result-grid{grid-template-columns:1fr}
+}
