@@ -1,0 +1,250 @@
+/* SBRate Rate Simulation V6
+   - market-basis selector
+   - smaller selector cards
+   - more readable PC one-screen layout
+*/
+
+.rate-simulation-basis-picker{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 0 10px;
+  padding:7px 9px;
+  border:1px solid #e4ebf4;
+  border-radius:11px;
+  background:#fbfcfe;
+}
+.rate-simulation-basis-caption{
+  flex:0 0 auto;
+  color:#7f8b9c;
+  font-size:9px;
+  font-weight:750;
+  white-space:nowrap;
+}
+.rate-simulation-basis-options{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
+  width:min(330px,70%);
+}
+.rate-simulation-basis-option{
+  position:relative;
+  min-width:0;
+}
+.rate-simulation-basis-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.rate-simulation-basis-option span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:30px;
+  padding:0 10px;
+  border:1px solid #e0e7f0;
+  border-radius:9px;
+  background:#fff;
+  color:#667387;
+  font-size:9px;
+  font-weight:800;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.rate-simulation-basis-option input:checked + span{
+  border-color:#a9caf6;
+  background:#edf5ff;
+  color:#1556c0;
+  box-shadow:0 1px 5px rgba(21,86,192,.08);
+}
+
+/* PC: selector cards are lighter/smaller; the rest gains breathing room. */
+@media (min-width:641px){
+  .rate-simulation-panel{
+    width:min(790px,calc(100vw - 30px)) !important;
+    max-height:calc(100vh - 18px) !important;
+  }
+  .rate-simulation-head{
+    padding:13px 16px !important;
+  }
+  .rate-simulation-title{
+    font-size:16.5px !important;
+  }
+  .rate-simulation-basis{
+    font-size:10px !important;
+  }
+  .rate-simulation-body{
+    max-height:calc(100vh - 78px) !important;
+    overflow:auto !important;
+    padding:14px 16px 13px !important;
+  }
+
+  .rate-simulation-controls{
+    gap:40px !important;
+    margin-bottom:8px !important;
+  }
+  .rate-simulation-field{
+    min-height:62px !important;
+    height:62px !important;
+    padding:7px 11px !important;
+    border-radius:12px !important;
+    justify-content:center !important;
+  }
+  .rate-simulation-field label{
+    margin-bottom:4px !important;
+    font-size:9.2px !important;
+  }
+  .rate-simulation-field select{
+    min-height:24px !important;
+    height:24px !important;
+    line-height:24px !important;
+    font-size:12.5px !important;
+  }
+
+  .rate-simulation-basis-picker{
+    min-height:46px;
+    margin-bottom:9px;
+    padding:7px 10px;
+  }
+  .rate-simulation-basis-caption{
+    font-size:9.5px;
+  }
+  .rate-simulation-basis-options{
+    width:350px;
+  }
+  .rate-simulation-basis-option span{
+    min-height:31px;
+    font-size:9.8px;
+  }
+
+  .rate-simulation-rate-box{
+    min-height:82px !important;
+    height:82px !important;
+    padding:10px 12px !important;
+  }
+  .rate-simulation-label{
+    font-size:9.5px !important;
+  }
+  .rate-simulation-big,
+  .rate-simulation-target input{
+    font-size:27px !important;
+    line-height:34px !important;
+  }
+  .rate-simulation-big,
+  .rate-simulation-target,
+  .rate-simulation-target input{
+    min-height:34px !important;
+    height:34px !important;
+  }
+  .rate-simulation-target b{
+    font-size:18px !important;
+  }
+  .rate-simulation-arrow{
+    font-size:22px !important;
+  }
+  .rate-simulation-delta{
+    margin-top:7px !important;
+    font-size:10.5px !important;
+  }
+  .rate-simulation-presets{
+    margin-top:8px !important;
+    gap:6px !important;
+  }
+  .rate-simulation-presets button{
+    min-height:33px !important;
+    font-size:10px !important;
+  }
+
+  #rate-simulation-v3-layer .rate-simulation-grid{
+    gap:8px !important;
+    margin-top:9px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-card{
+    min-height:64px !important;
+    padding:9px 11px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-card .rate-simulation-label{
+    font-size:9.5px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-transition{
+    font-size:11.5px !important;
+    gap:6px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-pill{
+    font-size:8.2px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-note{
+    margin-top:9px !important;
+    padding:8px 11px !important;
+    font-size:10px !important;
+    line-height:1.4 !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-zone{
+    margin-top:9px !important;
+    padding:7px !important;
+    gap:7px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-neighbor{
+    min-height:42px !important;
+    padding:7px 9px !important;
+    font-size:9.8px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-note ~ .rate-simulation-grid .rate-simulation-card{
+    min-height:60px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-note ~ .rate-simulation-grid .rate-simulation-card > b{
+    font-size:14px !important;
+  }
+  #rate-simulation-v3-layer .rate-simulation-foot{
+    margin-top:9px !important;
+    padding-top:7px !important;
+    font-size:8.7px !important;
+  }
+}
+
+/* Mobile: keep the aligned left/right geometry but reduce only selector height. */
+@media (max-width:640px){
+  .rate-simulation-controls{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:38px !important;
+    margin-bottom:8px !important;
+  }
+  .rate-simulation-field{
+    min-height:64px !important;
+    height:64px !important;
+    padding:7px 10px !important;
+    border-radius:13px !important;
+    justify-content:center !important;
+  }
+  .rate-simulation-field label{
+    margin:0 0 3px !important;
+    font-size:8.5px !important;
+  }
+  .rate-simulation-field select{
+    min-height:26px !important;
+    height:26px !important;
+    line-height:26px !important;
+    font-size:10.5px !important;
+  }
+
+  .rate-simulation-basis-picker{
+    display:block;
+    margin-bottom:9px;
+    padding:7px 8px;
+  }
+  .rate-simulation-basis-caption{
+    display:block;
+    margin-bottom:5px;
+    font-size:8px;
+  }
+  .rate-simulation-basis-options{
+    width:100%;
+    gap:5px;
+  }
+  .rate-simulation-basis-option span{
+    min-height:30px;
+    padding:0 5px;
+    font-size:8.5px;
+  }
+}
