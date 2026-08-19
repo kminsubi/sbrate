@@ -16,6 +16,27 @@ def _find_running_app_module():
     return None
 
 
+def _pension_count_line(label, data):
+    banks = data.get("banks", 0)
+    valid = data.get("valid_rate_rows", 0)
+    verified = data.get("verified_today")
+    retained = data.get("retained_last_good")
+    unavailable = data.get("unavailable_rows")
+    failed_no_value = data.get("fetch_failed_rows")
+
+    # Backward compatibility with V1 payloads.
+    if verified is None and retained is None and unavailable is None:
+        return f"• {label} : {banks}개사 / 금리확인 {valid}개사"
+
+    verified = int(verified or 0)
+    retained = int(retained or 0)
+    unavailable = int(unavailable or 0) + int(failed_no_value or 0)
+    return (
+        f"• {label} : {banks}개사 / 금리확인 {valid}개사"
+        f" · 오늘확인 {verified} · 직전값 {retained} · 미확보 {unavailable}"
+    )
+
+
 def _quality_message(payload):
     status = str(payload.get("status") or "UNKNOWN").upper()
     generated_at = str(payload.get("generated_at") or "-")
@@ -37,13 +58,13 @@ def _quality_message(payload):
         "",
         "수집현황",
         f"• 정기예금 : {deposit.get('banks', 0)}개사 / {deposit.get('items', 0)}상품",
-        f"• ISA : {isa.get('banks', 0)}개사 / 금리확인 {isa.get('valid_rate_rows', 0)}개사",
-        f"• IRP : {irp.get('banks', 0)}개사 / 금리확인 {irp.get('valid_rate_rows', 0)}개사",
+        _pension_count_line("ISA", isa),
+        _pension_count_line("IRP", irp),
     ]
 
     if issues:
         lines.extend(["", "확인 필요"])
-        for item in issues[:10]:
+        for item in issues[:12]:
             if not isinstance(item, dict):
                 continue
             level = str(item.get("level") or "WARNING")
@@ -61,6 +82,8 @@ def _quality_message(payload):
     else:
         lines.extend([
             "",
+            "※ '오늘확인'은 이번 실행에서 공식소스를 정상 확인한 건수입니다.",
+            "※ '직전값'은 오늘 확인 실패로 마지막 정상값을 유지한 건수입니다.",
             "※ WARNING 데이터는 반영되지만 관리자 확인이 필요합니다.",
         ])
 
