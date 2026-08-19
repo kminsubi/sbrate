@@ -58,7 +58,7 @@ jobs:
           DEPOSIT_OUTCOME: ${{ steps.deposit.outcome }}
           PENSION_OUTCOME: ${{ steps.pension.outcome }}
         run: |
-          python data_quality_v2.py \
+          python data_quality_v3.py \
             --deposit-outcome "$DEPOSIT_OUTCOME" \
             --pension-outcome "$PENSION_OUTCOME" \
             --github-output "$GITHUB_OUTPUT"
