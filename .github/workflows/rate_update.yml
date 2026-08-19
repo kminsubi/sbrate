@@ -114,6 +114,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # Existing tracked data files can be added normally even though
+          # data/*.json is ignored. data_quality_status.json is newly created
+          # by the guard, so force-add it explicitly.
           for f in \
             data/latest_rates.json \
             data/previous_rates.json \
@@ -121,14 +124,16 @@ jobs:
             data/banks.json \
             data/isa_rates.json \
             data/irp_rates.json \
-            data/pension_sources.json \
-            data/data_quality_status.json \
-            data/history/*.json
+            data/pension_sources.json
           do
             if [ -f "$f" ]; then
               git add "$f"
             fi
           done
+
+          if [ -f "data/data_quality_status.json" ]; then
+            git add -f data/data_quality_status.json
+          fi
 
           if [ -d "data/history" ]; then
             git add data/history/*.json 2>/dev/null || true
