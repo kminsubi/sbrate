@@ -1,5 +1,6 @@
 name: V5.45 Visitor Stats Patch
 
+# One-shot workflow: this edit intentionally triggers the patch after creation.
 on:
   push:
     branches: [main]
