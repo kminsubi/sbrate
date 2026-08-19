@@ -1,0 +1,47 @@
+name: SBRate Rate Simulation V2 Patch
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/rate_sim_v2_patch.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Apply V2 patch
+        run: python .github/rate_sim_v2_patch.py
+
+      - name: Validate Python
+        run: python -m py_compile rate_simulator.py
+
+      - name: Validate JavaScript
+        run: node --check static/js/rate_simulator.js
+
+      - name: Validate diff
+        run: git diff --check
+
+      - name: Commit V2
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add rate_simulator.py static/js/rate_simulator.js static/css/rate_simulator.css
+          git add -u .github/rate_sim_v2_patch.py .github/workflows/rate_sim_v2_patch.yml
+          git commit -m "Upgrade rate simulation controls and stability" || echo "No changes to commit"
+          git push origin main
