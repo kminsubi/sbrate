@@ -1,7 +1,9 @@
 # ==========================================
-# SBRate V5.45 Anonymous Visitor Stats
+# SBRate V5.46 Anonymous Visitor Stats
 # - PC / mobile unique browser + pageview counts
 # - Telegram /stats for admin private chat only
+# - Upstash Redis REST for persistent storage
+# - SQLite fallback when Upstash is not configured/unavailable
 # - No IP / name / employee ID / User-Agent stored
 # ==========================================
 
@@ -14,6 +16,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
+import requests
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -25,6 +29,8 @@ VISITOR_STATS_FILE = os.getenv(
 VISITOR_COOKIE_NAME = "sbrate_vid"
 VISITOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 VISITOR_STATS_KST = timezone(timedelta(hours=9))
+VISITOR_RETENTION_SECONDS = 60 * 60 * 24 * 60
+
 VISITOR_HASH_SALT = (
     os.getenv(
         "SB_RATE_VISITOR_SALT",
@@ -33,9 +39,73 @@ VISITOR_HASH_SALT = (
     or "sbrate-anonymous-visitor-v1"
 )
 
+UPSTASH_REDIS_REST_URL = os.getenv(
+    "UPSTASH_REDIS_REST_URL",
+    ""
+).strip().rstrip("/")
+
+UPSTASH_REDIS_REST_TOKEN = os.getenv(
+    "UPSTASH_REDIS_REST_TOKEN",
+    ""
+).strip()
+
 
 def _now():
     return datetime.now(VISITOR_STATS_KST)
+
+
+def _upstash_enabled():
+    return bool(
+        UPSTASH_REDIS_REST_URL
+        and UPSTASH_REDIS_REST_TOKEN
+    )
+
+
+def _upstash_pipeline(commands, timeout=5):
+    if not _upstash_enabled():
+        raise RuntimeError("Upstash is not configured")
+
+    response = requests.post(
+        f"{UPSTASH_REDIS_REST_URL}/pipeline",
+        headers={
+            "Authorization": f"Bearer {UPSTASH_REDIS_REST_TOKEN}",
+            "Content-Type": "application/json",
+        },
+        json=commands,
+        timeout=timeout,
+    )
+    response.raise_for_status()
+
+    payload = response.json()
+    if not isinstance(payload, list):
+        raise RuntimeError("Invalid Upstash pipeline response")
+
+    for item in payload:
+        if isinstance(item, dict) and item.get("error"):
+            raise RuntimeError(str(item.get("error")))
+
+    return payload
+
+
+def _redis_result(item, default=0):
+    if not isinstance(item, dict):
+        return default
+    value = item.get("result")
+    if value is None:
+        return default
+    return value
+
+
+def _redis_keys(day, platform=None):
+    prefix = "sbrate:visitor:v1"
+    if platform:
+        return {
+            "visitors": f"{prefix}:{day}:{platform}:visitors",
+            "views": f"{prefix}:{day}:{platform}:views",
+        }
+    return {
+        "all": f"{prefix}:{day}:all:visitors",
+    }
 
 
 def _db():
@@ -101,38 +171,74 @@ def _hash_visitor_id(visitor_id):
     return hashlib.sha256(raw).hexdigest()[:32]
 
 
+def _record_visit_upstash(platform, visitor_hash, day):
+    platform_keys = _redis_keys(day, platform)
+    all_key = _redis_keys(day)["all"]
+
+    commands = [
+        ["SADD", platform_keys["visitors"], visitor_hash],
+        ["SADD", all_key, visitor_hash],
+        ["INCR", platform_keys["views"]],
+        ["EXPIRE", platform_keys["visitors"], VISITOR_RETENTION_SECONDS],
+        ["EXPIRE", all_key, VISITOR_RETENTION_SECONDS],
+        ["EXPIRE", platform_keys["views"], VISITOR_RETENTION_SECONDS],
+    ]
+    _upstash_pipeline(commands)
+
+
+def _record_visit_sqlite(platform, visitor_hash, now):
+    day = now.strftime("%Y-%m-%d")
+    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+    cutoff = (now.date() - timedelta(days=45)).isoformat()
+
+    with _db() as conn:
+        conn.execute(
+            """
+            INSERT INTO visitor_stats (
+                day, platform, visitor_hash,
+                pageviews, first_seen, last_seen
+            )
+            VALUES (?, ?, ?, 1, ?, ?)
+            ON CONFLICT(day, platform, visitor_hash)
+            DO UPDATE SET
+                pageviews = pageviews + 1,
+                last_seen = excluded.last_seen
+            """,
+            (day, platform, visitor_hash, timestamp, timestamp)
+        )
+        conn.execute(
+            "DELETE FROM visitor_stats WHERE day < ?",
+            (cutoff,)
+        )
+
+
 def _record_visit(platform, visitor_id):
     if platform not in ("pc", "mobile"):
         return
 
     now = _now()
     day = now.strftime("%Y-%m-%d")
-    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
     visitor_hash = _hash_visitor_id(visitor_id)
-    cutoff = (now.date() - timedelta(days=45)).isoformat()
+
+    if _upstash_enabled():
+        try:
+            _record_visit_upstash(
+                platform,
+                visitor_hash,
+                day
+            )
+            return
+        except Exception as error:
+            print("VISITOR STATS UPSTASH RECORD ERROR:", error)
 
     try:
-        with _db() as conn:
-            conn.execute(
-                """
-                INSERT INTO visitor_stats (
-                    day, platform, visitor_hash,
-                    pageviews, first_seen, last_seen
-                )
-                VALUES (?, ?, ?, 1, ?, ?)
-                ON CONFLICT(day, platform, visitor_hash)
-                DO UPDATE SET
-                    pageviews = pageviews + 1,
-                    last_seen = excluded.last_seen
-                """,
-                (day, platform, visitor_hash, timestamp, timestamp)
-            )
-            conn.execute(
-                "DELETE FROM visitor_stats WHERE day < ?",
-                (cutoff,)
-            )
+        _record_visit_sqlite(
+            platform,
+            visitor_hash,
+            now
+        )
     except Exception as error:
-        print("VISITOR STATS RECORD ERROR:", error)
+        print("VISITOR STATS SQLITE RECORD ERROR:", error)
 
 
 def _track_response(response, platform, request, make_response):
@@ -165,14 +271,12 @@ def _track_response(response, platform, request, make_response):
     return response
 
 
-def _snapshot(days=7):
-    days = max(1, min(int(days or 7), 31))
+def _empty_snapshot(days):
     now = _now()
     date_list = [
         (now.date() - timedelta(days=offset)).isoformat()
         for offset in range(days)
     ]
-
     result = {
         day: {
             "pc": {"visitors": 0, "views": 0},
@@ -181,62 +285,125 @@ def _snapshot(days=7):
         }
         for day in date_list
     }
-
-    try:
-        with _db() as conn:
-            placeholders = ",".join("?" for _ in date_list)
-
-            rows = conn.execute(
-                f"""
-                SELECT day, platform,
-                       COUNT(*) AS visitors,
-                       COALESCE(SUM(pageviews), 0) AS views
-                FROM visitor_stats
-                WHERE day IN ({placeholders})
-                GROUP BY day, platform
-                """,
-                date_list
-            ).fetchall()
-
-            totals = conn.execute(
-                f"""
-                SELECT day,
-                       COUNT(DISTINCT visitor_hash) AS visitors,
-                       COALESCE(SUM(pageviews), 0) AS views
-                FROM visitor_stats
-                WHERE day IN ({placeholders})
-                GROUP BY day
-                """,
-                date_list
-            ).fetchall()
-
-        for day, platform, visitors, views in rows:
-            if day in result and platform in ("pc", "mobile"):
-                result[day][platform] = {
-                    "visitors": int(visitors or 0),
-                    "views": int(views or 0),
-                }
-
-        for day, visitors, views in totals:
-            if day in result:
-                result[day]["total"] = {
-                    "visitors": int(visitors or 0),
-                    "views": int(views or 0),
-                }
-
-    except Exception as error:
-        print("VISITOR STATS READ ERROR:", error)
-
     return now, date_list, result
 
 
+def _snapshot_upstash(days):
+    now, date_list, result = _empty_snapshot(days)
+    commands = []
+
+    for day in date_list:
+        pc = _redis_keys(day, "pc")
+        mobile = _redis_keys(day, "mobile")
+        all_key = _redis_keys(day)["all"]
+
+        commands.extend([
+            ["SCARD", pc["visitors"]],
+            ["GET", pc["views"]],
+            ["SCARD", mobile["visitors"]],
+            ["GET", mobile["views"]],
+            ["SCARD", all_key],
+        ])
+
+    payload = _upstash_pipeline(commands)
+    cursor = 0
+
+    for day in date_list:
+        pc_visitors = int(_redis_result(payload[cursor], 0) or 0)
+        pc_views = int(_redis_result(payload[cursor + 1], 0) or 0)
+        mobile_visitors = int(_redis_result(payload[cursor + 2], 0) or 0)
+        mobile_views = int(_redis_result(payload[cursor + 3], 0) or 0)
+        total_visitors = int(_redis_result(payload[cursor + 4], 0) or 0)
+        cursor += 5
+
+        result[day]["pc"] = {
+            "visitors": pc_visitors,
+            "views": pc_views,
+        }
+        result[day]["mobile"] = {
+            "visitors": mobile_visitors,
+            "views": mobile_views,
+        }
+        result[day]["total"] = {
+            "visitors": total_visitors,
+            "views": pc_views + mobile_views,
+        }
+
+    return now, date_list, result, "Upstash (영구)"
+
+
+def _snapshot_sqlite(days):
+    now, date_list, result = _empty_snapshot(days)
+
+    with _db() as conn:
+        placeholders = ",".join("?" for _ in date_list)
+
+        rows = conn.execute(
+            f"""
+            SELECT day, platform,
+                   COUNT(*) AS visitors,
+                   COALESCE(SUM(pageviews), 0) AS views
+            FROM visitor_stats
+            WHERE day IN ({placeholders})
+            GROUP BY day, platform
+            """,
+            date_list
+        ).fetchall()
+
+        totals = conn.execute(
+            f"""
+            SELECT day,
+                   COUNT(DISTINCT visitor_hash) AS visitors,
+                   COALESCE(SUM(pageviews), 0) AS views
+            FROM visitor_stats
+            WHERE day IN ({placeholders})
+            GROUP BY day
+            """,
+            date_list
+        ).fetchall()
+
+    for day, platform, visitors, views in rows:
+        if day in result and platform in ("pc", "mobile"):
+            result[day][platform] = {
+                "visitors": int(visitors or 0),
+                "views": int(views or 0),
+            }
+
+    for day, visitors, views in totals:
+        if day in result:
+            result[day]["total"] = {
+                "visitors": int(visitors or 0),
+                "views": int(views or 0),
+            }
+
+    return now, date_list, result, "SQLite (임시)"
+
+
+def _snapshot(days=7):
+    days = max(1, min(int(days or 7), 31))
+
+    if _upstash_enabled():
+        try:
+            return _snapshot_upstash(days)
+        except Exception as error:
+            print("VISITOR STATS UPSTASH READ ERROR:", error)
+
+    try:
+        return _snapshot_sqlite(days)
+    except Exception as error:
+        print("VISITOR STATS SQLITE READ ERROR:", error)
+        now, date_list, result = _empty_snapshot(days)
+        return now, date_list, result, "저장소 오류"
+
+
 def visitor_stats_text():
-    now, date_list, stats = _snapshot(7)
+    now, date_list, stats, backend = _snapshot(7)
     current = stats[date_list[0]]
 
     lines = [
         "📊 SBRate 이용현황",
         f"{now.strftime('%Y-%m-%d %H:%M')} KST",
+        f"저장소 : {backend}",
         "",
         "오늘",
         (
@@ -372,7 +539,15 @@ def install_visitor_stats_hooks():
 
         if pc_ok and mobile_ok and telegram_ok:
             app_module._visitor_stats_hooks_installed = True
-            print("Visitor Stats V5.45 hooks installed")
+            backend = (
+                "Upstash persistent"
+                if _upstash_enabled()
+                else "SQLite fallback"
+            )
+            print(
+                "Visitor Stats V5.46 hooks installed:",
+                backend
+            )
             return True
 
         print(
