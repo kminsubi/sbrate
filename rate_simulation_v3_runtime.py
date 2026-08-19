@@ -51,14 +51,14 @@ def install_rate_simulation_v3_runtime():
                     html = html.replace("</head>", css + "\n</head>", 1)
                     html = html.replace("</body>", js + "\n" + guard + "\n</body>", 1)
 
-                # V4 is deliberately a separate cache-busted override so a
-                # previously cached V3 asset cannot hide the latest UI polish.
+                # V4 remains a separate override, with an explicit cache bump
+                # whenever PC/mobile layout polish changes.
                 v4_marker = "data-sbrate-rate-simulation-v4=\"1\""
                 if v4_marker not in html:
                     v4_css = (
                         '<link data-sbrate-rate-simulation-v4="1" '
                         'rel="stylesheet" '
-                        'href="/static/css/rate_simulation_v4_polish.css?v=20260820v1">'
+                        'href="/static/css/rate_simulation_v4_polish.css?v=20260820v2">'
                     )
                     v4_js = (
                         '<script data-sbrate-rate-simulation-v4="1" '
