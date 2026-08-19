@@ -3,6 +3,7 @@
 # - Prevent stale dashboard HTML after deploy
 # - Load V4 layout/label polish on both PC and mobile
 # - Load V5 mobile selector alignment polish
+# - Load V6 market-basis selector and readable layout polish
 import sys
 
 
@@ -68,8 +69,8 @@ def install_rate_simulation_v3_runtime():
                     html = html.replace("</head>", v4_css + "\n</head>", 1)
                     html = html.replace("</body>", v4_js + "\n</body>", 1)
 
-                # V5 only adjusts mobile selector-card geometry so the period/
-                # product cards align exactly with the two rate cards below.
+                # V5 aligns the mobile selector-card left/right geometry with
+                # the rate cards below. V6 can still reduce its height later.
                 v5_marker = "data-sbrate-rate-simulation-v5=\"1\""
                 if v5_marker not in html:
                     v5_css = (
@@ -78,6 +79,22 @@ def install_rate_simulation_v3_runtime():
                         'href="/static/css/rate_simulation_v5_mobile_align.css?v=20260820v1">'
                     )
                     html = html.replace("</head>", v5_css + "\n</head>", 1)
+
+                # V6 is loaded last so its smaller selector cards, larger PC
+                # text and market-basis selector win over previous polish layers.
+                v6_marker = "data-sbrate-rate-simulation-v6=\"1\""
+                if v6_marker not in html:
+                    v6_css = (
+                        '<link data-sbrate-rate-simulation-v6="1" '
+                        'rel="stylesheet" '
+                        'href="/static/css/rate_simulation_v6.css?v=20260820v1">'
+                    )
+                    v6_js = (
+                        '<script data-sbrate-rate-simulation-v6="1" '
+                        'src="/static/js/rate_simulation_v6.js?v=20260820v1"></script>'
+                    )
+                    html = html.replace("</head>", v6_css + "\n</head>", 1)
+                    html = html.replace("</body>", v6_js + "\n</body>", 1)
 
                 response.set_data(html)
                 response.headers.pop("Content-Length", None)
