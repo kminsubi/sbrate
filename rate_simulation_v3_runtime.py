@@ -2,6 +2,7 @@
 # - Direct stable assets for PC dashboard
 # - Prevent stale dashboard HTML after deploy
 # - Load V4 layout/label polish on both PC and mobile
+# - Load V5 mobile selector alignment polish
 import sys
 
 
@@ -66,6 +67,17 @@ def install_rate_simulation_v3_runtime():
                     )
                     html = html.replace("</head>", v4_css + "\n</head>", 1)
                     html = html.replace("</body>", v4_js + "\n</body>", 1)
+
+                # V5 only adjusts mobile selector-card geometry so the period/
+                # product cards align exactly with the two rate cards below.
+                v5_marker = "data-sbrate-rate-simulation-v5=\"1\""
+                if v5_marker not in html:
+                    v5_css = (
+                        '<link data-sbrate-rate-simulation-v5="1" '
+                        'rel="stylesheet" '
+                        'href="/static/css/rate_simulation_v5_mobile_align.css?v=20260820v1">'
+                    )
+                    html = html.replace("</head>", v5_css + "\n</head>", 1)
 
                 response.set_data(html)
                 response.headers.pop("Content-Length", None)
