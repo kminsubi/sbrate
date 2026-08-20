@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-08-21 01:05:14",
+  "timezone": "Asia/Seoul",
+  "status": "WARNING",
+  "block": false,
+  "notify": true,
+  "fingerprint": "821d51e224ba5219",
+  "previous_fingerprint": "",
+  "collector_outcomes": {
+    "deposit": "success",
+    "pension": "success"
+  },
+  "counts": {
+    "deposit": {
+      "items": 376,
+      "banks": 75,
+      "previous_items": 376,
+      "previous_banks": 75,
+      "woori_rate_12m": 3.8
+    },
+    "isa": {
+      "rows": 13,
+      "banks": 13,
+      "valid_rate_rows": 9,
+      "verified_today": 8,
+      "retained_last_good": 1,
+      "unavailable_rows": 3,
+      "fetch_failed_rows": 1,
+      "woori_rate_12m": 3.7
+    },
+    "irp": {
+      "rows": 13,
+      "banks": 13,
+      "valid_rate_rows": 12,
+      "verified_today": 11,
+      "retained_last_good": 0,
+      "unavailable_rows": 0,
+      "fetch_failed_rows": 1,
+      "woori_rate_12m": 3.7
+    }
+  },
+  "issues": [
+    {
+      "level": "WARNING",
+      "key": "isa:fetch_failed_no_value:한국투자",
+      "section": "ISA",
+      "message": "한국투자 공식확인에 실패했고 현재 표시 가능한 금리가 없습니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "isa:retained:db",
+      "section": "ISA",
+      "message": "DB 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "isa:unavailable_rows",
+      "section": "ISA",
+      "message": "금리 미확보 은행이 3개사입니다. 오늘 실패한 은행과는 별도 관리합니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "irp:fetch_failed_no_value:한국투자",
+      "section": "IRP",
+      "message": "한국투자 공식확인에 실패했고 현재 표시 가능한 금리가 없습니다."
+    }
+  ]
+}
