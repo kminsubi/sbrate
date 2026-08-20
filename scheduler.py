@@ -19,6 +19,7 @@ from rate_simulation_v3_runtime import install_rate_simulation_v3_runtime
 from rate_simulation_v6 import install_rate_simulation_v6
 from visitor_platform import enable_mobile_platform_detection
 from visitor_stats import install_visitor_stats_hooks
+from visitor_stats_verified import install_verified_visitor_tracking
 
 
 # ==========================================
@@ -130,8 +131,11 @@ def start_scheduler():
 
 # app.py가 scheduler를 import하는 시점에 PC/모바일/Telegram route는
 # 이미 등록되어 있으므로 런타임 hook/endpoint를 연결한다.
-# 휴대폰이 루트(/) 주소로 접속해도 실제 기기 기준으로 모바일 집계한다.
+# 휴대폰이 루트(/) 주소로 접속해도 실제 기기 기준으로 모바일 판별한다.
+# 단순 HTML 요청은 방문자로 확정하지 않고, 실제 화면이 3초 이상
+# 표시된 브라우저만 Verified Visitor V2에서 실사용으로 집계한다.
 enable_mobile_platform_detection()
+install_verified_visitor_tracking()
 install_visitor_stats_hooks()
 install_data_quality_endpoint()
 install_rate_simulator()
