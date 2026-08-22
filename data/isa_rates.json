@@ -10,17 +10,16 @@
       "24m": 3.3,
       "36m": 3.0
     },
-    "status": "verified_official_fallback",
+    "status": "verified_official",
     "source_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-    "updated_at": "2026-08-22 00:59:58",
-    "collector": "woori_isa_verified_fallback",
+    "updated_at": "2026-08-23 00:48:38",
+    "collector": "woori_isa_official_product_page",
     "disclosure_date": "2026-07-31",
     "reference_date": "2026-07-31",
-    "disclosure_date_source": "verified_official_fallback_date",
+    "disclosure_date_source": "woori_isa_rate_table_reference_date",
     "disclosure_date_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-    "fetch_error": "https://www.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: 우리금융 ISA 공식 상품페이지 검증 실패 | https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: 우리금융 ISA 공식 상품페이지 검증 실패",
-    "note": "우리금융 공식 ISA 상품페이지 접속 실패로 마지막 검증 공식값 유지. 공식 금리안내 기준일 2026-07-31: 3개월 2.40%, 6개월 3.70%, 12개월 3.70%, 24개월 3.30%, 36개월 3.00%. 공식 페이지 접속이 복구되면 자동수집값을 우선 사용.",
-    "collected_at": "2026-08-22 00:59:58"
+    "note": "우리금융저축은행 공식 ISA 정기예금 상품페이지의 금리안내 표 자동수집. 기간별 단리(이율) 사용, 복리 수익률/중도해지이율 제외.",
+    "collected_at": "2026-08-23 00:48:38"
   },
   {
     "bank": "KB",
@@ -33,19 +32,14 @@
       "24m": 2.3,
       "36m": 2.3
     },
-    "status": "stale_retained_after_fetch_error",
+    "status": "verified_official",
     "source_url": "https://www.kbsavings.com/websquare/engine/callJsonService.jsp?serviceID=S_CommonItemService_getItemInfo",
-    "updated_at": "2026-08-21 01:00:31",
-    "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+    "updated_at": "2026-08-23 00:48:39",
+    "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용.",
     "disclosure_date": "2026-07-23",
-    "collected_at": "2026-08-21 01:00:31",
+    "collected_at": "2026-08-23 00:48:39",
     "disclosure_date_source": "kb_rate_table_sejeon_basis",
-    "disclosure_date_url": "https://www.kbsavings.com/websquare/engine/callJsonService.jsp?serviceID=S_CommonItemService_getItemInfo",
-    "stale": true,
-    "retained_last_good": true,
-    "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-08-22 01:01:00",
-    "last_fetch_error": "KB official API request failed | payload#1: ITEM_NAME empty | payload#2: HTTPSConnectionPool(host='www.kbsavings.com', port=443): Read timed out. (read timeout=30) | payload#3: HTTPSConnectionPool(host='www.kbsavings.com', port=443): Read timed out. (read timeout=30) | payload#4: ITEM_NAME empty"
+    "disclosure_date_url": "https://www.kbsavings.com/websquare/engine/callJsonService.jsp?serviceID=S_CommonItemService_getItemInfo"
   },
   {
     "bank": "신한",
@@ -60,10 +54,10 @@
     },
     "status": "verified_official",
     "source_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json",
-    "updated_at": "2026-08-22 01:04:09",
+    "updated_at": "2026-08-23 00:48:42",
     "note": "신한저축은행 공식 ISA정기예금 API. dscr10220.LIST의 CLASS_CD=24014, FM_TERM별 APLY_RATE 약정이율 사용. 공식 가입기간 3/6/12/24개월, 36개월 미제공.",
-    "disclosure_date": "2026-08-22",
-    "collected_at": "2026-08-22 01:04:09",
+    "disclosure_date": "2026-08-23",
+    "collected_at": "2026-08-23 00:48:42",
     "disclosure_date_source": "shinhan_rate_guide_current_basis",
     "disclosure_date_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json"
   },
@@ -78,18 +72,14 @@
       "24m": 2.9,
       "36m": 2.8
     },
-    "status": "stale_retained_after_fetch_error",
+    "status": "verified_official",
     "source_url": "https://www.hanasavings.com/YPR/YPR0103",
-    "updated_at": "2026-08-21 01:00:40",
-    "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+    "updated_at": "2026-08-23 00:48:46",
+    "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리",
     "disclosure_date": "2026-08-16",
-    "collected_at": "2026-08-21 01:00:40",
+    "collected_at": "2026-08-23 00:48:46",
     "disclosure_date_source": "hana_rate_table_current_basis",
-    "disclosure_date_url": "https://www.hanasavings.com/YPR/YPR0103",
-    "stale": true,
-    "retained_last_good": true,
-    "last_fetch_status": "rate_not_found",
-    "last_attempt_at": "2026-08-22 01:04:12"
+    "disclosure_date_url": "https://www.hanasavings.com/YPR/YPR0103"
   },
   {
     "bank": "SBI",
@@ -104,10 +94,10 @@
     },
     "status": "verified_source_rate_pending",
     "source_url": "https://www.sbisb.co.kr/gds0010100.act",
-    "updated_at": "2026-08-22 01:04:13",
+    "updated_at": "2026-08-23 00:48:52",
     "note": "공식 상품공시 화면에 ISA 카테고리 존재 확인. 상세 금리 값은 현재 공개 HTML에서 확인되지 않아 None 유지.",
     "disclosure_date": null,
-    "collected_at": "2026-08-22 01:04:13",
+    "collected_at": "2026-08-23 00:48:52",
     "disclosure_date_source": "not_found"
   },
   {
@@ -123,12 +113,12 @@
     },
     "status": "verified_official",
     "source_url": "https://www.oksavingsbank.com/#/gdsDepsMngmDtl?depsGdsSqno=1261&pageNo=2&menuCd=00365&mngmTr=00000&inrtTp=00000&etryMthd=00000&acmlMthd=00000&entrObjc=00000&frdmEtryMthd=00000",
-    "updated_at": "2026-08-22 01:04:14",
+    "updated_at": "2026-08-23 00:48:53",
     "effective_date": "2026-08-03",
     "depsGdsSqno": "1261",
     "note": "OK저축은행 공식 홈페이지 상품정보 API 자동수집. ISA / depsGdsSqno=1261 / 시행일=2026-08-03",
     "disclosure_date": "2026-08-03",
-    "collected_at": "2026-08-22 01:04:14",
+    "collected_at": "2026-08-23 00:48:53",
     "disclosure_date_source": "existing_collector"
   },
   {
@@ -144,11 +134,11 @@
     },
     "status": "fetch_or_parse_error",
     "source_url": "https://sb.koreainvestment.com/?PRD-PDS001-10#",
-    "updated_at": "2026-08-22 01:06:16",
+    "updated_at": "2026-08-23 00:50:57",
     "error": "Message: \n",
     "note": "한국투자 공식 WebSquare ISA 수집 실패 (v5.5 재시도 2회): Message: \n",
     "disclosure_date": null,
-    "collected_at": "2026-08-22 01:06:16",
+    "collected_at": "2026-08-23 00:50:57",
     "disclosure_date_source": "not_collected"
   },
   {
@@ -162,19 +152,14 @@
       "24m": 1.5,
       "36m": 1.5
     },
-    "status": "stale_retained_after_fetch_error",
+    "status": "verified_official",
     "source_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255020&sysDsCd=01",
-    "updated_at": "2026-08-21 01:05:08",
-    "disclosure_date": "2026-08-21",
+    "updated_at": "2026-08-23 00:52:48",
+    "disclosure_date": "2026-08-23",
     "disclosure_date_source": "welcome_rate_table_reference_date",
     "disclosure_date_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255020&sysDsCd=01",
-    "note": "웰컴저축은행 공식 WELCOME ISA 정기예금 상세페이지. 금리안내 약정금리 표의 3/6/12/24/36개월 연이율 사용. 괄호 안 연수익률 및 중도해지이율 제외. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
-    "collected_at": "2026-08-21 01:05:08",
-    "stale": true,
-    "retained_last_good": true,
-    "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-08-22 01:08:06",
-    "last_fetch_error": "WELCOME ISA 공식 상품 상세페이지 검증 실패"
+    "note": "웰컴저축은행 공식 WELCOME ISA 정기예금 상세페이지. 금리안내 약정금리 표의 3/6/12/24/36개월 연이율 사용. 괄호 안 연수익률 및 중도해지이율 제외.",
+    "collected_at": "2026-08-23 00:52:48"
   },
   {
     "bank": "애큐온",
@@ -189,10 +174,10 @@
     },
     "status": "verified_official",
     "source_url": "https://www.acuonsb.co.kr/sd_TUB_GD_INFO_T.jct",
-    "updated_at": "2026-08-22 01:08:08",
+    "updated_at": "2026-08-23 00:52:55",
     "note": "애큐온저축은행 공식 JEX 상품정보 API. GD_INFO_C=1201170, REC_001의 INT_TYPE=1 약정금리 중 COND_TRM별 CONT_APLY_INT 사용.",
     "disclosure_date": "2026-08-05",
-    "collected_at": "2026-08-22 01:08:08",
+    "collected_at": "2026-08-23 00:52:55",
     "disclosure_date_source": "acuon_official_api:payload.CHNG_DATETIME",
     "disclosure_date_url": "https://www.acuonsb.co.kr/sd_TUB_GD_INFO_T.jct"
   },
@@ -209,10 +194,10 @@
     },
     "status": "verified_official",
     "source_url": "https://www.daolsb.com/deposit/goods.do?gds_cd=DA104&gds_clss_cd=DA",
-    "updated_at": "2026-08-22 01:08:10",
+    "updated_at": "2026-08-23 00:52:56",
     "note": "다올저축은행 공식 ISA 정기예금 약정이율, 최종금리변경일 2026-03-26",
     "disclosure_date": "2026-03-26",
-    "collected_at": "2026-08-22 01:08:10",
+    "collected_at": "2026-08-23 00:52:56",
     "disclosure_date_source": "existing_collector"
   },
   {
@@ -231,14 +216,14 @@
     "updated_at": "2026-08-18 00:57:00",
     "effective_date": "2026-07-28",
     "api_url": "https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do",
-    "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-28 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+    "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-28 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
     "disclosure_date": "2026-07-28",
     "collected_at": "2026-08-18 00:57:00",
     "disclosure_date_source": "existing_collector",
     "stale": true,
     "retained_last_good": true,
     "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-08-22 01:08:11",
+    "last_attempt_at": "2026-08-23 00:52:57",
     "last_fetch_error": "HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)')))"
   },
   {
@@ -254,9 +239,9 @@
     },
     "status": "research_pending",
     "source_url": null,
-    "updated_at": "2026-08-22 01:08:11",
+    "updated_at": "2026-08-23 00:52:57",
     "disclosure_date": null,
-    "collected_at": "2026-08-22 01:08:11",
+    "collected_at": "2026-08-23 00:52:57",
     "disclosure_date_source": "not_found"
   },
   {
@@ -272,10 +257,10 @@
     },
     "status": "verified_source_rate_pending",
     "source_url": "https://www.nhsavingsbank.co.kr/dpisPrd/view.do?prdCode=24302",
-    "updated_at": "2026-08-22 01:08:11",
+    "updated_at": "2026-08-23 00:52:57",
     "note": "공식 상세페이지에서 상품 존재 확인. 현재 HTML에서 적용금리 숫자가 비어 있어 금리는 None 유지.",
     "disclosure_date": null,
-    "collected_at": "2026-08-22 01:08:11",
+    "collected_at": "2026-08-23 00:52:57",
     "disclosure_date_source": "not_found"
   }
 ]
