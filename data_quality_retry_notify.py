@@ -32,6 +32,7 @@ def retry_issue(item):
         ":retained:",
         ":fetch_failed_no_value:",
         ":collector_failed",
+        ":disclosure_not_refreshed:",
     )
     return any(marker in key for marker in retry_markers)
 
@@ -54,7 +55,10 @@ def main():
     issues = source.get("issues") if isinstance(source.get("issues"), list) else []
     remaining = [item for item in issues if retry_issue(item)]
 
-    has_error = any(str(item.get("level") or "").upper() == "ERROR" for item in remaining)
+    has_error = any(
+        str(item.get("level") or "").upper() == "ERROR"
+        for item in remaining
+    )
     notify = bool(remaining)
     status = "BLOCKED" if has_error else ("WARNING" if notify else "OK")
 
@@ -77,7 +81,10 @@ def main():
     print("notify:", notify)
     print("remaining retry issues:", len(remaining))
     for item in remaining:
-        print(f"[{item.get('level','WARNING')}] {item.get('section','-')} - {item.get('message','-')}")
+        print(
+            f"[{item.get('level','WARNING')}] "
+            f"{item.get('section','-')} - {item.get('message','-')}"
+        )
     print("=" * 68)
 
 
