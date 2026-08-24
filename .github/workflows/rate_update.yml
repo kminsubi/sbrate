@@ -3,8 +3,10 @@ name: SBRateBot Daily Auto Update
 on:
   schedule:
     # GitHub cron is UTC.
-    # 15:30 UTC = 00:30 KST (next day)
+    # 15:30 UTC = 00:30 KST (next day): full collection.
     - cron: "30 15 * * *"
+    # 21:30 UTC = 06:30 KST (next day): retry only failed ISA/IRP sources.
+    - cron: "30 21 * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,6 +18,7 @@ concurrency:
 
 jobs:
   update-rates:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 15 * * *'
     runs-on: ubuntu-latest
 
     steps:
@@ -70,9 +73,14 @@ jobs:
           echo "Block publish  : ${{ steps.quality.outputs.block }}"
           echo "Notify admin   : ${{ steps.quality.outputs.notify }}"
           echo "Issue count    : ${{ steps.quality.outputs.issue_count }}"
+          echo "00:30 WARNING notifications are deferred to the 06:30 retry."
 
-      - name: Notify Data Quality warning
-        if: always() && steps.quality.outcome == 'success' && steps.quality.outputs.notify == 'true'
+      - name: Notify immediate blocking error
+        if: >-
+          always() &&
+          steps.quality.outcome == 'success' &&
+          steps.quality.outputs.status == 'BLOCKED' &&
+          steps.quality.outputs.notify == 'true'
         continue-on-error: true
         run: |
           curl --fail --show-error --silent \
@@ -114,9 +122,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Existing tracked data files can be added normally even though
-          # data/*.json is ignored. data_quality_status.json is newly created
-          # by the guard, so force-add it explicitly.
           for f in \
             data/latest_rates.json \
             data/previous_rates.json \
@@ -161,4 +166,139 @@ jobs:
           echo "ISA/IRP      : ${{ steps.pension.outcome }}"
           echo "Quality      : ${{ steps.quality.outputs.status }}"
           echo "Block        : ${{ steps.quality.outputs.block }}"
+          exit 1
+
+  retry-pension:
+    if: github.event_name == 'schedule' && github.event.schedule == '30 21 * * *'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout latest repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests urllib3 beautifulsoup4 selenium
+
+      - name: Retry only failed ISA and IRP sources
+        id: retry
+        continue-on-error: true
+        run: |
+          python crawler/pension_retry_failed.py
+
+      - name: Run final Data Quality Guard after retry
+        id: quality
+        if: always()
+        env:
+          PENSION_OUTCOME: ${{ steps.retry.outcome }}
+        run: |
+          python data_quality_v3.py \
+            --deposit-outcome success \
+            --pension-outcome "$PENSION_OUTCOME" \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Build second-pass alert payload
+        id: retry_alert
+        if: always() && steps.quality.outcome == 'success'
+        run: |
+          python data_quality_retry_notify.py \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Show retry result
+        if: always()
+        run: |
+          echo "Retry collector : ${{ steps.retry.outcome }}"
+          echo "Quality status  : ${{ steps.quality.outputs.status }}"
+          echo "Retry alert     : ${{ steps.retry_alert.outputs.notify }}"
+          echo "Remaining issues: ${{ steps.retry_alert.outputs.issue_count }}"
+
+      - name: Notify remaining failures after second check
+        if: >-
+          always() &&
+          steps.retry_alert.outcome == 'success' &&
+          steps.retry_alert.outputs.notify == 'true'
+        continue-on-error: true
+        run: |
+          curl --fail --show-error --silent \
+            --retry 2 \
+            --retry-delay 5 \
+            --connect-timeout 10 \
+            --max-time 120 \
+            "https://sbrate.onrender.com/" > /dev/null
+
+          curl --fail --show-error --silent \
+            --retry 3 \
+            --retry-delay 5 \
+            --connect-timeout 10 \
+            --max-time 120 \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "X-SBRate-Secret: ${{ secrets.TELEGRAM_BRIEF_SECRET }}" \
+            --data-binary @data/data_quality_retry_status.json \
+            "https://sbrate.onrender.com/telegram/data-quality"
+
+      - name: Save final daily history snapshot
+        if: >-
+          always() &&
+          steps.retry.outcome == 'success' &&
+          steps.quality.outcome == 'success' &&
+          steps.quality.outputs.block != 'true'
+        run: |
+          python crawler/snapshot_history.py
+
+      - name: Commit retry results
+        if: >-
+          always() &&
+          steps.retry.outcome == 'success' &&
+          steps.quality.outcome == 'success' &&
+          steps.quality.outputs.block != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for f in \
+            data/isa_rates.json \
+            data/irp_rates.json \
+            data/pension_sources.json
+          do
+            if [ -f "$f" ]; then
+              git add "$f"
+            fi
+          done
+
+          if [ -f "data/data_quality_status.json" ]; then
+            git add -f data/data_quality_status.json
+          fi
+
+          if [ -d "data/history" ]; then
+            git add data/history/*.json 2>/dev/null || true
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No retry data changes to commit"
+          else
+            git commit -m "Retry failed ISA IRP official sources"
+            git push
+          fi
+
+      - name: Fail if retry pipeline technically failed
+        if: >-
+          always() &&
+          (
+            steps.retry.outcome != 'success' ||
+            steps.quality.outcome != 'success' ||
+            steps.quality.outputs.block == 'true'
+          )
+        run: |
+          echo "06:30 pension retry pipeline failed or was blocked."
+          echo "Retry   : ${{ steps.retry.outcome }}"
+          echo "Quality : ${{ steps.quality.outputs.status }}"
+          echo "Block   : ${{ steps.quality.outputs.block }}"
           exit 1
