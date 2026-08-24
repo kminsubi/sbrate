@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import irp_disclosure as source
@@ -7,6 +7,7 @@ import irp_disclosure as source
 
 BASE = Path(__file__).resolve().parent.parent
 OUTPUT = BASE / "data" / "irp_disclosure_rates.json"
+KST = timezone(timedelta(hours=9))
 
 
 def _load_existing():
@@ -68,9 +69,17 @@ def main():
         )
         raise SystemExit(4)
 
-    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # GitHub Actions runners use UTC. Store verification timestamps explicitly
+    # in KST so 00:30/06:30 runs are classified as the correct Korean date.
+    now_text = datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S")
+    for item in banks.values():
+        if isinstance(item, dict):
+            item["updated_at"] = now_text
+            item["verification_timezone"] = "Asia/Seoul"
+
     payload = {
         "generated_at": now_text,
+        "timezone": "Asia/Seoul",
         "strategy": "retirement_provider_disclosure",
         "sources": source.DISCLOSURE_URLS,
         "source_errors": source_errors,
