@@ -271,14 +271,16 @@
     },
     "status": "fetch_or_parse_error",
     "source_url": "https://sb.koreainvestment.com/?PRD-PDS001-11#",
-    "updated_at": "2026-08-25 01:09:38",
+    "updated_at": "2026-08-25 06:58:21",
     "error": "Message: \n",
     "note": "한국투자 공식 WebSquare IRP 수집 실패 (v5.5 재시도 2회): Message: \n",
     "disclosure_date": null,
-    "collected_at": "2026-08-25 01:09:38",
+    "collected_at": "2026-08-25 06:58:21",
     "disclosure_date_source": "not_collected",
     "rate_type": "IRP/DC·IRP",
-    "rate_basis": "IRP/DC·IRP 약정금리"
+    "rate_basis": "IRP/DC·IRP 약정금리",
+    "retry_attempt_at": "2026-08-25 06:54:08",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "웰컴",

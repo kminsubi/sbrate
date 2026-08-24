@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-08-25 01:09:51",
+  "snapshot_at": "2026-08-25 06:58:23",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-08-25 01:05:08",
@@ -10673,12 +10673,14 @@
       },
       "status": "fetch_or_parse_error",
       "source_url": "https://sb.koreainvestment.com/?PRD-PDS001-10#",
-      "updated_at": "2026-08-25 01:07:43",
+      "updated_at": "2026-08-25 06:56:25",
       "error": "Message: \n",
       "note": "한국투자 공식 WebSquare ISA 수집 실패 (v5.5 재시도 2회): Message: \n",
       "disclosure_date": null,
-      "collected_at": "2026-08-25 01:07:43",
-      "disclosure_date_source": "not_collected"
+      "collected_at": "2026-08-25 06:56:25",
+      "disclosure_date_source": "not_collected",
+      "retry_attempt_at": "2026-08-25 06:54:08",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "웰컴",
@@ -10755,15 +10757,17 @@
       "updated_at": "2026-08-18 00:57:00",
       "effective_date": "2026-07-28",
       "api_url": "https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do",
-      "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-28 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-28 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
       "disclosure_date": "2026-07-28",
       "collected_at": "2026-08-18 00:57:00",
       "disclosure_date_source": "existing_collector",
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-08-25 01:09:50",
-      "last_fetch_error": "HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)')))"
+      "last_attempt_at": "2026-08-25 06:58:22",
+      "last_fetch_error": "HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)')))",
+      "retry_attempt_at": "2026-08-25 06:54:08",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "JT친애",
@@ -11076,14 +11080,16 @@
       },
       "status": "fetch_or_parse_error",
       "source_url": "https://sb.koreainvestment.com/?PRD-PDS001-11#",
-      "updated_at": "2026-08-25 01:09:38",
+      "updated_at": "2026-08-25 06:58:21",
       "error": "Message: \n",
       "note": "한국투자 공식 WebSquare IRP 수집 실패 (v5.5 재시도 2회): Message: \n",
       "disclosure_date": null,
-      "collected_at": "2026-08-25 01:09:38",
+      "collected_at": "2026-08-25 06:58:21",
       "disclosure_date_source": "not_collected",
       "rate_type": "IRP/DC·IRP",
-      "rate_basis": "IRP/DC·IRP 약정금리"
+      "rate_basis": "IRP/DC·IRP 약정금리",
+      "retry_attempt_at": "2026-08-25 06:54:08",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "웰컴",
