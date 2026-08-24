@@ -40,6 +40,7 @@ def _pension_count_line(label, data):
 def _quality_message(payload):
     status = str(payload.get("status") or "UNKNOWN").upper()
     generated_at = str(payload.get("generated_at") or "-")
+    verification_phase = str(payload.get("verification_phase") or "").strip()
     counts = payload.get("counts") if isinstance(payload.get("counts"), dict) else {}
     issues = payload.get("issues") if isinstance(payload.get("issues"), list) else []
 
@@ -55,12 +56,18 @@ def _quality_message(payload):
         "",
         f"검증상태 : {status}",
         f"검증시각 : {generated_at}",
+    ]
+
+    if verification_phase:
+        lines.append(f"검증단계 : {verification_phase}")
+
+    lines.extend([
         "",
         "수집현황",
         f"• 정기예금 : {deposit.get('banks', 0)}개사 / {deposit.get('items', 0)}상품",
         _pension_count_line("ISA", isa),
         _pension_count_line("IRP", irp),
-    ]
+    ])
 
     if issues:
         lines.extend(["", "확인 필요"])
@@ -84,8 +91,11 @@ def _quality_message(payload):
             "",
             "※ '오늘확인'은 이번 실행에서 공식소스를 정상 확인한 건수입니다.",
             "※ '직전값'은 오늘 확인 실패로 마지막 정상값을 유지한 건수입니다.",
-            "※ WARNING 데이터는 반영되지만 관리자 확인이 필요합니다.",
         ])
+        if verification_phase:
+            lines.append("※ 00:30 1차 실패 후 06:30 재확인에서도 남은 실패만 알립니다.")
+        else:
+            lines.append("※ WARNING 데이터는 반영되지만 관리자 확인이 필요합니다.")
 
     return "\n".join(lines)
 
