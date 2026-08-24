@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-24 00:55:52",
+  "generated_at": "2026-08-25 01:09:50",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "1690c6be2707e4ff",
-  "previous_fingerprint": "821d51e224ba5219",
+  "fingerprint": "53fd2b1f3c1f39c1",
+  "previous_fingerprint": "1690c6be2707e4ff",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,8 +22,8 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 9,
-      "verified_today": 6,
-      "retained_last_good": 3,
+      "verified_today": 8,
+      "retained_last_good": 1,
       "unavailable_rows": 3,
       "fetch_failed_rows": 1,
       "woori_rate_12m": 3.7
@@ -42,15 +42,9 @@
   "issues": [
     {
       "level": "WARNING",
-      "key": "isa:retained:신한",
-      "section": "ISA",
-      "message": "신한 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "isa:retained:하나",
-      "section": "ISA",
-      "message": "하나 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
+      "key": "deposit:large_rate_change",
+      "section": "정기예금",
+      "message": "비정상 급변 후보: 동양 정기예금(비대면,인터넷뱅킹,스마트폰뱅킹) 12개월 +0.60%p."
     },
     {
       "level": "WARNING",
