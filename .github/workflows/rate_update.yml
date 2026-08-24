@@ -42,17 +42,30 @@ jobs:
         run: |
           python crawler/fsb.py
 
+      - name: Refresh official IRP provider disclosure
+        id: irp_disclosure
+        continue-on-error: true
+        run: |
+          python crawler/irp_disclosure_safe.py
+
       - name: Update ISA and IRP rates
         id: pension
         continue-on-error: true
         run: |
           python crawler/pension_rates.py
 
+      - name: Apply fresh IRP disclosure verification
+        if: always()
+        continue-on-error: true
+        run: |
+          python crawler/pension_disclosure_postprocess.py
+
       - name: Show collector results
         if: always()
         run: |
-          echo "Fixed deposit: ${{ steps.deposit.outcome }}"
-          echo "ISA/IRP      : ${{ steps.pension.outcome }}"
+          echo "Fixed deposit : ${{ steps.deposit.outcome }}"
+          echo "IRP disclosure: ${{ steps.irp_disclosure.outcome }}"
+          echo "ISA/IRP       : ${{ steps.pension.outcome }}"
 
       - name: Run Data Quality Guard
         id: quality
@@ -129,6 +142,7 @@ jobs:
             data/banks.json \
             data/isa_rates.json \
             data/irp_rates.json \
+            data/irp_disclosure_rates.json \
             data/pension_sources.json
           do
             if [ -f "$f" ]; then
@@ -187,11 +201,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests urllib3 beautifulsoup4 selenium
 
+      - name: Refresh official IRP provider disclosure again
+        id: irp_disclosure_retry
+        continue-on-error: true
+        run: |
+          python crawler/irp_disclosure_safe.py
+
       - name: Retry only failed ISA and IRP sources
         id: retry
         continue-on-error: true
         run: |
           python crawler/pension_retry_failed.py
+
+      - name: Apply fresh IRP disclosure verification after retry
+        if: always()
+        continue-on-error: true
+        run: |
+          python crawler/pension_disclosure_postprocess.py
 
       - name: Run final Data Quality Guard after retry
         id: quality
@@ -214,9 +240,10 @@ jobs:
       - name: Show retry result
         if: always()
         run: |
-          echo "Retry collector : ${{ steps.retry.outcome }}"
-          echo "Quality status  : ${{ steps.quality.outputs.status }}"
-          echo "Retry alert     : ${{ steps.retry_alert.outputs.notify }}"
+          echo "IRP disclosure : ${{ steps.irp_disclosure_retry.outcome }}"
+          echo "Retry collector: ${{ steps.retry.outcome }}"
+          echo "Quality status : ${{ steps.quality.outputs.status }}"
+          echo "Retry alert    : ${{ steps.retry_alert.outputs.notify }}"
           echo "Remaining issues: ${{ steps.retry_alert.outputs.issue_count }}"
 
       - name: Notify remaining failures after second check
@@ -266,6 +293,7 @@ jobs:
           for f in \
             data/isa_rates.json \
             data/irp_rates.json \
+            data/irp_disclosure_rates.json \
             data/pension_sources.json
           do
             if [ -f "$f" ]; then
