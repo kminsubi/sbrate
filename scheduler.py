@@ -14,6 +14,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
 from fisis_history_patch import install_fisis_history_patch
 from fisis_management import install_fisis_management
+from fisis_quality_patch import install_fisis_quality_patch
 from fisis_region_patch import install_fisis_region_patch
 from management_report import install_management_report
 from management_report_auto_update import check_latest_quarter, install_management_report_auto_update
@@ -173,9 +174,10 @@ install_management_report_v5_runtime()
 install_management_report_v4_runtime()
 install_management_report()
 
-# FISIS: 2020Q1 이력 -> 주소기준 지역 -> 자동 최신분기 감지 순으로 설치한다.
+# FISIS: 2020Q1 이력 -> 권역 -> 90% 완결성 기준 -> 자동 최신분기 감지.
 install_fisis_history_patch()
 install_fisis_region_patch()
+install_fisis_quality_patch()
 install_management_report_auto_update()
 install_fisis_management()
 
