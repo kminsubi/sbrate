@@ -4,7 +4,7 @@ This module intentionally monkey-patches the existing provider so the proven man
 report path remains intact. It never exposes or stores the FISIS authentication key.
 """
 
-INTELLIGENCE_SCHEMA_VERSION = 2
+INTELLIGENCE_SCHEMA_VERSION = 3
 SELECTIVE_ACCOUNT_TABLES = {"SE006", "SE014"}
 
 
@@ -41,13 +41,15 @@ def install_fisis_intelligence_patch():
         "roa": "C",
         "roe": "D",
     })
+    # SE014 is the dedicated interest-sector P&L table. Its expense branch uses
+    # B-codes (B1/B11/B115), unlike the summary P&L SE006 A2/A21/A215 branch.
     fm.TABLES.setdefault("SE014", {}).update({
         "net_interest_income": "A",
         "interest_income": "A1",
         "loan_interest_income": "A13",
-        "interest_expense": "A2",
-        "deposit_interest_expense": "A21",
-        "time_deposit_interest_expense": "A215",
+        "interest_expense": "B1",
+        "deposit_interest_expense": "B11",
+        "time_deposit_interest_expense": "B115",
     })
 
     # Soundness / liquidity / capital detail
@@ -116,9 +118,8 @@ def install_fisis_intelligence_patch():
     original_build_store = fm._build_store
 
     def fetch_table_optimized(finance_cd, list_no, metric_accounts, start_month, end_month):
-        # SE006/SE014 contain many hundreds of detailed account rows. Requesting the
-        # whole table for 26 quarters is slow and can time out, so use the documented
-        # accountCd parameter only for the handful of accounts SBRate actually needs.
+        # SE006/SE014 contain many detailed account rows. Request only the accounts
+        # SBRate needs by using FISIS's documented accountCd parameter.
         if list_no not in SELECTIVE_ACCOUNT_TABLES:
             return original_fetch_table(finance_cd, list_no, metric_accounts, start_month, end_month)
 
@@ -156,7 +157,7 @@ def install_fisis_intelligence_patch():
         if isinstance(store, dict):
             store["intelligence_schema_version"] = INTELLIGENCE_SCHEMA_VERSION
             store["intelligence_metric_groups"] = ["funding", "soundness", "profitability"]
-            store["intelligence_fetch_mode"] = "selective-account-v2"
+            store["intelligence_fetch_mode"] = "selective-account-v3"
         return store
 
     fm._fetch_table = fetch_table_optimized
