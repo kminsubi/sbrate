@@ -1,6 +1,9 @@
 import sys
 
 
+ASSET_VERSION = "20260826mi1"
+
+
 def install_management_report_v5_runtime():
     app_module = sys.modules.get("app") or sys.modules.get("__main__")
     if app_module is None or not hasattr(app_module, "app"):
@@ -26,10 +29,22 @@ def install_management_report_v5_runtime():
                         '<link rel="stylesheet" href="/static/css/management_report_v5_patch.css?v=20260826v7">\n</head>',
                         1,
                     )
+                if "management_intelligence.css" not in html:
+                    html = html.replace(
+                        "</head>",
+                        f'<link rel="stylesheet" href="/static/css/management_intelligence.css?v={ASSET_VERSION}">\n</head>',
+                        1,
+                    )
                 if "management_report_v5_patch.js" not in html:
                     html = html.replace(
                         "</body>",
                         '<script src="/static/js/management_report_v5_patch.js?v=20260826v7"></script>\n</body>',
+                        1,
+                    )
+                if "management_intelligence.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/management_intelligence.js?v={ASSET_VERSION}"></script>\n</body>',
                         1,
                     )
                 response.set_data(html)
