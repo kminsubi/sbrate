@@ -1,9 +1,10 @@
 {
   "ok": true,
+  "probe_version": 2,
   "source": "금융감독원 금융통계정보시스템(FISIS)",
   "sector": "E",
   "table_count": 31,
-  "interesting_table_count": 20,
+  "interesting_table_count": 22,
   "category_errors": [],
   "account_errors": [],
   "interesting_tables": [
@@ -928,6 +929,54 @@
       ]
     },
     {
+      "list_no": "SE010",
+      "list_nm": "수익성",
+      "sml_div": "C",
+      "account_count": 10,
+      "accounts": [
+        {
+          "account_cd": "A",
+          "account_nm": "총자산(평잔)"
+        },
+        {
+          "account_cd": "B",
+          "account_nm": "자기자본(평잔)"
+        },
+        {
+          "account_cd": "C",
+          "account_nm": "총자산순이익률(ROA)"
+        },
+        {
+          "account_cd": "C1",
+          "account_nm": "당기순이익"
+        },
+        {
+          "account_cd": "D",
+          "account_nm": "자기자본순이익률(ROE)"
+        },
+        {
+          "account_cd": "E",
+          "account_nm": "총자산경비율"
+        },
+        {
+          "account_cd": "E1",
+          "account_nm": "판매비와 일반관리비"
+        },
+        {
+          "account_cd": "F",
+          "account_nm": "수지비율"
+        },
+        {
+          "account_cd": "F1",
+          "account_nm": "수지비율_영업비용"
+        },
+        {
+          "account_cd": "F2",
+          "account_nm": "수지비율_영업수익"
+        }
+      ]
+    },
+    {
       "list_no": "SE011",
       "list_nm": "유동성",
       "sml_div": "C",
@@ -1448,6 +1497,30 @@
         {
           "account_cd": "C",
           "account_nm": "단순자기자본비율"
+        }
+      ]
+    },
+    {
+      "list_no": "SE018",
+      "list_nm": "자본적정성(자본적정성지표)",
+      "sml_div": "C",
+      "account_count": 4,
+      "accounts": [
+        {
+          "account_cd": "A",
+          "account_nm": "BIS기준 자기자본비율"
+        },
+        {
+          "account_cd": "A1",
+          "account_nm": "기본자본비율"
+        },
+        {
+          "account_cd": "A2",
+          "account_nm": "보완자본비율"
+        },
+        {
+          "account_cd": "B",
+          "account_nm": "단순자기자본 비율"
         }
       ]
     },
