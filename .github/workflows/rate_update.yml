@@ -52,7 +52,7 @@ jobs:
         id: pension
         continue-on-error: true
         run: |
-          python crawler/pension_rates.py
+          python crawler/pension_entry.py
 
       - name: Apply fresh IRP disclosure verification
         if: always()
@@ -211,7 +211,7 @@ jobs:
         id: retry
         continue-on-error: true
         run: |
-          python crawler/pension_retry_failed.py
+          python crawler/pension_retry_entry.py
 
       - name: Apply fresh IRP disclosure verification after retry
         if: always()
