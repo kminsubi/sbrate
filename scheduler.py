@@ -12,6 +12,7 @@ from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
+from management_report import install_management_report
 from rate_simulator import install_rate_simulator
 from rate_simulator_v2 import install_rate_simulator_v2
 from rate_simulator_v2_polish import install_rate_simulator_v2_polish
@@ -138,6 +139,7 @@ enable_mobile_platform_detection()
 install_verified_visitor_tracking()
 install_visitor_stats_hooks()
 install_data_quality_endpoint()
+install_management_report()
 install_rate_simulator()
 install_rate_simulator_v2()
 install_rate_simulator_v2_polish()
