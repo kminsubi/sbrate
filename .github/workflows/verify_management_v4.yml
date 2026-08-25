@@ -1,0 +1,29 @@
+name: Verify Management V4
+
+on:
+  push:
+    paths:
+      - 'static/js/management_report.js'
+      - 'static/css/management_report_v4.css'
+      - 'management_report_v4_runtime.py'
+      - 'fisis_history_patch.py'
+      - 'scheduler.py'
+      - '.github/workflows/verify_management_v4.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Python syntax
+        run: python -m py_compile scheduler.py management_report_v4_runtime.py fisis_history_patch.py
+      - name: Check JavaScript syntax
+        run: node --check static/js/management_report.js
+      - name: Check requested management wiring
+        run: |
+          grep -q "mode: 'single'" static/js/management_report.js
+          grep -q "전년말比" static/js/management_report.js
+          grep -q "전분기比" static/js/management_report.js
+          grep -q "202001" fisis_history_patch.py
+          grep -q "management_report_v4.css" management_report_v4_runtime.py
