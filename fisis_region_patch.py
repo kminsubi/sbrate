@@ -33,20 +33,25 @@ def _region_from_address(address):
     if not text:
         return ""
 
-    rules = (
-        (("서울특별시", "서울시", "서울 "), "서울"),
-        (("인천광역시", "인천시", "인천 "), "인천"),
-        (("경기도", "경기 "), "경기"),
-        (("세종특별자치시", "세종시", "세종 "), "충청"),
-        (("대전광역시", "대전시", "대전 ", "충청북도", "충북", "충청남도", "충남"), "충청"),
-        (("광주광역시", "광주시", "광주 ", "전라북도", "전북", "전북특별자치도", "전라남도", "전남"), "전라"),
-        (("부산광역시", "부산시", "부산 ", "대구광역시", "대구시", "대구 ", "울산광역시", "울산시", "울산 ", "경상북도", "경북", "경상남도", "경남"), "경상"),
-        (("강원특별자치도", "강원도", "강원 "), "강원"),
-        (("제주특별자치도", "제주도", "제주 "), "제주"),
-    )
-    for tokens, region in rules:
-        if any(token in text for token in tokens):
-            return region
+    # 도/광역시를 뜻하는 주소 첫 토큰을 기준으로 분류한다.
+    # 예: "경기도 광주시"를 광주(전라)로 잘못 분류하지 않는다.
+    first = text.split(" ", 1)[0]
+    if first.startswith("서울"):
+        return "서울"
+    if first.startswith("인천"):
+        return "인천"
+    if first.startswith("경기"):
+        return "경기"
+    if first.startswith(("세종", "대전", "충청", "충북", "충남")):
+        return "충청"
+    if first.startswith(("광주", "전라", "전북", "전남")):
+        return "전라"
+    if first.startswith(("부산", "대구", "울산", "경상", "경북", "경남")):
+        return "경상"
+    if first.startswith("강원"):
+        return "강원"
+    if first.startswith("제주"):
+        return "제주"
     return "기타"
 
 
