@@ -1,0 +1,185 @@
+name: Verify FISIS Management Report
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/verify_fisis_management.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sbrate-verify-fisis-management
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify live Render FISIS management APIs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          ready=0
+
+          for i in $(seq 1 45); do
+            echo "Verification attempt $i/45"
+
+            q_code=$(curl -L -sS --max-time 120 \
+              -H "Cache-Control: no-cache" \
+              -o /tmp/quarters.json \
+              -w "%{http_code}" \
+              "https://sbrate.onrender.com/api/management-report/quarters?verify=${GITHUB_SHA}-${i}" || true)
+
+            if [ "$q_code" != "200" ]; then
+              echo "quarters HTTP=$q_code"
+              sleep 20
+              continue
+            fi
+
+            pair=$(python - <<'PY'
+          import json
+          p=json.load(open('/tmp/quarters.json', encoding='utf-8'))
+          qs=p.get('quarters') if isinstance(p,dict) else None
+          ok=(p.get('ok') is True and 'FISIS' in str(p.get('source') or '') and isinstance(qs,list) and len(qs)>=2)
+          if not ok:
+              print('')
+          else:
+              a,b=qs[0],qs[1]
+              # Require broad industry coverage before treating the cache as ready.
+              if min(int(a.get('bank_count') or 0), int(b.get('bank_count') or 0)) < 50:
+                  print('')
+              else:
+                  print(f"{a.get('key','')} {b.get('key','')}")
+          PY
+          )
+
+            if [ -z "$pair" ]; then
+              echo "FISIS quarters not ready yet"
+              cat /tmp/quarters.json || true
+              sleep 20
+              continue
+            fi
+
+            base=$(echo "$pair" | awk '{print $1}')
+            compare=$(echo "$pair" | awk '{print $2}')
+            echo "Testing comparison: $base vs $compare"
+
+            r_code=$(curl -L -sS --max-time 120 \
+              -H "Cache-Control: no-cache" \
+              -o /tmp/report.json \
+              -w "%{http_code}" \
+              "https://sbrate.onrender.com/api/management-report?base=${base}&compare=${compare}&verify=${GITHUB_SHA}-${i}" || true)
+
+            if [ "$r_code" != "200" ]; then
+              echo "report HTTP=$r_code"
+              sleep 20
+              continue
+            fi
+
+            if python - <<'PY'
+          import json, sys
+          p=json.load(open('/tmp/report.json', encoding='utf-8'))
+          rows=p.get('rows') if isinstance(p,dict) else None
+          w=p.get('woori') if isinstance(p,dict) else None
+          metrics=(w or {}).get('metrics') if isinstance(w,dict) else None
+          required=['total_assets','corporate_loans','household_loans','total_loans','bis_ratio','npl_ratio','delinquency_ratio','net_income','employees']
+          ok=(
+              p.get('ok') is True
+              and 'FISIS' in str(p.get('source_name') or '')
+              and isinstance(rows,list) and len(rows)>=50
+              and isinstance(w,dict) and w.get('is_woori') is True
+              and isinstance(metrics,dict)
+              and all(k in metrics for k in required)
+              and metrics['total_assets'].get('base') is not None
+              and metrics['total_loans'].get('base') is not None
+              and metrics['bis_ratio'].get('base') is not None
+              and metrics['delinquency_ratio'].get('base') is not None
+              and metrics['employees'].get('base') is not None
+          )
+          sys.exit(0 if ok else 1)
+          PY
+            then
+              python - <<'PY'
+          import json
+          q=json.load(open('/tmp/quarters.json', encoding='utf-8'))
+          r=json.load(open('/tmp/report.json', encoding='utf-8'))
+          w=r.get('woori') or {}
+          metrics=w.get('metrics') or {}
+          out={
+              'ok': True,
+              'source': q.get('source'),
+              'updated_at': q.get('updated_at'),
+              'quarter_count': len(q.get('quarters') or []),
+              'latest_quarters': [
+                  {
+                      'key': x.get('key'),
+                      'label': x.get('label'),
+                      'as_of': x.get('as_of'),
+                      'bank_count': x.get('bank_count'),
+                  }
+                  for x in (q.get('quarters') or [])[:4]
+              ],
+              'comparison': {
+                  'base': r.get('base_quarter'),
+                  'compare': r.get('compare_quarter'),
+                  'row_count': len(r.get('rows') or []),
+              },
+              'woori': {
+                  'bank': w.get('bank'),
+                  'rank': w.get('rank'),
+                  'compare_rank': w.get('compare_rank'),
+                  'total_assets': (metrics.get('total_assets') or {}).get('base'),
+                  'corporate_loans': (metrics.get('corporate_loans') or {}).get('base'),
+                  'household_loans': (metrics.get('household_loans') or {}).get('base'),
+                  'total_loans': (metrics.get('total_loans') or {}).get('base'),
+                  'bis_ratio': (metrics.get('bis_ratio') or {}).get('base'),
+                  'npl_ratio': (metrics.get('npl_ratio') or {}).get('base'),
+                  'delinquency_ratio': (metrics.get('delinquency_ratio') or {}).get('base'),
+                  'net_income': (metrics.get('net_income') or {}).get('base'),
+                  'employees': (metrics.get('employees') or {}).get('base'),
+              },
+          }
+          with open('data/fisis_management_verify.json','w',encoding='utf-8') as f:
+              json.dump(out,f,ensure_ascii=False,indent=2)
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+              ready=1
+              break
+            fi
+
+            echo "Comparison payload not complete yet"
+            cat /tmp/report.json || true
+            sleep 20
+          done
+
+          if [ "$ready" != "1" ]; then
+            echo "Live FISIS management report did not become ready"
+            echo "Last quarters payload:"
+            cat /tmp/quarters.json 2>/dev/null || true
+            echo
+            echo "Last report payload:"
+            cat /tmp/report.json 2>/dev/null || true
+            exit 1
+          fi
+
+      - name: Commit safe verification result
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/fisis_management_verify.json
+          if git diff --cached --quiet; then
+            echo "No verification changes"
+          else
+            git commit -m "Capture live FISIS management verification"
+            git pull --rebase origin main
+            git push origin main
+          fi
