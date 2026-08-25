@@ -98,3 +98,23 @@ body>header>div:last-child{min-width:0;flex:0 1 auto}
   .mr-table.is-single .mr-col-bank{left:42px;width:118px;min-width:118px}
   .mr-table.is-single .mr-col-region{left:160px;width:66px;min-width:66px}
 }
+
+/* Header V4: 버튼 우선 표시. 중복/장식 정보를 먼저 줄여 겹침을 원천 방지한다. */
+body>header{min-width:0!important}
+body>header>div:first-child{min-width:0!important;flex:1 1 auto!important;overflow:visible!important}
+body>header>div:last-child{min-width:max-content!important;flex:0 0 auto!important;position:relative!important;z-index:5!important}
+#management-report-open{min-width:92px!important;max-width:none!important;flex:0 0 92px!important;overflow:visible!important;position:relative!important;z-index:6!important}
+@media(max-width:1900px){
+  #dashboard-market-label{display:none!important}
+  #header-current-datetime{display:none!important}
+  #market-product-tabs .market-product-tab{padding-left:10px!important;padding-right:10px!important}
+  body>header>div:first-child{gap:7px!important}
+  body>header>div:last-child{gap:7px!important}
+}
+@media(max-width:1550px){
+  body>header h1{font-size:13px!important;padding-left:8px!important}
+  #management-report-open{min-width:84px!important;flex-basis:84px!important;padding-left:7px!important;padding-right:7px!important}
+}
+@media(max-width:1350px){
+  body>header h1{display:none!important}
+}
