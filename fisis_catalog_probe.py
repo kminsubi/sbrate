@@ -4,14 +4,15 @@ import sys
 
 KEYWORDS = (
     "예수", "예금", "수신", "자금조달", "조달", "이자비용", "이자수익", "순이자",
-    "손익", "영업이익", "당기순이익", "ROA", "ROE", "총자산이익률", "자기자본이익률",
-    "연체", "고정이하", "부실", "대손", "충당", "건전성", "BIS", "자기자본",
+    "손익", "영업이익", "당기순이익", "수익성", "ROA", "ROE", "총자산이익률", "자기자본이익률",
+    "연체", "고정이하", "부실", "대손", "충당", "건전성", "BIS", "자기자본", "자본적정성",
     "위험가중", "유동성", "예대율", "대출", "여신", "업종별", "담보별", "용도별",
     "가계", "기업", "중소기업", "부동산", "PF", "프로젝트", "점포", "임직원",
 )
 
 # FISIS 경영정보 공식 분류: 일반현황 / 재무현황 / 주요경영지표 / 주요영업활동.
 STAT_CATEGORIES = "ABCD"
+PROBE_VERSION = 2
 
 
 def _rows(value):
@@ -78,6 +79,7 @@ def scan_fisis_catalog(include_accounts=True, max_account_tables=60):
     tables = {}
     category_errors = []
 
+    # FISIS 저축은행 경영정보는 A~D 4개 공식 분류로 제공된다.
     for sml_div in STAT_CATEGORIES:
         try:
             result = fm._api_get(
@@ -129,6 +131,7 @@ def scan_fisis_catalog(include_accounts=True, max_account_tables=60):
 
     return {
         "ok": True,
+        "probe_version": PROBE_VERSION,
         "sector": fm.FISIS_SECTOR,
         "source": fm.FISIS_SOURCE_NAME,
         "table_count": len(ordered),
