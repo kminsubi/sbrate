@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-08-25 06:58:22",
+  "generated_at": "2026-08-26 01:12:42",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": false,
-  "fingerprint": "53fd2b1f3c1f39c1",
+  "notify": true,
+  "fingerprint": "fa8d96c866410efb",
   "previous_fingerprint": "53fd2b1f3c1f39c1",
   "collector_outcomes": {
     "deposit": "success",
@@ -12,7 +12,7 @@
   },
   "counts": {
     "deposit": {
-      "items": 376,
+      "items": 377,
       "banks": 75,
       "previous_items": 376,
       "previous_banks": 75,
@@ -21,42 +21,30 @@
     "isa": {
       "rows": 13,
       "banks": 13,
-      "valid_rate_rows": 9,
-      "verified_today": 8,
+      "valid_rate_rows": 10,
+      "verified_today": 9,
       "retained_last_good": 1,
       "unavailable_rows": 3,
-      "fetch_failed_rows": 1,
+      "fetch_failed_rows": 0,
       "woori_rate_12m": 3.7
     },
     "irp": {
       "rows": 13,
       "banks": 13,
-      "valid_rate_rows": 12,
-      "verified_today": 11,
+      "valid_rate_rows": 13,
+      "verified_today": 8,
       "retained_last_good": 0,
       "unavailable_rows": 0,
-      "fetch_failed_rows": 1,
+      "fetch_failed_rows": 0,
       "woori_rate_12m": 3.7
     }
   },
   "issues": [
     {
       "level": "WARNING",
-      "key": "deposit:large_rate_change",
-      "section": "정기예금",
-      "message": "비정상 급변 후보: 동양 정기예금(비대면,인터넷뱅킹,스마트폰뱅킹) 12개월 +0.60%p."
-    },
-    {
-      "level": "WARNING",
-      "key": "isa:fetch_failed_no_value:한국투자",
+      "key": "isa:retained:신한",
       "section": "ISA",
-      "message": "한국투자 공식확인에 실패했고 현재 표시 가능한 금리가 없습니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "isa:retained:db",
-      "section": "ISA",
-      "message": "DB 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
+      "message": "신한 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
     },
     {
       "level": "WARNING",
@@ -66,9 +54,27 @@
     },
     {
       "level": "WARNING",
-      "key": "irp:fetch_failed_no_value:한국투자",
+      "key": "irp:disclosure_not_refreshed:sbi",
       "section": "IRP",
-      "message": "한국투자 공식확인에 실패했고 현재 표시 가능한 금리가 없습니다."
+      "message": "SBI IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "irp:disclosure_not_refreshed:db",
+      "section": "IRP",
+      "message": "DB IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "irp:disclosure_not_refreshed:jt친애",
+      "section": "IRP",
+      "message": "JT친애 IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "irp:disclosure_not_refreshed:nh",
+      "section": "IRP",
+      "message": "NH IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
     }
   ]
 }
