@@ -30,6 +30,23 @@ FSB_REGION_GROUPS = {
     ],
 }
 
+# FISIS 회사명은 일부 영문 약칭을 한글 음역으로 제공한다.
+FISIS_NAME_ALIASES = {
+    "디비": "DB",
+    "제이티친애": "JT친애",
+    "케이비": "KB",
+    "엔에이치": "NH",
+    "오케이": "OK",
+    "오에스비": "OSB",
+    "에스비아이": "SBI",
+    "에이치비": "HB",
+    "제이티": "JT",
+    "비엔케이": "BNK",
+    "디에이치": "DH",
+    "아이비케이": "IBK",
+    "씨케이": "CK",
+}
+
 
 def _normalize_bank(name):
     text = re.sub(r"\s+", "", str(name or ""))
@@ -43,6 +60,10 @@ FSB_REGION_BY_BANK = {
     for region, banks in FSB_REGION_GROUPS.items()
     for bank in banks
 }
+for alias, canonical in FISIS_NAME_ALIASES.items():
+    key = _normalize_bank(canonical)
+    if key in FSB_REGION_BY_BANK:
+        FSB_REGION_BY_BANK[_normalize_bank(alias)] = FSB_REGION_BY_BANK[key]
 
 
 def _address_from_company_row(row):
@@ -137,12 +158,12 @@ def install_fisis_region_patch():
     def cache_is_fresh(store):
         if not original_cache_is_fresh(store):
             return False
-        return int((store or {}).get("region_schema_version") or 0) >= 2
+        return int((store or {}).get("region_schema_version") or 0) >= 3
 
     def build_store_with_region():
         store = original_build_store()
         if isinstance(store, dict):
-            store["region_schema_version"] = 2
+            store["region_schema_version"] = 3
             store["region_source"] = "저축은행중앙회 전국 저축은행 현황"
             store["region_source_url"] = "https://www.fsb.or.kr/sabintr_0100.act"
             quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
@@ -151,7 +172,7 @@ def install_fisis_region_patch():
             rows = latest.get("banks") if isinstance(latest, dict) else []
             store["latest_region_count"] = sum(
                 1 for row in (rows or [])
-                if isinstance(row, dict) and str(row.get("region") or "").strip()
+                if isinstance(row, dict) and str(row.get("region") or "").strip() not in ("", "기타")
             )
         return store
 
@@ -174,6 +195,10 @@ def install_fisis_region_patch():
                     companies = fm._companies()
                     with_address = [x for x in companies if x.get("address")]
                     with_region = [x for x in companies if x.get("region") and x.get("region") != "기타"]
+                    unmatched = [
+                        x.get("finance_nm") for x in companies
+                        if x.get("region") in (None, "", "기타")
+                    ]
                     woori = next(
                         (x for x in companies if "우리금융저축은행" in str(x.get("finance_nm") or "")),
                         None,
@@ -183,6 +208,7 @@ def install_fisis_region_patch():
                         "company_count": len(companies),
                         "address_count": len(with_address),
                         "region_count": len(with_region),
+                        "unmatched": unmatched,
                         "region_source": "저축은행중앙회 전국 저축은행 현황",
                         "woori": {
                             "bank": (woori or {}).get("finance_nm"),
