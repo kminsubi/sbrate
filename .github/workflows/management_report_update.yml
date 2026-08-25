@@ -1,0 +1,55 @@
+name: SBRate Management Quarterly Update
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "crawler/management_quarterly.py"
+      - ".github/workflows/management_report_update.yml"
+  schedule:
+    # 18:15 UTC on the 1st = 03:15 KST on the 2nd.
+    # Quarterly statistics are published after quarter end, so a monthly check is sufficient.
+    - cron: "15 18 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sbrate-management-quarterly
+  cancel-in-progress: false
+
+jobs:
+  update-management-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install collector packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 pdfplumber
+
+      - name: Collect FSB quarterly management statistics
+        run: |
+          python crawler/management_quarterly.py --limit 12
+
+      - name: Commit quarterly snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/management/quarters.json
+          if git diff --cached --quiet; then
+            echo "No management-report data changes"
+          else
+            git commit -m "Update FSB quarterly management report data"
+            git push origin main
+          fi
