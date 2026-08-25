@@ -27,10 +27,11 @@ FIELDS = [
 
 def _load_store():
     try:
-        with DATA_FILE.open("r", encoding="utf-8-sig") as f:
-            data = json.load(f)
+        from fisis_management import get_management_store
+        data = get_management_store(trigger_refresh=True)
         return data if isinstance(data, dict) else {}
-    except Exception:
+    except Exception as error:
+        print("Management report FISIS store error:", error)
         return {}
 
 
@@ -134,7 +135,7 @@ def _comparison_payload(base_quarter, compare_quarter):
         "compare_label": compare_meta.get("label") or _quarter_label(compare_quarter),
         "base_source_url": base_meta.get("source_url"),
         "compare_source_url": compare_meta.get("source_url"),
-        "source_name": "저축은행중앙회 금융통계자료",
+        "source_name": "금융감독원 금융통계정보시스템(FISIS)",
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "fields": [
             {"key": field, "label": label, "unit": unit, "kind": kind}
@@ -186,7 +187,7 @@ def _xlsx_bytes(payload):
         rows.append((row, item.get("is_woori")))
 
     title = f"SBRate 경영현황 비교 - {payload['base_label']} vs {payload['compare_label']}"
-    subtitle = "출처: 저축은행중앙회 금융통계자료 | 금액: 억원 / 비율 증감: %p"
+    subtitle = "출처: 금융감독원 금융통계정보시스템(FISIS) | 금액: 억원 / 비율 증감: %p"
     xml_rows = []
     max_col = len(headers)
     xml_rows.append(f'<row r="1" ht="28" customHeight="1">{_xml_cell(1,1,title,1)}</row>')
@@ -329,7 +330,7 @@ def install_management_report():
             })
         return jsonify({
             "ok": True,
-            "source": "저축은행중앙회 금융통계자료",
+            "source": "금융감독원 금융통계정보시스템(FISIS)",
             "updated_at": store.get("updated_at"),
             "quarters": items,
         })
@@ -381,11 +382,11 @@ def install_management_report():
                 if marker not in html:
                     css = (
                         '<link data-sbrate-management-report="1" rel="stylesheet" '
-                        'href="/static/css/management_report.css?v=20260825v1">'
+                        'href="/static/css/management_report.css?v=20260825v2">'
                     )
                     js = (
                         '<script data-sbrate-management-report="1" '
-                        'src="/static/js/management_report.js?v=20260825v1"></script>'
+                        'src="/static/js/management_report.js?v=20260825v2"></script>'
                     )
                     html = html.replace("</head>", css + "\n</head>", 1)
                     html = html.replace("</body>", js + "\n</body>", 1)

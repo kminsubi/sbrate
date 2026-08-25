@@ -87,7 +87,7 @@
           <div>
             <div class="mr-eyebrow">MANAGEMENT INTELLIGENCE</div>
             <h2>경영현황 보고서</h2>
-            <p id="mr-source-line">저축은행중앙회 금융통계자료 기준</p>
+            <p id="mr-source-line">금융감독원 금융통계정보시스템(FISIS) 기준</p>
           </div>
           <button type="button" id="mr-close" class="mr-icon-btn" aria-label="닫기">×</button>
         </div>
@@ -118,7 +118,7 @@
             <div class="mr-legend">
               <span class="mr-legend-good">● 개선/증가</span>
               <span class="mr-legend-bad">● 악화/감소</span>
-              <span>※ 연체율·고정이하여신비율은 하락이 개선</span>
+              <span>※ 연체율·고정이하여신비율은 하락이 개선 · 당기순이익은 공시 누적값</span>
             </div>
           </div>
           <div class="mr-table-wrap">
@@ -151,7 +151,7 @@
 
   async function loadQuarters() {
     const status = document.getElementById('mr-status');
-    status.textContent = '중앙회 분기 데이터를 확인하고 있습니다.';
+    status.textContent = 'FISIS 분기 데이터를 확인하고 있습니다.';
     const data = await fetchJson('/api/management-report/quarters');
     state.quarters = Array.isArray(data.quarters) ? data.quarters : [];
     const baseSel = document.getElementById('mr-base-quarter');
