@@ -30,6 +30,27 @@
     flex:0 0 auto !important;
   }
 
+  /* Prevent the single-quarter query button from being clipped off-screen. */
+  .mr-toolbar-single{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 92px !important;
+    width:100% !important;
+    max-width:100% !important;
+    overflow:visible !important;
+  }
+  .mr-toolbar-single .mr-select-box,
+  .mr-toolbar-single .mr-select-box select{
+    min-width:0 !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .mr-toolbar-single #mr-single-run{
+    width:92px !important;
+    min-width:92px !important;
+    padding-left:8px !important;
+    padding-right:8px !important;
+  }
+
   .mr-table-card{
     flex:0 0 auto !important;
     min-height:560px !important;
@@ -47,6 +68,14 @@
 }
 
 @media(max-width:420px){
+  .mr-toolbar-single{
+    grid-template-columns:minmax(0,1fr) 84px !important;
+  }
+  .mr-toolbar-single #mr-single-run{
+    width:84px !important;
+    min-width:84px !important;
+    font-size:10px !important;
+  }
   .mr-table-card{min-height:520px !important;}
   .mr-table-wrap{min-height:440px !important;max-height:64vh !important;}
 }
