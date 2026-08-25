@@ -1,7 +1,7 @@
 import sys
 
 
-ASSET_VERSION = "20260826mi1"
+ASSET_VERSION = "20260826mi2"
 
 
 def install_management_report_v5_runtime():
@@ -45,6 +45,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</body>",
                         f'<script src="/static/js/management_intelligence.js?v={ASSET_VERSION}"></script>\n</body>',
+                        1,
+                    )
+                if "management_intelligence_polish.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/management_intelligence_polish.js?v={ASSET_VERSION}"></script>\n</body>',
                         1,
                     )
                 response.set_data(html)
