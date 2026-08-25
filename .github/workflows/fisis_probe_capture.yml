@@ -29,12 +29,12 @@ jobs:
         run: |
           mkdir -p data
           ok=0
-          for i in $(seq 1 24); do
-            echo "Probe attempt $i/24"
-            code=$(curl -L -sS --max-time 90 -o /tmp/fisis_probe.json -w "%{http_code}" "https://sbrate.onrender.com/api/_sbrate/fisis-probe" || true)
-            valid=$(python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); print('yes' if p.get('configured') is True and p.get('sector') == 'E' and isinstance(p.get('statistics'), dict) else 'no')" 2>/dev/null || echo no)
+          for i in $(seq 1 30); do
+            echo "Probe attempt $i/30"
+            code=$(curl -L -sS --max-time 120 -o /tmp/fisis_probe.json -w "%{http_code}" "https://sbrate.onrender.com/api/_sbrate/fisis-probe" || true)
+            valid=$(python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); v=p.get('validation_2026q1'); print('yes' if p.get('configured') is True and p.get('sector') == 'E' and isinstance(v, dict) and 'total_assets' in v and 'employees' in v else 'no')" 2>/dev/null || echo no)
             if [ "$code" = "200" ] && [ "$valid" = "yes" ]; then
-              python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); print('companies=',p.get('companies',{}).get('count'),'statistics=',p.get('statistics',{}).get('count'))"
+              python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); print('companies=',p.get('companies',{}).get('count'),'active=',p.get('companies',{}).get('active_name_count'),'metrics=',list(p.get('validation_2026q1',{})))"
               cp /tmp/fisis_probe.json data/fisis_probe_result.json
               ok=1
               break
@@ -42,7 +42,7 @@ jobs:
             sleep 30
           done
           if [ "$ok" != "1" ]; then
-            echo "Render FISIS probe did not become ready in time"
+            echo "Render FISIS value probe did not become ready in time"
             cat /tmp/fisis_probe.json 2>/dev/null || true
             exit 1
           fi
@@ -55,7 +55,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No probe changes"
           else
-            git commit -m "Capture FISIS savings-bank metadata"
+            git commit -m "Capture FISIS quarterly value validation"
             git pull --rebase origin main
             git push origin main
           fi
