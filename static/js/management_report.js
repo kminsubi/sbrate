@@ -56,13 +56,67 @@
     return num > 0 ? 'mr-delta-good' : 'mr-delta-bad';
   }
 
+  function polishExecutiveReportHtml(html) {
+    return String(html || '')
+      .replace(/(<div class="er-insight">\s*<b>[^<]+<\/b>)가\s+/g, '$1 ')
+      .replace(/시장 상단을 형성하고 있으며/g, '시장 최고금리를 기록하고 있으며')
+      .replace(/우리금융보다 높은 금리 기관은/g, '우리금융보다 금리가 높은 저축은행은')
+      .replace(/TOP5 경계와의 단순 금리차는/g, 'TOP5 진입 기준과의 금리 차이는')
+      .replace(/TOP5 경계 금리/g, 'TOP5 진입 기준 금리')
+      .replace(/단순 금리차/g, '금리 차이')
+      .replace(/선두사 Gap/g, '선두 저축은행과의 금리 격차')
+      .replace(/상위금리권/g, '상위 금리권')
+      .replace(/상위기관/g, '상위 기관');
+  }
+
+  function polishRenderedExecutiveReport(root = document) {
+    const report = root.querySelector ? root.querySelector('#executive-report-document') : null;
+    if (!report || report.dataset.koreanPolished === '1') return;
+
+    report.querySelectorAll('.er-insight').forEach((block) => {
+      const firstBold = block.querySelector('b');
+      if (firstBold) {
+        let node = firstBold.nextSibling;
+        while (node && node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) node = node.nextSibling;
+        if (node && node.nodeType === Node.TEXT_NODE) {
+          node.textContent = node.textContent.replace(/^\s*가\s+/, ' ');
+        }
+      }
+    });
+
+    report.innerHTML = polishExecutiveReportHtml(report.innerHTML);
+    report.dataset.koreanPolished = '1';
+  }
+
+  function installExecutiveReportPolish() {
+    const original = window.buildExecutiveReportBase;
+    if (typeof original === 'function' && !original.__sbrateKoreanPolished) {
+      const wrapped = function(...args) {
+        return polishExecutiveReportHtml(original.apply(this, args));
+      };
+      wrapped.__sbrateKoreanPolished = true;
+      window.buildExecutiveReportBase = wrapped;
+    }
+
+    const observer = new MutationObserver(() => polishRenderedExecutiveReport(document));
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    polishRenderedExecutiveReport(document);
+  }
+
   function mountOpenButtons() {
     const pcAnchor = document.getElementById('error-report-open');
     if (pcAnchor && !document.getElementById('management-report-open')) {
-      const btn = el('button', 'mr-open-btn', '📑 경영현황 보고서');
+      const btn = el('button', 'mr-open-btn', '📑 경영현황');
       btn.id = 'management-report-open';
       btn.type = 'button';
-      pcAnchor.parentNode.insertBefore(btn, pcAnchor);
+      btn.title = 'FISIS 경영현황 보고서 열기';
+
+      const marketTabs = document.getElementById('market-product-tabs');
+      if (marketTabs && marketTabs.parentNode) {
+        marketTabs.insertAdjacentElement('afterend', btn);
+      } else {
+        pcAnchor.parentNode.insertBefore(btn, pcAnchor);
+      }
       btn.addEventListener('click', openReport);
     }
 
@@ -299,6 +353,7 @@
   function init() {
     if (state.mounted) return;
     state.mounted = true;
+    installExecutiveReportPolish();
     mountOpenButtons();
     mountModal();
   }
