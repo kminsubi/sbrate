@@ -12,8 +12,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
 from fisis_catalog_probe import install_fisis_catalog_probe
 from fisis_history_patch import install_fisis_history_patch
-from fisis_intelligence_store import install_fisis_intelligence_store
-from fisis_management import install_fisis_management
+import fisis_intelligence_store
 from fisis_quality_patch import install_fisis_quality_patch
 from fisis_region_patch import install_fisis_region_patch
 from management_intelligence import install_management_intelligence
@@ -40,13 +39,11 @@ def run_crawler():
     print("SBRateBot 통합 데이터 업데이트 시작")
     print(datetime.now())
     print("=" * 60)
-
     jobs = [
         ("정기예금", os.path.join(BASE_DIR, "crawler", "fsb.py")),
         ("ISA / 퇴직연금(IRP)", os.path.join(BASE_DIR, "crawler", "pension_rates.py")),
     ]
     results = []
-
     for name, script_path in jobs:
         print()
         print("-" * 60)
@@ -66,7 +63,6 @@ def run_crawler():
         except Exception as e:
             print(f"[{name}] 업데이트 오류:", e)
             results.append((name, False, str(e)))
-
     print()
     print("=" * 60)
     print("SBRateBot 통합 데이터 업데이트 결과")
@@ -111,8 +107,6 @@ def start_scheduler():
     print("FISIS 최신분기 확인 : 매일 07:10 / 19:10")
 
 
-# app.py가 scheduler를 import하는 시점에 PC/모바일/Telegram route는
-# 이미 등록되어 있으므로 런타임 hook/endpoint를 연결한다.
 enable_mobile_platform_detection()
 install_verified_visitor_tracking()
 install_visitor_stats_hooks()
@@ -124,16 +118,21 @@ install_management_report_v5_runtime()
 install_management_report_v4_runtime()
 install_management_report()
 
-# 안정화된 기본 경영현황 캐시는 그대로 유지한다.
-# 2020Q1 이력/권역/품질 규칙만 기본 provider에 적용하고,
-# 수신·건전성·수익성 확장 지표는 별도 최근분기 캐시에서 수집한다.
+# 기본 FISIS provider에는 검증된 이력/권역/품질 규칙만 적용한다.
+# 기존 Upstash 경영현황 캐시는 요청 시 즉시 읽히며, 오래됐을 때는
+# 기존 management_report 경로에서 백그라운드 갱신된다. 배포 직후에는
+# 대용량 기본 캐시 재수집을 먼저 돌리지 않아 확장 지표와 API를 경쟁시키지 않는다.
 install_fisis_history_patch()
 install_fisis_region_patch()
 install_fisis_quality_patch()
 install_management_report_auto_update()
 install_fisis_catalog_probe()
-install_fisis_management()
-install_fisis_intelligence_store()
+
+# 확장 지표는 기본 캐시를 절대 refresh시키지 않고 현재 저장된 기준분기만 읽는다.
+# 이 한 줄이 과거 2020Q1+ 전체 재수집과 최근분기 intelligence 수집의 충돌을 차단한다.
+import fisis_management as _fm
+fisis_intelligence_store._base_store = lambda: _fm.get_management_store(trigger_refresh=False) or {}
+fisis_intelligence_store.install_fisis_intelligence_store()
 install_management_intelligence()
 
 install_rate_simulator()
