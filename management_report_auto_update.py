@@ -49,6 +49,19 @@ def fm_now_date():
     return fm._now().date()
 
 
+def _stored_asset_count(store, quarter):
+    quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
+    meta = quarters.get(quarter) if isinstance(quarters.get(quarter), dict) else {}
+    count = int(meta.get("asset_bank_count") or 0)
+    if count:
+        return count
+    rows = meta.get("banks") if isinstance(meta.get("banks"), list) else []
+    return sum(
+        1 for row in rows
+        if isinstance(row, dict) and row.get("total_assets") is not None
+    )
+
+
 def _probe_worker(base_result, target, target_month):
     import fisis_management as fm
 
@@ -56,6 +69,7 @@ def _probe_worker(base_result, target, target_month):
     try:
         companies = fm._companies()
         threshold = max(20, math.ceil(len(companies) * MIN_QUARTER_COVERAGE))
+        stored_count = int(result.get("stored_asset_count") or 0)
         result.update({
             "probe_required": True,
             "company_count": len(companies),
@@ -90,13 +104,19 @@ def _probe_worker(base_result, target, target_month):
         result["published_asset_count"] = published
         result["probe_error_count"] = errors
 
-        if published >= threshold:
+        # 새 분기 최초 승격: 90% 이상 공시됐을 때만 전체 데이터를 받는다.
+        # 이미 최신분기로 승격된 뒤에는 추가 은행이 공시될 때마다 다시 받아
+        # 72/79 같은 중간 상태에 멈추지 않도록 한다.
+        should_refresh = published >= threshold and published > stored_count
+        if should_refresh:
             result["triggered_refresh"] = bool(fm.trigger_management_refresh(force=True))
             result["status"] = (
                 "new_quarter_refresh_started"
                 if result["triggered_refresh"]
                 else "refresh_already_running"
             )
+        elif published >= threshold:
+            result["status"] = "latest_quarter_no_new_banks"
         else:
             result["status"] = "new_quarter_not_broadly_published"
 
@@ -123,6 +143,8 @@ def check_latest_quarter(force_probe=False):
     quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
     current_latest = max(quarters.keys(), key=_quarter_rank, default="")
     target, target_month, target_as_of = _target_info(fm)
+    active_count = int(store.get("active_company_count") or 0)
+    stored_target_count = _stored_asset_count(store, target) if target else 0
 
     result = {
         "ok": True,
@@ -131,11 +153,21 @@ def check_latest_quarter(force_probe=False):
         "target_quarter": target,
         "target_as_of": target_as_of,
         "coverage_ratio_required": MIN_QUARTER_COVERAGE,
+        "stored_asset_count": stored_target_count,
+        "active_company_count": active_count,
         "probe_required": False,
         "triggered_refresh": False,
     }
 
-    if not target or _quarter_rank(current_latest) >= _quarter_rank(target):
+    if not target:
+        result["status"] = "latest_already_loaded"
+        return result
+
+    # 목표 분기가 이미 최신이어도 전 은행 데이터가 다 들어오기 전까지는
+    # 하루 두 번 가볍게 총자산 공시 수를 확인해 후속 공시를 자동 반영한다.
+    target_is_latest = _quarter_rank(current_latest) >= _quarter_rank(target)
+    target_is_complete = active_count > 0 and stored_target_count >= active_count
+    if target_is_latest and target_is_complete and not force_probe:
         result["status"] = "latest_already_loaded"
         return result
 
