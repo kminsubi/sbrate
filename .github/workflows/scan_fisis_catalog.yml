@@ -103,7 +103,8 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/fisis_catalog_scan.json data/fisis_catalog_summary.json
+          git pull --rebase origin main
+          git add -f data/fisis_catalog_scan.json data/fisis_catalog_summary.json
           if git diff --cached --quiet; then
             echo 'No catalog changes'
           else
