@@ -12,8 +12,10 @@ from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
+from fisis_history_patch import install_fisis_history_patch
 from fisis_management import install_fisis_management
 from management_report import install_management_report
+from management_report_v4_runtime import install_management_report_v4_runtime
 from rate_simulator import install_rate_simulator
 from rate_simulator_v2 import install_rate_simulator_v2
 from rate_simulator_v2_polish import install_rate_simulator_v2_polish
@@ -140,8 +142,16 @@ enable_mobile_platform_detection()
 install_verified_visitor_tracking()
 install_visitor_stats_hooks()
 install_data_quality_endpoint()
+
+# V4 asset hook을 먼저 등록해야 Flask after_request 역순 실행에서
+# management_report가 주입한 기존 asset URL을 마지막에 v4로 교체할 수 있다.
+install_management_report_v4_runtime()
 install_management_report()
+
+# 2020Q1부터 FISIS 이력을 확장한 뒤 기존 warm-up을 실행한다.
+install_fisis_history_patch()
 install_fisis_management()
+
 install_rate_simulator()
 install_rate_simulator_v2()
 install_rate_simulator_v2_polish()
