@@ -1,17 +1,17 @@
 name: SBRate Management Quarterly Update
 
 on:
+  schedule:
+    # 18:15 UTC on the 1st = 03:15 KST on the 2nd.
+    # Quarterly statistics are published after quarter end, so a monthly check is sufficient.
+    - cron: "15 18 1 * *"
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
       - "crawler/management_quarterly.py"
       - ".github/workflows/management_report_update.yml"
-  schedule:
-    # 18:15 UTC on the 1st = 03:15 KST on the 2nd.
-    # Quarterly statistics are published after quarter end, so a monthly check is sufficient.
-    - cron: "15 18 1 * *"
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -40,6 +40,7 @@ jobs:
 
       - name: Collect FSB quarterly management statistics
         run: |
+          # Initial bootstrap and every later refresh keep up to 12 quarter-end snapshots.
           python crawler/management_quarterly.py --limit 12
 
       - name: Commit quarterly snapshots
