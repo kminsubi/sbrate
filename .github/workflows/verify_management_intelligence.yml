@@ -30,7 +30,7 @@ jobs:
           set -e
           for i in $(seq 1 80); do
             html="$(curl -fsS --max-time 90 https://sbrate.onrender.com/ || true)"
-            if printf '%s' "$html" | grep -q 'management_intelligence_polish.js?v=20260826mi2'; then
+            if printf '%s' "$html" | grep -q 'management_intelligence_polish.js?v=20260826mi3'; then
               if curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-intelligence/insight' >/tmp/insight.json; then
                 echo 'Management intelligence deployment is live'
                 exit 0
@@ -77,12 +77,13 @@ jobs:
           def val(d,key):
               return (((d.get('woori') or {}).get('metrics') or {}).get(key) or {}).get('base')
           ok=(
-              f.get('ok') and f.get('ready') and int(f.get('intelligence_schema_version') or 0) >= 2 and len(f.get('rows') or []) >= 70 and
+              f.get('ok') and f.get('ready') and int(f.get('intelligence_schema_version') or 0) >= 3 and len(f.get('rows') or []) >= 70 and
               val(f,'deposits') is not None and val(f,'time_deposits') is not None and
-              s.get('ok') and s.get('ready') and len(s.get('rows') or []) >= 70 and
+              s.get('ok') and s.get('ready') and int(s.get('intelligence_schema_version') or 0) >= 3 and len(s.get('rows') or []) >= 70 and
               val(s,'liquidity_ratio') is not None and val(s,'delinquency_ratio') is not None and
-              p.get('ok') and p.get('ready') and len(p.get('rows') or []) >= 70 and
-              val(p,'roa') is not None and val(p,'roe') is not None and val(p,'operating_profit') is not None
+              p.get('ok') and p.get('ready') and int(p.get('intelligence_schema_version') or 0) >= 3 and len(p.get('rows') or []) >= 70 and
+              val(p,'roa') is not None and val(p,'roe') is not None and val(p,'operating_profit') is not None and
+              val(p,'interest_expense') is not None and val(p,'deposit_interest_expense') is not None and val(p,'time_deposit_interest_expense') is not None
           )
           sys.exit(0 if ok else 1)
           PY
@@ -116,12 +117,23 @@ jobs:
                   'woori_rank': w.get('section_rank'),
               })
           f=json.load(open('/tmp/funding.json',encoding='utf-8'))
-          m=(f.get('woori') or {}).get('metrics') or {}
+          fm=(f.get('woori') or {}).get('metrics') or {}
           print('woori_funding', {
-              'deposits': (m.get('deposits') or {}).get('base'),
-              'time_deposits': (m.get('time_deposits') or {}).get('base'),
-              'deposit_market_share': (m.get('deposit_market_share') or {}).get('base'),
-              'simple_loan_deposit_ratio': (m.get('simple_loan_deposit_ratio') or {}).get('base'),
+              'deposits': (fm.get('deposits') or {}).get('base'),
+              'time_deposits': (fm.get('time_deposits') or {}).get('base'),
+              'deposit_market_share': (fm.get('deposit_market_share') or {}).get('base'),
+              'simple_loan_deposit_ratio': (fm.get('simple_loan_deposit_ratio') or {}).get('base'),
+          })
+          p=json.load(open('/tmp/profitability.json',encoding='utf-8'))
+          pm=(p.get('woori') or {}).get('metrics') or {}
+          print('woori_profitability', {
+              'net_income': (pm.get('net_income') or {}).get('base'),
+              'operating_profit': (pm.get('operating_profit') or {}).get('base'),
+              'roa': (pm.get('roa') or {}).get('base'),
+              'roe': (pm.get('roe') or {}).get('base'),
+              'interest_expense': (pm.get('interest_expense') or {}).get('base'),
+              'deposit_interest_expense': (pm.get('deposit_interest_expense') or {}).get('base'),
+              'time_deposit_interest_expense': (pm.get('time_deposit_interest_expense') or {}).get('base'),
           })
           print('current_market', f.get('current_market'))
           print('rate_history', f.get('rate_history'))
