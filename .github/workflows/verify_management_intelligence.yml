@@ -7,6 +7,7 @@ on:
       - 'management_intelligence.py'
       - 'management_report_v5_runtime.py'
       - 'static/js/management_intelligence.js'
+      - 'static/js/management_intelligence_polish.js'
       - 'static/css/management_intelligence.css'
       - 'scheduler.py'
       - '.github/workflows/verify_management_intelligence.yml'
@@ -22,13 +23,14 @@ jobs:
         run: |
           python -m py_compile fisis_intelligence_patch.py management_intelligence.py management_report_v5_runtime.py scheduler.py
           node --check static/js/management_intelligence.js
+          node --check static/js/management_intelligence_polish.js
 
       - name: Wait for Render management intelligence deployment
         run: |
           set -e
           for i in $(seq 1 80); do
             html="$(curl -fsS --max-time 90 https://sbrate.onrender.com/ || true)"
-            if printf '%s' "$html" | grep -q 'management_intelligence.js?v=20260826mi1'; then
+            if printf '%s' "$html" | grep -q 'management_intelligence_polish.js?v=20260826mi2'; then
               if curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-intelligence/insight' >/tmp/insight.json; then
                 echo 'Management intelligence deployment is live'
                 exit 0
@@ -75,7 +77,7 @@ jobs:
           def val(d,key):
               return (((d.get('woori') or {}).get('metrics') or {}).get(key) or {}).get('base')
           ok=(
-              f.get('ok') and f.get('ready') and len(f.get('rows') or []) >= 70 and
+              f.get('ok') and f.get('ready') and int(f.get('intelligence_schema_version') or 0) >= 2 and len(f.get('rows') or []) >= 70 and
               val(f,'deposits') is not None and val(f,'time_deposits') is not None and
               s.get('ok') and s.get('ready') and len(s.get('rows') or []) >= 70 and
               val(s,'liquidity_ratio') is not None and val(s,'delinquency_ratio') is not None and
@@ -107,6 +109,7 @@ jobs:
               w=d.get('woori') or {}
               print(name, {
                   'ready': d.get('ready'),
+                  'schema': d.get('intelligence_schema_version'),
                   'base': d.get('base'),
                   'compare': d.get('compare'),
                   'bank_count': d.get('bank_count'),
