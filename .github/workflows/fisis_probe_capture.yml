@@ -1,0 +1,67 @@
+name: Temporary FISIS Probe Capture
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "fisis_probe_runtime.py"
+      - "scheduler.py"
+      - ".github/workflows/fisis_probe_capture.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sbrate-fisis-probe-capture
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Wait for Render deploy and capture safe metadata
+        shell: bash
+        run: |
+          mkdir -p data
+          ok=0
+          for i in $(seq 1 24); do
+            echo "Probe attempt $i/24"
+            code=$(curl -L -sS --max-time 90 -o /tmp/fisis_probe.json -w "%{http_code}" "https://sbrate.onrender.com/api/_sbrate/fisis-probe" || true)
+            if [ "$code" = "200" ] && python - <<'PY'
+import json
+p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8'))
+assert p.get('configured') is True
+assert p.get('sector') == 'E'
+assert isinstance(p.get('statistics'), dict)
+print('companies=', p.get('companies',{}).get('count'), 'statistics=', p.get('statistics',{}).get('count'))
+PY
+            then
+              cp /tmp/fisis_probe.json data/fisis_probe_result.json
+              ok=1
+              break
+            fi
+            sleep 30
+          done
+          if [ "$ok" != "1" ]; then
+            echo "Render FISIS probe did not become ready in time"
+            cat /tmp/fisis_probe.json 2>/dev/null || true
+            exit 1
+          fi
+
+      - name: Commit probe result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/fisis_probe_result.json
+          if git diff --cached --quiet; then
+            echo "No probe changes"
+          else
+            git commit -m "Capture FISIS savings-bank metadata"
+            git pull --rebase origin main
+            git push origin main
+          fi
