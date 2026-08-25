@@ -20,7 +20,7 @@ jobs:
           set -e
           for i in $(seq 1 60); do
             if curl -fsS --max-time 60 'https://sbrate.onrender.com/api/management-report/fisis-catalog?accounts=0' >/tmp/catalog-lite.json; then
-              python - <<'PY'
+              if python - <<'PY'
           import json, sys
           try:
               d=json.load(open('/tmp/catalog-lite.json',encoding='utf-8'))
@@ -28,8 +28,10 @@ jobs:
               sys.exit(1)
           sys.exit(0 if d.get('ok') and d.get('table_count',0) > 0 and int(d.get('probe_version') or 0) >= 2 else 1)
           PY
-              echo 'FISIS catalog endpoint v2 is live'
-              exit 0
+              then
+                echo 'FISIS catalog endpoint v2 is live'
+                exit 0
+              fi
             fi
             echo "waiting for Render... $i/60"
             sleep 10
