@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - "crawler/management_quarterly.py"
+      - "crawler/management_pdf_probe.py"
       - ".github/workflows/management_report_update.yml"
 
 permissions:
@@ -38,9 +39,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4 pdfplumber
 
+      - name: Probe current FSB PDF layout
+        run: |
+          python crawler/management_pdf_probe.py
+
       - name: Collect FSB quarterly management statistics
         run: |
-          # Initial bootstrap and every later refresh keep up to 12 quarter-end snapshots.
           python crawler/management_quarterly.py --limit 12
 
       - name: Commit quarterly snapshots
