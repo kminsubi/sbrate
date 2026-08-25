@@ -30,10 +30,17 @@ jobs:
           for i in $(seq 1 60); do
             html="$(curl -fsS --max-time 90 https://sbrate.onrender.com/ || true)"
             region="$(curl -fsS --max-time 90 https://sbrate.onrender.com/api/management-report/region-diagnostic || true)"
-            if echo "$html" | grep -q '20260826v7' \
-              && echo "$region" | grep -q '저축은행중앙회 전국 저축은행 현황' \
-              && echo "$region" | grep -q '충청'; then
-              printf '%s' "$region" > /tmp/region.json
+            printf '%s' "$region" > /tmp/region.json
+            if echo "$html" | grep -q '20260826v7' && python - <<'PY'
+          import json, sys
+          try:
+              d=json.load(open('/tmp/region.json',encoding='utf-8'))
+          except Exception:
+              sys.exit(1)
+          w=d.get('woori') or {}
+          sys.exit(0 if d.get('region_source') == '저축은행중앙회 전국 저축은행 현황' and w.get('region') == '충청' else 1)
+          PY
+            then
               echo 'Current V5 deployment is live'
               exit 0
             fi
