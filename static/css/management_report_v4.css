@@ -1,0 +1,123 @@
+/* SBRate Management Report V4 - 2026-08-25 */
+
+/* =========================================================
+   PC HEADER: keep the live clock visible while protecting buttons
+========================================================= */
+#header-current-datetime{
+  display:block !important;
+  flex:0 0 auto !important;
+  min-width:138px !important;
+  color:#64748b !important;
+  font-size:10px !important;
+  font-variant-numeric:tabular-nums !important;
+  white-space:nowrap !important;
+}
+
+@media(max-width:1900px){
+  #header-current-datetime{display:block !important;font-size:9.5px !important;min-width:132px !important;}
+  body>header>div:last-child{gap:6px !important;}
+}
+
+@media(max-width:1550px){
+  #header-current-datetime{font-size:9px !important;min-width:124px !important;}
+}
+
+/* =========================================================
+   MOBILE HEADER: 경영현황 + 금리 시뮬레이션을 같은 버튼 그룹으로 고정
+========================================================= */
+.mobile-simulation-row{
+  flex-wrap:nowrap !important;
+  gap:6px !important;
+}
+.mobile-simulation-source{
+  flex:1 1 auto !important;
+  min-width:0 !important;
+}
+.mr-mobile-simulation-actions{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:5px !important;
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+}
+#management-report-open-mobile{
+  margin:0 !important;
+  padding:5px 8px !important;
+  border-radius:999px !important;
+  font-size:8.5px !important;
+  line-height:1 !important;
+  min-width:auto !important;
+  white-space:nowrap !important;
+  box-shadow:none !important;
+}
+
+@media(max-width:380px){
+  .mr-mobile-simulation-actions{gap:4px !important;}
+  #management-report-open-mobile{font-size:8px !important;padding:5px 7px !important;}
+}
+
+/* =========================================================
+   MODAL TITLE: latest disclosure directly beside the title
+========================================================= */
+.mr-title-block{min-width:0;}
+.mr-title-line{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  flex-wrap:wrap !important;
+}
+.mr-title-line h2{margin:0 !important;}
+.mr-title-line .mr-latest-badge{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  padding:4px 8px !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  border:1px solid #c7ddfb !important;
+  white-space:nowrap !important;
+}
+.mr-title-line .mr-latest-badge span{
+  font-size:8px !important;
+  font-weight:800 !important;
+  color:#6f7d90 !important;
+}
+.mr-title-line .mr-latest-badge strong{
+  font-size:10px !important;
+  font-weight:900 !important;
+  color:#1556c0 !important;
+}
+
+/* =========================================================
+   SINGLE QUARTER VIEW
+========================================================= */
+.mr-table.is-single{
+  min-width:1750px !important;
+}
+.mr-table.is-single thead tr:nth-child(2){
+  display:table-row !important;
+}
+.mr-table.is-single .mr-col-rank{left:0 !important;width:48px !important;min-width:48px !important;}
+.mr-table.is-single .mr-col-rankchg{left:48px !important;width:68px !important;min-width:68px !important;}
+.mr-table.is-single .mr-col-bank{left:116px !important;width:145px !important;min-width:145px !important;}
+.mr-table.is-single .mr-col-region{left:261px !important;width:78px !important;min-width:78px !important;}
+.mr-table.is-single td:nth-child(1),
+.mr-table.is-single td:nth-child(2),
+.mr-table.is-single td:nth-child(4){text-align:center !important;}
+.mr-table.is-single td:nth-child(3){text-align:left !important;font-weight:800 !important;}
+
+/* Summary cards: 7-card executive row on large screens */
+@media(min-width:1350px){
+  .mr-summary{grid-template-columns:repeat(7,minmax(0,1fr)) !important;}
+}
+
+@media(max-width:900px){
+  .mr-title-line{gap:6px !important;}
+  .mr-title-line .mr-latest-badge{padding:3px 6px !important;}
+  .mr-table.is-single{min-width:1540px !important;}
+  .mr-table.is-single .mr-col-rank{left:0 !important;width:42px !important;min-width:42px !important;}
+  .mr-table.is-single .mr-col-rankchg{left:42px !important;width:60px !important;min-width:60px !important;}
+  .mr-table.is-single .mr-col-bank{left:102px !important;width:118px !important;min-width:118px !important;}
+  .mr-table.is-single .mr-col-region{left:220px !important;width:66px !important;min-width:66px !important;}
+}
