@@ -8,6 +8,7 @@ on:
       - 'management_report_v5_runtime.py'
       - 'management_report_auto_update.py'
       - 'fisis_region_patch.py'
+      - 'fisis_quality_patch.py'
       - 'scheduler.py'
       - '.github/workflows/verify_management_v5.yml'
   workflow_dispatch:
@@ -20,7 +21,7 @@ jobs:
 
       - name: Syntax checks
         run: |
-          python -m py_compile scheduler.py fisis_region_patch.py management_report_auto_update.py management_report_v5_runtime.py
+          python -m py_compile scheduler.py fisis_region_patch.py fisis_quality_patch.py management_report_auto_update.py management_report_v5_runtime.py
           node --check static/js/management_report_v5_patch.js
 
       - name: Wait for current Render deployment
@@ -29,7 +30,7 @@ jobs:
           for i in $(seq 1 60); do
             html="$(curl -fsS --max-time 90 https://sbrate.onrender.com/ || true)"
             region="$(curl -fsS --max-time 90 https://sbrate.onrender.com/api/management-report/region-diagnostic || true)"
-            if echo "$html" | grep -q '20260826v6' \
+            if echo "$html" | grep -q '20260826v7' \
               && echo "$region" | grep -q '저축은행중앙회 전국 저축은행 현황' \
               && echo "$region" | grep -q '충청'; then
               printf '%s' "$region" > /tmp/region.json
@@ -73,6 +74,7 @@ jobs:
           assert d.get('ok') is True, d
           assert d.get('current_latest'), d
           assert d.get('target_quarter'), d
+          assert float(d.get('coverage_ratio_required',0)) >= 0.90, d
           assert d.get('status') in {
               'latest_already_loaded',
               'waiting_for_disclosure_window',
