@@ -1,0 +1,62 @@
+/* SBRate FISIS Management Intelligence */
+.mi-section-tabs{display:flex;gap:6px;align-items:center;flex:0 0 auto;margin-left:auto;white-space:nowrap}
+.mi-section-tab{border:1px solid #dce5f1;background:#fff;color:#65758b;border-radius:9px;padding:7px 11px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.mi-section-tab:hover{border-color:#9fc1f2;color:#1556c0}
+.mi-section-tab.is-active{background:#1556c0;border-color:#1556c0;color:#fff;box-shadow:0 3px 10px rgba(21,86,192,.14)}
+.mi-content{padding:0 18px 18px;overflow:visible}
+.mi-content[hidden]{display:none!important}
+.mi-block{border:1px solid #e6edf6;border-radius:14px;background:#fff;overflow:hidden;margin-top:12px}
+.mi-block-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid #edf2f7;background:#f9fbfd}
+.mi-block-title{font-size:12px;font-weight:800;color:#26354d}
+.mi-block-meta{font-size:10px;color:#8491a3;text-align:right}
+.mi-card-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:12px}
+.mi-card{min-width:0;border:1px solid #e9eef5;border-radius:11px;background:#fff;padding:10px 11px}
+.mi-card-primary{background:linear-gradient(145deg,#eef5ff,#fff);border-color:#d4e4fb}
+.mi-card-label{font-size:9.5px;color:#8390a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi-card-value{margin-top:3px;font-size:17px;font-weight:800;color:#1d2939;letter-spacing:-.02em;white-space:nowrap}
+.mi-card-sub{margin-top:3px;font-size:9.5px;color:#8a96a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi-card-sub .up,.mi-delta.up{color:#1769d2;font-weight:800}
+.mi-card-sub .down,.mi-delta.down{color:#df3f3f;font-weight:800}
+.mi-card-sub .flat,.mi-delta.flat{color:#8a96a8;font-weight:700}
+.mi-linkage{padding:12px 14px;background:linear-gradient(90deg,#f5f9ff,#fbfdff);border-left:3px solid #2b6fd1;font-size:11px;color:#44536a;line-height:1.65}
+.mi-linkage strong{color:#183b72}
+.mi-note{padding:10px 14px;font-size:10px;color:#7c899a;line-height:1.55;background:#fbfcfe;border-top:1px solid #edf2f7}
+.mi-table-wrap{overflow:auto;max-height:54vh;-webkit-overflow-scrolling:touch}
+.mi-table{width:100%;min-width:980px;border-collapse:collapse;font-size:10.5px}
+.mi-table th{position:sticky;top:0;z-index:2;background:#f8fafc;color:#758399;font-weight:700;padding:8px 7px;border-bottom:1px solid #e7edf5;text-align:right;white-space:nowrap}
+.mi-table th:first-child,.mi-table th:nth-child(2),.mi-table th:nth-child(3){text-align:center}
+.mi-table td{padding:8px 7px;border-bottom:1px solid #f0f3f7;text-align:right;color:#354156;white-space:nowrap}
+.mi-table td:first-child,.mi-table td:nth-child(2),.mi-table td:nth-child(3){text-align:center}
+.mi-table tr.mi-woori td{background:#edf5ff;color:#1556c0;font-weight:700}
+.mi-warmup{margin-top:12px;padding:28px 16px;border:1px dashed #b9cbe4;border-radius:14px;background:#f7faff;text-align:center;color:#63738b;font-size:12px;line-height:1.7}
+.mi-insight-box{border:1px solid #dbe8f9;background:linear-gradient(145deg,#f5f9ff,#fff);border-radius:12px;padding:10px 11px;margin-top:2px}
+.mi-insight-title{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:10.5px;font-weight:800;color:#1556c0;margin-bottom:6px}
+.mi-insight-basis{font-size:8.5px;color:#8a96a8;font-weight:500;white-space:nowrap}
+.mi-insight-line{font-size:9.5px;color:#536174;line-height:1.5;margin-top:3px;word-break:keep-all}
+.mi-insight-line b{color:#24364f}
+
+@media(max-width:1200px){
+  .mi-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mi-section-tab{padding:6px 8px;font-size:10px}
+}
+
+@media(max-width:900px){
+  .mr-topbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:center!important}
+  .mi-section-tabs{grid-column:1 / -1;grid-row:2;width:100%;overflow-x:auto;overflow-y:hidden;margin-left:0;padding:1px 0 3px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .mi-section-tabs::-webkit-scrollbar{display:none}
+  .mi-section-tab{flex:0 0 auto;padding:7px 10px;font-size:10px}
+  .mi-content{padding:0 10px 18px}
+  .mi-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:10px}
+  .mi-card-value{font-size:15px}
+  .mi-block-head{padding:10px 11px;align-items:flex-start}
+  .mi-block-meta{max-width:52%;white-space:normal}
+  .mi-table-wrap{max-height:none;overflow:auto;touch-action:pan-x pan-y}
+  .mi-table{min-width:920px}
+  .mi-linkage{font-size:10.5px}
+}
+
+@media(max-width:420px){
+  .mi-card-grid{grid-template-columns:1fr 1fr}
+  .mi-card{padding:9px}
+  .mi-card-value{font-size:14px}
+}
