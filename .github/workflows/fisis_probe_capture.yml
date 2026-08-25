@@ -32,15 +32,9 @@ jobs:
           for i in $(seq 1 24); do
             echo "Probe attempt $i/24"
             code=$(curl -L -sS --max-time 90 -o /tmp/fisis_probe.json -w "%{http_code}" "https://sbrate.onrender.com/api/_sbrate/fisis-probe" || true)
-            if [ "$code" = "200" ] && python - <<'PY'
-import json
-p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8'))
-assert p.get('configured') is True
-assert p.get('sector') == 'E'
-assert isinstance(p.get('statistics'), dict)
-print('companies=', p.get('companies',{}).get('count'), 'statistics=', p.get('statistics',{}).get('count'))
-PY
-            then
+            valid=$(python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); print('yes' if p.get('configured') is True and p.get('sector') == 'E' and isinstance(p.get('statistics'), dict) else 'no')" 2>/dev/null || echo no)
+            if [ "$code" = "200" ] && [ "$valid" = "yes" ]; then
+              python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); print('companies=',p.get('companies',{}).get('count'),'statistics=',p.get('statistics',{}).get('count'))"
               cp /tmp/fisis_probe.json data/fisis_probe_result.json
               ok=1
               break
