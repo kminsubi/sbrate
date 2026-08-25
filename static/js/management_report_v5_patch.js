@@ -12,15 +12,22 @@
   }
 
   function patchRankSummaryLabel() {
-    if (!singleModeActive()) return;
     const card = document.querySelector('#mr-summary .mr-summary-card.mr-summary-woori');
     const small = card?.querySelector('small');
     if (!small) return;
+
+    const text = String(small.textContent || '').trim();
+    let label = '';
+    if (singleModeActive() || text.startsWith('전분기')) label = '전분기比';
+    else if (text.startsWith('비교분기')) label = '비교분기比';
+    if (!label) return;
+
     const delta = small.querySelector('b');
     if (delta) {
-      small.innerHTML = `전분기比 ${delta.outerHTML}`;
-    } else if (/^전분기\s/.test(small.textContent || '')) {
-      small.textContent = (small.textContent || '').replace(/^전분기\s+.*?·\s*/, '전분기比 ');
+      small.innerHTML = `${label} ${delta.outerHTML}`;
+    } else {
+      const match = text.match(/([+▲]\s*\d+(?:\.\d+)?|-)(?:\s*)$/);
+      small.textContent = `${label} ${match ? match[1] : '-'}`;
     }
   }
 
@@ -60,16 +67,18 @@
       const oldCompare = compare?.value || '';
       const previousLatest = lastKnownLatest || oldSingle || oldBase;
       const latestChanged = !!previousLatest && previousLatest !== latest.key;
+      const singleWasDefault = !oldSingle || oldSingle === previousLatest;
+      const baseWasDefault = !oldBase || oldBase === previousLatest;
 
-      const singleSelected = (!oldSingle || oldSingle === previousLatest || latestChanged)
+      const singleSelected = (latestChanged && singleWasDefault) || !oldSingle
         ? latest.key
         : oldSingle;
-      const baseSelected = (!oldBase || oldBase === previousLatest || latestChanged)
+      const baseSelected = (latestChanged && baseWasDefault) || !oldBase
         ? latest.key
         : oldBase;
-      const compareSelected = (
-        latestChanged || !oldCompare || oldCompare === latest.key || oldCompare === previousLatest
-      ) ? (second?.key || oldCompare) : oldCompare;
+      const compareSelected = latestChanged && baseWasDefault
+        ? (second?.key || oldCompare)
+        : ((!oldCompare || oldCompare === baseSelected) ? (second?.key || oldCompare) : oldCompare);
 
       fillSelect(single, quarters, singleSelected);
       fillSelect(base, quarters, baseSelected);
@@ -78,7 +87,7 @@
       if (badge) badge.textContent = latest.label;
       lastKnownLatest = latest.key;
 
-      if (rerunSingle && singleModeActive() && latestChanged) {
+      if (rerunSingle && singleModeActive() && latestChanged && singleWasDefault) {
         setTimeout(() => document.getElementById('mr-single-run')?.click(), 30);
       }
     } catch (_) {
