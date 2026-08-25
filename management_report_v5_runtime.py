@@ -23,13 +23,13 @@ def install_management_report_v5_runtime():
                 if "management_report_v5_patch.css" not in html:
                     html = html.replace(
                         "</head>",
-                        '<link rel="stylesheet" href="/static/css/management_report_v5_patch.css?v=20260826v6">\n</head>',
+                        '<link rel="stylesheet" href="/static/css/management_report_v5_patch.css?v=20260826v7">\n</head>',
                         1,
                     )
                 if "management_report_v5_patch.js" not in html:
                     html = html.replace(
                         "</body>",
-                        '<script src="/static/js/management_report_v5_patch.js?v=20260826v6"></script>\n</body>',
+                        '<script src="/static/js/management_report_v5_patch.js?v=20260826v7"></script>\n</body>',
                         1,
                     )
                 response.set_data(html)
