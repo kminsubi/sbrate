@@ -31,7 +31,7 @@ jobs:
           ok=0
           for i in $(seq 1 30); do
             echo "Probe attempt $i/30"
-            code=$(curl -L -sS --max-time 120 -o /tmp/fisis_probe.json -w "%{http_code}" "https://sbrate.onrender.com/api/_sbrate/fisis-probe" || true)
+            code=$(curl -L -sS --max-time 120 -H "Cache-Control: no-cache" -o /tmp/fisis_probe.json -w "%{http_code}" "https://sbrate.onrender.com/api/_sbrate/fisis-probe?probe=${GITHUB_SHA}-${i}" || true)
             valid=$(python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); v=p.get('validation_2026q1'); print('yes' if p.get('configured') is True and p.get('sector') == 'E' and isinstance(v, dict) and 'total_assets' in v and 'employees' in v else 'no')" 2>/dev/null || echo no)
             if [ "$code" = "200" ] && [ "$valid" = "yes" ]; then
               python -c "import json; p=json.load(open('/tmp/fisis_probe.json', encoding='utf-8')); print('companies=',p.get('companies',{}).get('count'),'active=',p.get('companies',{}).get('active_name_count'),'metrics=',list(p.get('validation_2026q1',{})))"
