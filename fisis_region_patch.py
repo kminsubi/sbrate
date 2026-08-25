@@ -2,6 +2,49 @@ import re
 import sys
 
 
+# 저축은행중앙회 '전국 저축은행 현황'의 6개 권역 기준.
+# https://www.fsb.or.kr/sabintr_0100.act
+FSB_REGION_GROUPS = {
+    "서울": [
+        "DB", "JT친애", "KB", "NH", "OK", "OSB", "SBI", "대신", "더케이", "민국",
+        "HB", "스카이", "바로", "신한", "애큐온", "예가람", "웰컴", "유안타", "다올",
+        "조은", "키움예스", "푸른", "하나",
+    ],
+    "인천/경기": [
+        "JT", "금화", "남양", "모아", "부림", "삼정", "상상인", "세람", "안국", "안양",
+        "영진", "융창", "인성", "인천", "키움", "페퍼", "평택", "한국투자", "한화",
+    ],
+    "부산/경남": [
+        "BNK", "DH", "IBK", "고려", "국제", "동원제일", "솔브레인", "에스앤티", "우리",
+        "조흥", "진주", "흥국",
+    ],
+    "대구/경북/강원": [
+        "CK", "대백", "대아", "대원", "드림", "라온", "머스트삼일", "엠에스", "오성",
+        "유니온", "참",
+    ],
+    "호남": [
+        "대한", "더블", "동양", "삼호", "센트럴", "스마트", "스타",
+    ],
+    "충청": [
+        "대명", "상상인플러스", "아산", "우리금융", "오투", "청주", "한성",
+    ],
+}
+
+
+def _normalize_bank(name):
+    text = re.sub(r"\s+", "", str(name or ""))
+    text = text.replace("㈜", "").replace("(주)", "")
+    text = text.replace("상호저축은행", "").replace("저축은행", "")
+    return text.upper()
+
+
+FSB_REGION_BY_BANK = {
+    _normalize_bank(bank): region
+    for region, banks in FSB_REGION_GROUPS.items()
+    for bank in banks
+}
+
+
 def _address_from_company_row(row):
     if not isinstance(row, dict):
         return ""
@@ -32,27 +75,24 @@ def _region_from_address(address):
     text = re.sub(r"\s+", " ", str(address or "")).strip()
     if not text:
         return ""
-
-    # 도/광역시를 뜻하는 주소 첫 토큰을 기준으로 분류한다.
-    # 예: "경기도 광주시"를 광주(전라)로 잘못 분류하지 않는다.
     first = text.split(" ", 1)[0]
     if first.startswith("서울"):
         return "서울"
-    if first.startswith("인천"):
-        return "인천"
-    if first.startswith("경기"):
-        return "경기"
+    if first.startswith(("인천", "경기")):
+        return "인천/경기"
+    if first.startswith(("부산", "경남")):
+        return "부산/경남"
+    if first.startswith(("대구", "경북", "강원")):
+        return "대구/경북/강원"
+    if first.startswith(("광주", "전라", "전북", "전남", "제주")):
+        return "호남"
     if first.startswith(("세종", "대전", "충청", "충북", "충남")):
         return "충청"
-    if first.startswith(("광주", "전라", "전북", "전남")):
-        return "전라"
-    if first.startswith(("부산", "대구", "울산", "경상", "경북", "경남")):
-        return "경상"
-    if first.startswith("강원"):
-        return "강원"
-    if first.startswith("제주"):
-        return "제주"
-    return "기타"
+    return ""
+
+
+def _region_for_company(name, address=""):
+    return FSB_REGION_BY_BANK.get(_normalize_bank(name)) or _region_from_address(address) or "기타"
 
 
 def install_fisis_region_patch():
@@ -82,7 +122,7 @@ def install_fisis_region_patch():
                 "finance_cd": code,
                 "finance_nm": name,
                 "address": address,
-                "region": _region_from_address(address),
+                "region": _region_for_company(name, address),
             })
         return active
 
@@ -97,12 +137,14 @@ def install_fisis_region_patch():
     def cache_is_fresh(store):
         if not original_cache_is_fresh(store):
             return False
-        return int((store or {}).get("region_schema_version") or 0) >= 1
+        return int((store or {}).get("region_schema_version") or 0) >= 2
 
     def build_store_with_region():
         store = original_build_store()
         if isinstance(store, dict):
-            store["region_schema_version"] = 1
+            store["region_schema_version"] = 2
+            store["region_source"] = "저축은행중앙회 전국 저축은행 현황"
+            store["region_source_url"] = "https://www.fsb.or.kr/sabintr_0100.act"
             quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
             latest_key = max(quarters.keys(), default="")
             latest = quarters.get(latest_key) if latest_key else {}
@@ -131,7 +173,7 @@ def install_fisis_region_patch():
                 try:
                     companies = fm._companies()
                     with_address = [x for x in companies if x.get("address")]
-                    with_region = [x for x in companies if x.get("region")]
+                    with_region = [x for x in companies if x.get("region") and x.get("region") != "기타"]
                     woori = next(
                         (x for x in companies if "우리금융저축은행" in str(x.get("finance_nm") or "")),
                         None,
@@ -141,6 +183,7 @@ def install_fisis_region_patch():
                         "company_count": len(companies),
                         "address_count": len(with_address),
                         "region_count": len(with_region),
+                        "region_source": "저축은행중앙회 전국 저축은행 현황",
                         "woori": {
                             "bank": (woori or {}).get("finance_nm"),
                             "address": (woori or {}).get("address"),
@@ -150,5 +193,5 @@ def install_fisis_region_patch():
                 except Exception as exc:
                     return jsonify({"ok": False, "error": str(exc)}), 500
 
-    print("FISIS management region patch installed: headquarters address -> region")
+    print("FISIS management region patch installed: FSB 6-region mapping")
     return True
