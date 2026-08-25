@@ -4,7 +4,8 @@ This module intentionally monkey-patches the existing provider so the proven man
 report path remains intact. It never exposes or stores the FISIS authentication key.
 """
 
-INTELLIGENCE_SCHEMA_VERSION = 1
+INTELLIGENCE_SCHEMA_VERSION = 2
+SELECTIVE_ACCOUNT_TABLES = {"SE006", "SE014"}
 
 
 def install_fisis_intelligence_patch():
@@ -110,8 +111,40 @@ def install_fisis_intelligence_patch():
     for metric in ratio_metrics:
         fm.METRIC_KIND[metric] = "ratio"
 
+    original_fetch_table = fm._fetch_table
     original_cache_is_fresh = fm._cache_is_fresh
     original_build_store = fm._build_store
+
+    def fetch_table_optimized(finance_cd, list_no, metric_accounts, start_month, end_month):
+        # SE006/SE014 contain many hundreds of detailed account rows. Requesting the
+        # whole table for 26 quarters is slow and can time out, so use the documented
+        # accountCd parameter only for the handful of accounts SBRate actually needs.
+        if list_no not in SELECTIVE_ACCOUNT_TABLES:
+            return original_fetch_table(finance_cd, list_no, metric_accounts, start_month, end_month)
+
+        values = {}
+        for metric, account_cd in metric_accounts.items():
+            result = fm._api_get(
+                "statisticsInfoSearch",
+                financeCd=finance_cd,
+                listNo=list_no,
+                accountCd=account_cd,
+                term="Q",
+                startBaseMm=start_month,
+                endBaseMm=end_month,
+            )
+            legend = fm._legend(result)
+            for row in fm._as_rows(result.get("list")):
+                returned_code = str(row.get("account_cd") or "").strip()
+                if returned_code and returned_code != account_cd:
+                    continue
+                quarter = fm._quarter_key(row.get("base_month"))
+                if not quarter:
+                    continue
+                value = fm._choose_value(row, legend, fm.METRIC_KIND[metric])
+                if value is not None:
+                    values.setdefault(quarter, {})[metric] = value
+        return values
 
     def cache_is_fresh(store):
         if not original_cache_is_fresh(store):
@@ -123,8 +156,10 @@ def install_fisis_intelligence_patch():
         if isinstance(store, dict):
             store["intelligence_schema_version"] = INTELLIGENCE_SCHEMA_VERSION
             store["intelligence_metric_groups"] = ["funding", "soundness", "profitability"]
+            store["intelligence_fetch_mode"] = "selective-account-v2"
         return store
 
+    fm._fetch_table = fetch_table_optimized
     fm._cache_is_fresh = cache_is_fresh
     fm._build_store = build_store
     fm._sbrate_intelligence_patch_installed = True
