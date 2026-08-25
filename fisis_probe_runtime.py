@@ -6,10 +6,23 @@ import requests
 BASE = "https://fisis.fss.or.kr/openapi"
 TIMEOUT = 25
 SAVINGS_BANK_SECTOR = "E"
+WOORI_FINANCE_CD = "0010488"
 KEYWORDS = (
     "재무", "자산", "대출", "여신", "기업", "가계", "손익", "순이익",
     "경영", "BIS", "자본", "건전", "연체", "고정이하", "임직원", "직원", "인원", "생산성",
 )
+VALIDATION_METRICS = {
+    "total_assets": ("SE003", "A"),
+    "corporate_loans": ("SE020", "A"),
+    "household_loans": ("SE020", "B"),
+    "total_loans": ("SE020", "D"),
+    "bis_ratio": ("SE035", "C"),
+    "npl_ratio": ("SE034", "A"),
+    "delinquency_ratio": ("SE019", "C"),
+    "net_income_press": ("SE033", "A"),
+    "net_income_statement": ("SE006", "K"),
+    "employees": ("SE001", "A"),
+}
 
 
 def _rows(payload):
@@ -45,6 +58,18 @@ def _score_stat(row):
     return sum(1 for word in KEYWORDS if word.lower() in text.lower())
 
 
+def _safe_stat_result(payload):
+    result = payload.get("result") if isinstance(payload, dict) else {}
+    if not isinstance(result, dict):
+        return {}
+    return {
+        "unit": result.get("unit"),
+        "description": result.get("description"),
+        "list": result.get("list"),
+        "total_count": result.get("total_count"),
+    }
+
+
 def install_fisis_probe():
     app_module = sys.modules.get("app") or sys.modules.get("__main__")
     if app_module is None or not hasattr(app_module, "app"):
@@ -66,8 +91,10 @@ def install_fisis_probe():
 
         try:
             companies = _rows(_get("companySearch", key, partDiv=SAVINGS_BANK_SECTOR))
+            active = [r for r in companies if "[폐]" not in str(r.get("finance_nm") or "")]
             out["companies"] = {
                 "count": len(companies),
+                "active_name_count": len(active),
                 "sample_keys": sorted(companies[0].keys()) if companies else [],
                 "woori": [r for r in companies if "우리금융" in str(r.get("finance_nm") or "")],
                 "sample": companies[:5],
@@ -86,9 +113,8 @@ def install_fisis_probe():
             }
         except Exception as exc:
             errors.append(f"statistics-all: {type(exc).__name__}: {exc}")
-            # Some deployments require a category. Merge A-D instead.
             merged = {}
-            for category in ("A", "B", "C", "D"):
+            for category in ("A", "B", "C", "D", "P"):
                 try:
                     for row in _rows(_get("statisticsListSearch", key, lrgDiv=SAVINGS_BANK_SECTOR, smlDiv=category)):
                         list_no = str(row.get("list_no") or "")
@@ -128,8 +154,33 @@ def install_fisis_probe():
                 })
             except Exception as exc:
                 errors.append(f"accounts-{list_no}: {type(exc).__name__}: {exc}")
-
         out["candidate_accounts"] = account_map
+
+        validation = {}
+        for metric, (list_no, account_cd) in VALIDATION_METRICS.items():
+            try:
+                payload = _get(
+                    "statisticsInfoSearch",
+                    key,
+                    financeCd=WOORI_FINANCE_CD,
+                    listNo=list_no,
+                    accountCd=account_cd,
+                    term="Q",
+                    startBaseMm="202603",
+                    endBaseMm="202603",
+                )
+                validation[metric] = {
+                    "list_no": list_no,
+                    "account_cd": account_cd,
+                    "result": _safe_stat_result(payload),
+                }
+            except Exception as exc:
+                validation[metric] = {
+                    "list_no": list_no,
+                    "account_cd": account_cd,
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+        out["validation_2026q1"] = validation
         out["errors"] = errors[:30]
         return jsonify(out)
 
