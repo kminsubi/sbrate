@@ -1,5 +1,5 @@
 body.mr-lock{overflow:hidden!important}
-.mr-open-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #bfdbfe;background:#eff6ff;color:#1556c0;padding:6px 11px;border-radius:9px;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer;transition:.16s ease}
+.mr-open-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #bfdbfe;background:#eff6ff;color:#1556c0;padding:6px 11px;border-radius:9px;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer;transition:.16s ease;flex:0 0 auto}
 .mr-open-btn:hover{background:#dbeafe;border-color:#93c5fd}
 .mr-open-btn-mobile{padding:5px 8px;font-size:10px;margin-left:5px}
 .mr-modal{position:fixed;inset:0;z-index:99990;background:rgba(15,23,42,.46);backdrop-filter:blur(5px);display:none;padding:20px}
@@ -16,4 +16,21 @@ body.mr-lock{overflow:hidden!important}
 .mr-table-wrap{overflow:auto;flex:1;min-height:0}.mr-table{border-collapse:separate;border-spacing:0;min-width:2500px;width:max-content;font-size:10px}.mr-table th,.mr-table td{height:31px;padding:5px 8px;border-right:1px solid #edf1f6;border-bottom:1px solid #edf1f6;text-align:right;white-space:nowrap;background:#fff}.mr-table thead th{position:sticky;top:0;z-index:15;background:#f8fafc;color:#64748b;font-weight:800;text-align:center}.mr-table thead tr:first-child th{top:0;height:33px}.mr-table thead tr:nth-child(2) th{top:33px;height:29px;background:#fbfcfe;font-size:9px}.mr-group-head{color:#334155!important;font-size:10px!important}.mr-group-head small{display:block;font-size:8px;color:#94a3b8;font-weight:600;margin-top:1px}
 .mr-table td:nth-child(1),.mr-table td:nth-child(2),.mr-table td:nth-child(4){text-align:center}.mr-table td:nth-child(3){text-align:left;font-weight:800}.mr-table .mr-compare-cell{background:#fbfcfe}.mr-sticky{position:sticky!important;z-index:10!important;background:#fff!important}.mr-table thead .mr-sticky{z-index:25!important;background:#f8fafc!important}.mr-col-rank{left:0;width:48px;min-width:48px}.mr-col-rankchg{left:48px;width:62px;min-width:62px}.mr-col-bank{left:110px;width:145px;min-width:145px}.mr-col-region{left:255px;width:78px;min-width:78px;box-shadow:5px 0 8px -8px rgba(15,23,42,.3)}
 .mr-woori-row td{background:#eef6ff!important;color:#1556c0!important;font-weight:800}.mr-woori-row .mr-compare-cell{background:#e7f1ff!important}.mr-delta-good{color:#1556c0!important;font-weight:800}.mr-delta-bad{color:#dc2626!important;font-weight:800}.mr-delta-flat{color:#94a3b8!important;font-weight:700}
+
+/* Header fit: 경영현황 버튼을 상품 탭 옆에 두고, 노트북 폭에서는 중복 시장현황 배지를 숨긴다. */
+#management-report-open{margin-left:2px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+body>header>div:first-child{min-width:0}
+body>header>div:last-child{min-width:0;flex:0 1 auto}
+@media(max-width:1900px){
+  #dashboard-market-label{display:none!important}
+  body>header{gap:10px!important;padding-left:12px!important;padding-right:12px!important}
+  body>header>div:first-child{gap:8px!important}
+  body>header>div:last-child{gap:8px!important}
+  #management-report-open{padding:6px 9px}
+}
+@media(max-width:1450px){
+  #header-current-datetime{display:none!important}
+  body>header h1{font-size:14px!important}
+}
+
 @media(max-width:900px){.mr-modal{padding:0}.mr-shell{width:100vw;height:100vh;border-radius:0}.mr-topbar{padding:14px 15px 11px}.mr-topbar h2{font-size:18px}.mr-toolbar{grid-template-columns:1fr 26px 1fr;padding:10px 12px;gap:7px}.mr-primary-btn,.mr-secondary-btn{grid-column:auto;height:35px}.mr-primary-btn{grid-column:1/2}.mr-secondary-btn{grid-column:2/4}.mr-status{margin:8px 12px 0}.mr-summary{padding:8px 12px 10px;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;overflow-x:auto}.mr-summary-card{padding:9px 10px}.mr-summary-card strong{font-size:15px}.mr-summary-card:first-child{grid-column:1/3}.mr-table-card{margin:0 0 0;border-left:0;border-right:0;border-bottom:0;border-radius:13px 13px 0 0}.mr-table-headline{padding:8px 10px;align-items:flex-start}.mr-legend{display:none}.mr-table{font-size:9px;min-width:2350px}.mr-table th,.mr-table td{padding:4px 6px}.mr-col-rank{left:0;width:42px;min-width:42px}.mr-col-rankchg{left:42px;width:54px;min-width:54px}.mr-col-bank{left:96px;width:118px;min-width:118px}.mr-col-region{left:214px;width:66px;min-width:66px}}
