@@ -1,0 +1,135 @@
+name: Verify Management Intelligence
+
+on:
+  push:
+    paths:
+      - 'fisis_intelligence_patch.py'
+      - 'management_intelligence.py'
+      - 'management_report_v5_runtime.py'
+      - 'static/js/management_intelligence.js'
+      - 'static/css/management_intelligence.css'
+      - 'scheduler.py'
+      - '.github/workflows/verify_management_intelligence.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Static syntax checks
+        run: |
+          python -m py_compile fisis_intelligence_patch.py management_intelligence.py management_report_v5_runtime.py scheduler.py
+          node --check static/js/management_intelligence.js
+
+      - name: Wait for Render management intelligence deployment
+        run: |
+          set -e
+          for i in $(seq 1 80); do
+            html="$(curl -fsS --max-time 90 https://sbrate.onrender.com/ || true)"
+            if printf '%s' "$html" | grep -q 'management_intelligence.js?v=20260826mi1'; then
+              if curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-intelligence/insight' >/tmp/insight.json; then
+                echo 'Management intelligence deployment is live'
+                exit 0
+              fi
+            fi
+            echo "waiting for Render deploy... $i/80"
+            sleep 10
+          done
+          echo 'Management intelligence deployment did not become live in time'
+          exit 1
+
+      - name: Wait for expanded FISIS cache
+        run: |
+          set -e
+          for i in $(seq 1 80); do
+            curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json || true
+            python - <<'PY' >/tmp/qparams.env || true
+          import json
+          try:
+              d=json.load(open('/tmp/quarters.json',encoding='utf-8'))
+              qs=d.get('quarters') or []
+              if not d.get('ok') or not qs:
+                  raise SystemExit
+              latest=qs[0]['key']
+              previous=qs[1]['key'] if len(qs)>1 else ''
+              print('LATEST='+latest)
+              print('PREVIOUS='+previous)
+          except Exception:
+              pass
+          PY
+            if [ -s /tmp/qparams.env ]; then
+              . /tmp/qparams.env
+              curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=funding&base=${LATEST}&compare=${PREVIOUS}" >/tmp/funding.json || true
+              curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=soundness&base=${LATEST}&compare=${PREVIOUS}" >/tmp/soundness.json || true
+              curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=profitability&base=${LATEST}&compare=${PREVIOUS}" >/tmp/profitability.json || true
+              if python - <<'PY'
+          import json, sys
+          try:
+              f=json.load(open('/tmp/funding.json',encoding='utf-8'))
+              s=json.load(open('/tmp/soundness.json',encoding='utf-8'))
+              p=json.load(open('/tmp/profitability.json',encoding='utf-8'))
+          except Exception:
+              sys.exit(1)
+          def val(d,key):
+              return (((d.get('woori') or {}).get('metrics') or {}).get(key) or {}).get('base')
+          ok=(
+              f.get('ok') and f.get('ready') and len(f.get('rows') or []) >= 70 and
+              val(f,'deposits') is not None and val(f,'time_deposits') is not None and
+              s.get('ok') and s.get('ready') and len(s.get('rows') or []) >= 70 and
+              val(s,'liquidity_ratio') is not None and val(s,'delinquency_ratio') is not None and
+              p.get('ok') and p.get('ready') and len(p.get('rows') or []) >= 70 and
+              val(p,'roa') is not None and val(p,'roe') is not None and val(p,'operating_profit') is not None
+          )
+          sys.exit(0 if ok else 1)
+          PY
+              then
+                echo 'Expanded FISIS management cache is ready'
+                exit 0
+              fi
+            fi
+            echo "waiting for expanded FISIS cache... $i/80"
+            sleep 15
+          done
+          echo 'Expanded FISIS cache was not ready in time'
+          echo 'Funding:'; cat /tmp/funding.json 2>/dev/null || true
+          echo 'Soundness:'; cat /tmp/soundness.json 2>/dev/null || true
+          echo 'Profitability:'; cat /tmp/profitability.json 2>/dev/null || true
+          exit 1
+
+      - name: Verify live intelligence payloads
+        run: |
+          python - <<'PY'
+          import json
+          for name in ('funding','soundness','profitability'):
+              d=json.load(open(f'/tmp/{name}.json',encoding='utf-8'))
+              w=d.get('woori') or {}
+              print(name, {
+                  'ready': d.get('ready'),
+                  'base': d.get('base'),
+                  'compare': d.get('compare'),
+                  'bank_count': d.get('bank_count'),
+                  'woori_rank': w.get('section_rank'),
+              })
+          f=json.load(open('/tmp/funding.json',encoding='utf-8'))
+          m=(f.get('woori') or {}).get('metrics') or {}
+          print('woori_funding', {
+              'deposits': (m.get('deposits') or {}).get('base'),
+              'time_deposits': (m.get('time_deposits') or {}).get('base'),
+              'deposit_market_share': (m.get('deposit_market_share') or {}).get('base'),
+              'simple_loan_deposit_ratio': (m.get('simple_loan_deposit_ratio') or {}).get('base'),
+          })
+          print('current_market', f.get('current_market'))
+          print('rate_history', f.get('rate_history'))
+          PY
+
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-intelligence/insight' >/tmp/insight.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/insight.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          assert d.get('ready') is True, d
+          assert d.get('latest'), d
+          print('insight', {'latest':d.get('latest'),'latest_label':d.get('latest_label'),'as_of':d.get('as_of'),'ready':d.get('ready')})
+          PY
