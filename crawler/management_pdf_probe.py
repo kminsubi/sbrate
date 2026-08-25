@@ -28,13 +28,23 @@ def call(session, service, data):
 
 
 def qkey(title):
-    m = re.search(r'\((20\d{2})\.(\d{2})\.(\d{2})\)', str(title or ''))
-    if not m:
-        return None
-    year, month, day = map(int, m.groups())
-    if month not in (3, 6, 9, 12):
-        return None
-    return f'{year}Q{month // 3}'
+    text = str(title or '')
+    # 중앙회 분기공시 제목은 은행별로 표기가 다르다.
+    # 예: (2026.03.31), (2026년 3월말), (20240930)
+    patterns = (
+        r'(20\d{2})\s*[.\-/]\s*(\d{1,2})\s*[.\-/]\s*(\d{1,2})',
+        r'(20\d{2})\s*년\s*(\d{1,2})\s*월\s*말',
+        r'(?<!\d)(20\d{2})(03|06|09|12)(?:30|31)(?!\d)',
+    )
+    for pattern in patterns:
+        m = re.search(pattern, text)
+        if not m:
+            continue
+        year = int(m.group(1))
+        month = int(m.group(2))
+        if month in (3, 6, 9, 12):
+            return f'{year}Q{month // 3}'
+    return None
 
 
 def compact_values(payload):
