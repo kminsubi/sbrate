@@ -6,13 +6,14 @@
     single: '',
     base: '',
     compare: '',
-    mode: 'compare',
+    mode: 'single',
     payload: null,
     mounted: false,
   };
 
   const moneyFields = new Set(['total_assets','corporate_loans','household_loans','total_loans','net_income']);
   const ratioFields = new Set(['bis_ratio','npl_ratio','delinquency_ratio']);
+  const yearEndDeltaFields = new Set(['total_assets','total_loans','net_income']);
   const preferredFieldOrder = [
     'total_assets',
     'household_loans',
@@ -51,24 +52,38 @@
   function deltaText(value, fieldKey) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) return '-';
     const num = Number(value);
-    const sign = num > 0 ? '+' : '';
-    if (ratioFields.has(fieldKey)) return `${sign}${num.toFixed(2)}%p`;
-    return `${sign}${Math.round(num).toLocaleString('ko-KR')}`;
+    if (ratioFields.has(fieldKey)) {
+      if (num > 0) return `+${num.toFixed(2)}%p`;
+      if (num < 0) return `▲${Math.abs(num).toFixed(2)}%p`;
+      return '0.00%p';
+    }
+    const abs = Math.round(Math.abs(num)).toLocaleString('ko-KR');
+    if (num > 0) return `+${abs}`;
+    if (num < 0) return `▲${abs}`;
+    return '0';
   }
 
-  // SBRate 공통 증감 규칙: 증가(+) 파랑 / 감소(-) 빨강.
-  // 건전성 지표도 색상은 방향 자체를 표시하고, 개선 여부는 별도 주석으로 설명한다.
+  function deltaWithUnit(value, fieldKey) {
+    const text = deltaText(value, fieldKey);
+    if (text === '-') return '-';
+    if (moneyFields.has(fieldKey)) return `${text}억원`;
+    if (fieldKey === 'employees') return `${text}명`;
+    return text;
+  }
+
+  // SBRate 공통 증감 규칙: 증가(+) 파랑 / 감소(▲) 빨강 / 동일 회색.
   function deltaClass(value) {
     const num = Number(value);
     if (!Number.isFinite(num) || num === 0) return 'mr-delta-flat';
     return num > 0 ? 'mr-delta-good' : 'mr-delta-bad';
   }
 
+  // 순위는 rank_change > 0 이 순위 상승(개선)이다.
   function rankDeltaText(value) {
     if (value === null || value === undefined) return '-';
     const num = Number(value);
     if (!Number.isFinite(num) || num === 0) return '-';
-    return num > 0 ? `↑${num}` : `↓${Math.abs(num)}`;
+    return num > 0 ? `+${num}` : `▲${Math.abs(num)}`;
   }
 
   function rankDeltaClass(value) {
@@ -87,14 +102,33 @@
     return ordered;
   }
 
-  function quarterIndex(key) {
-    return state.quarters.findIndex(item => item.key === key);
+  function quarterParts(key) {
+    const match = String(key || '').match(/^(\d{4})Q([1-4])$/);
+    return match ? { year: Number(match[1]), quarter: Number(match[2]) } : null;
+  }
+
+  function calendarPreviousQuarter(key) {
+    const parts = quarterParts(key);
+    if (!parts) return '';
+    if (parts.quarter === 1) return `${parts.year - 1}Q4`;
+    return `${parts.year}Q${parts.quarter - 1}`;
+  }
+
+  function previousYearEndQuarter(key) {
+    const parts = quarterParts(key);
+    return parts ? `${parts.year - 1}Q4` : '';
+  }
+
+  function hasQuarter(key) {
+    return !!key && state.quarters.some(item => item.key === key);
+  }
+
+  function anyOtherQuarter(key) {
+    return state.quarters.find(item => item.key !== key)?.key || '';
   }
 
   function isPreviousQuarter(base, compare) {
-    const baseIndex = quarterIndex(base);
-    const compareIndex = quarterIndex(compare);
-    return baseIndex >= 0 && compareIndex === baseIndex + 1;
+    return !!base && !!compare && calendarPreviousQuarter(base) === compare;
   }
 
   function rankComparisonLabel(data) {
@@ -109,10 +143,8 @@
       : '비교분기';
   }
 
-  function fallbackCompareQuarter(base) {
-    const index = quarterIndex(base);
-    if (index < 0) return state.quarters[1]?.key || '';
-    return state.quarters[index + 1]?.key || state.quarters[index - 1]?.key || '';
+  function rowMap(data) {
+    return new Map((data?.rows || []).map(item => [String(item.bank || ''), item]));
   }
 
   function polishExecutiveReportHtml(html) {
@@ -181,10 +213,24 @@
 
     const mobileAnchor = document.getElementById('mobile-report-open');
     if (mobileAnchor && !document.getElementById('management-report-open-mobile')) {
-      const btn = el('button', 'mr-open-btn mr-open-btn-mobile', '경영현황');
+      const btn = el('button', 'mr-open-btn mr-open-btn-mobile', '📑 경영현황');
       btn.id = 'management-report-open-mobile';
       btn.type = 'button';
-      mobileAnchor.insertAdjacentElement('afterend', btn);
+      btn.title = 'FISIS 경영현황 보고서 열기';
+
+      const simulationButton = document.getElementById('rate-simulation-open-mobile');
+      const simulationRow = simulationButton?.closest('.mobile-simulation-row');
+      if (simulationButton && simulationRow) {
+        let actions = simulationRow.querySelector('.mr-mobile-simulation-actions');
+        if (!actions) {
+          actions = el('div', 'mr-mobile-simulation-actions');
+          simulationRow.insertBefore(actions, simulationButton);
+          actions.appendChild(simulationButton);
+        }
+        actions.insertBefore(btn, simulationButton);
+      } else {
+        mobileAnchor.insertAdjacentElement('afterend', btn);
+      }
       btn.addEventListener('click', openReport);
     }
   }
@@ -197,24 +243,24 @@
     modal.innerHTML = `
       <div class="mr-shell" role="dialog" aria-modal="true" aria-label="경영현황 보고서">
         <div class="mr-topbar">
-          <div>
+          <div class="mr-title-block">
             <div class="mr-eyebrow">MANAGEMENT INTELLIGENCE</div>
-            <h2>경영현황 보고서</h2>
+            <div class="mr-title-line">
+              <h2>경영현황 보고서</h2>
+              <div class="mr-latest-badge"><span>최신데이터</span><strong id="mr-latest-quarter">확인중</strong></div>
+            </div>
             <p id="mr-source-line">금융감독원 금융통계정보시스템(FISIS) 기준</p>
           </div>
-          <div class="mr-topbar-actions">
-            <div class="mr-latest-badge"><span>최신데이터</span><strong id="mr-latest-quarter">확인중</strong></div>
-            <button type="button" id="mr-close" class="mr-icon-btn" aria-label="닫기">×</button>
-          </div>
+          <button type="button" id="mr-close" class="mr-icon-btn" aria-label="닫기">×</button>
         </div>
 
         <div class="mr-query-area">
           <div class="mr-mode-tabs" role="tablist" aria-label="조회 방식">
-            <button type="button" class="mr-mode-tab" data-mr-mode="single">분기현황 조회</button>
-            <button type="button" class="mr-mode-tab is-active" data-mr-mode="compare">분기비교</button>
+            <button type="button" class="mr-mode-tab is-active" data-mr-mode="single">분기현황 조회</button>
+            <button type="button" class="mr-mode-tab" data-mr-mode="compare">분기비교</button>
           </div>
 
-          <div id="mr-single-controls" class="mr-toolbar mr-toolbar-single is-hidden">
+          <div id="mr-single-controls" class="mr-toolbar mr-toolbar-single">
             <label class="mr-select-box">
               <span>조회분기</span>
               <select id="mr-single-quarter"></select>
@@ -222,7 +268,7 @@
             <button type="button" id="mr-single-run" class="mr-primary-btn">분기조회</button>
           </div>
 
-          <div id="mr-compare-controls" class="mr-toolbar mr-toolbar-compare">
+          <div id="mr-compare-controls" class="mr-toolbar mr-toolbar-compare is-hidden">
             <label class="mr-select-box">
               <span>기준분기</span>
               <select id="mr-base-quarter"></select>
@@ -243,13 +289,13 @@
         <div class="mr-table-card">
           <div class="mr-table-headline">
             <div>
-              <strong id="mr-table-title">업권 경영현황 비교</strong>
+              <strong id="mr-table-title">업권 경영현황</strong>
               <span>총자산 기준 순위</span>
             </div>
             <div class="mr-legend">
-              <span class="mr-legend-good">● 증가(+)</span>
-              <span class="mr-legend-bad">● 감소(-)</span>
-              <span>※ 모든 증감 색상은 동일 기준 · 연체율·고정이하여신비율은 하락 시 건전성 개선 · 당기순이익은 공시 누적값</span>
+              <span class="mr-legend-good">● 증가 +</span>
+              <span class="mr-legend-bad">● 감소 ▲</span>
+              <span>※ SBRate 공통 증감 표기 · 연체율·고정이하여신비율은 하락 시 건전성 개선 · 당기순이익은 공시 누적값</span>
             </div>
           </div>
           <div class="mr-table-wrap">
@@ -314,9 +360,9 @@
     const latestEl = document.getElementById('mr-latest-quarter');
     if (latestEl) latestEl.textContent = latest ? latest.label : '-';
 
-    status.textContent = state.quarters.length >= 2
+    status.textContent = state.quarters.length
       ? `사용 가능한 분기 ${state.quarters.length}개 · 최신 공시 ${latest?.label || '-'}`
-      : '비교 가능한 분기 데이터가 아직 충분하지 않습니다.';
+      : '사용 가능한 분기 데이터가 아직 없습니다.';
   }
 
   async function openReport() {
@@ -328,8 +374,8 @@
 
     try {
       if (!state.quarters.length) await loadQuarters();
-      if (state.mode === 'single') await loadSingleReport();
-      else if (state.quarters.length >= 2) await loadCompareReport();
+      if (state.mode === 'compare') await loadCompareReport();
+      else await loadSingleReport();
     } catch (error) {
       document.getElementById('mr-status').textContent = `데이터 확인 실패: ${error.message}`;
     }
@@ -373,8 +419,7 @@
       state.payload = data;
       renderCompareSummary(data);
       renderCompareTable(data);
-      const sourceLine = document.getElementById('mr-source-line');
-      sourceLine.textContent = `${data.source_name} · ${data.base_label} vs ${data.compare_label}`;
+      document.getElementById('mr-source-line').textContent = `${data.source_name} · ${data.base_label} vs ${data.compare_label}`;
       document.getElementById('mr-table-title').textContent = `${data.base_label} vs ${data.compare_label}`;
       status.textContent = `${data.rows.length}개 저축은행 · 기준분기 총자산 순 정렬`;
     } catch (error) {
@@ -389,22 +434,44 @@
     const selected = document.getElementById('mr-single-quarter').value;
     const status = document.getElementById('mr-status');
     if (!selected) return;
-    const fallback = fallbackCompareQuarter(selected);
-    if (!fallback) {
-      status.textContent = '분기현황을 조회할 수 있는 데이터가 부족합니다.';
+
+    const prevKeyCandidate = calendarPreviousQuarter(selected);
+    const yearEndKeyCandidate = previousYearEndQuarter(selected);
+    const prevKey = hasQuarter(prevKeyCandidate) ? prevKeyCandidate : '';
+    const yearEndKey = hasQuarter(yearEndKeyCandidate) ? yearEndKeyCandidate : '';
+    const primaryCompare = prevKey || yearEndKey || anyOtherQuarter(selected);
+
+    if (!primaryCompare) {
+      status.textContent = '분기현황을 조회할 수 있는 비교 기준 데이터가 없습니다.';
       return;
     }
+
     state.single = selected;
     status.textContent = '선택 분기 경영현황을 조회하고 있습니다.';
+
     try {
-      // 현재 API의 기준분기 값만 사용한다. 비교분기는 단일조회 렌더링에서 표시하지 않는다.
-      const data = await fetchJson(`/api/management-report?base=${encodeURIComponent(selected)}&compare=${encodeURIComponent(fallback)}`);
-      state.payload = data;
-      renderSingleSummary(data);
-      renderSingleTable(data);
-      document.getElementById('mr-source-line').textContent = `${data.source_name} · ${data.base_label}`;
-      document.getElementById('mr-table-title').textContent = `${data.base_label} 경영현황`;
-      status.textContent = `${data.rows.length}개 저축은행 · ${data.base_label} 총자산 순 정렬`;
+      const currentData = await fetchJson(`/api/management-report?base=${encodeURIComponent(selected)}&compare=${encodeURIComponent(primaryCompare)}`);
+      let prevData = null;
+      let yearEndData = null;
+
+      if (prevKey) {
+        prevData = primaryCompare === prevKey
+          ? currentData
+          : await fetchJson(`/api/management-report?base=${encodeURIComponent(selected)}&compare=${encodeURIComponent(prevKey)}`);
+      }
+
+      if (yearEndKey) {
+        if (primaryCompare === yearEndKey) yearEndData = currentData;
+        else if (prevKey === yearEndKey && prevData) yearEndData = prevData;
+        else yearEndData = await fetchJson(`/api/management-report?base=${encodeURIComponent(selected)}&compare=${encodeURIComponent(yearEndKey)}`);
+      }
+
+      state.payload = currentData;
+      renderSingleSummary(currentData, prevData, yearEndData);
+      renderSingleTable(currentData, prevData, yearEndData);
+      document.getElementById('mr-source-line').textContent = `${currentData.source_name} · ${currentData.base_label}`;
+      document.getElementById('mr-table-title').textContent = `${currentData.base_label} 경영현황`;
+      status.textContent = `${currentData.rows.length}개 저축은행 · ${currentData.base_label} 총자산 순 정렬`;
     } catch (error) {
       state.payload = null;
       document.getElementById('mr-summary').innerHTML = '';
@@ -415,6 +482,11 @@
 
   function summaryCard(label, value, sub, cls='', valueCls='') {
     return `<article class="mr-summary-card ${cls}"><span>${label}</span><strong class="${valueCls}">${value}</strong><small>${sub}</small></article>`;
+  }
+
+  function compareNote(label, delta, fieldKey) {
+    const cls = deltaClass(delta);
+    return `${label} <b class="${cls}">${deltaWithUnit(delta, fieldKey)}</b>`;
   }
 
   function renderCompareSummary(data) {
@@ -434,31 +506,69 @@
     const rankLabel = comparisonSubLabel(data);
     root.innerHTML = [
       summaryCard('우리금융 총자산 순위', `${w.rank || '-'}위`, `${rankLabel} ${w.compare_rank || '-'}위 · <b class="${rankDeltaClass(w.rank_change)}">${rankDelta}</b>`, 'mr-summary-woori'),
-      summaryCard('총자산 증감', deltaText(totalAssets.delta,'total_assets'), `기준 ${fmt(totalAssets.base,'total_assets')}억원`, '', deltaClass(totalAssets.delta)),
-      summaryCard('가계대출 증감', deltaText(household.delta,'household_loans'), `기준 ${fmt(household.base,'household_loans')}억원`, '', deltaClass(household.delta)),
-      summaryCard('총대출 증감', deltaText(totalLoans.delta,'total_loans'), `기준 ${fmt(totalLoans.base,'total_loans')}억원`, '', deltaClass(totalLoans.delta)),
-      summaryCard('당기순이익 증감', deltaText(netIncome.delta,'net_income'), `기준 ${fmt(netIncome.base,'net_income')}억원`, '', deltaClass(netIncome.delta)),
-      summaryCard('BIS 증감', deltaText(bis.delta,'bis_ratio'), `기준 ${fmt(bis.base,'bis_ratio')}`, '', deltaClass(bis.delta)),
-      summaryCard('연체율 증감', deltaText(delinquency.delta,'delinquency_ratio'), `기준 ${fmt(delinquency.base,'delinquency_ratio')}`, '', deltaClass(delinquency.delta)),
+      summaryCard('총자산 증감', deltaWithUnit(totalAssets.delta,'total_assets'), `기준 ${valueWithUnit(totalAssets.base,'total_assets')}`, '', deltaClass(totalAssets.delta)),
+      summaryCard('가계대출 증감', deltaWithUnit(household.delta,'household_loans'), `기준 ${valueWithUnit(household.base,'household_loans')}`, '', deltaClass(household.delta)),
+      summaryCard('총대출 증감', deltaWithUnit(totalLoans.delta,'total_loans'), `기준 ${valueWithUnit(totalLoans.base,'total_loans')}`, '', deltaClass(totalLoans.delta)),
+      summaryCard('당기순이익 증감', deltaWithUnit(netIncome.delta,'net_income'), `기준 ${valueWithUnit(netIncome.base,'net_income')}`, '', deltaClass(netIncome.delta)),
+      summaryCard('BIS 증감', deltaWithUnit(bis.delta,'bis_ratio'), `기준 ${valueWithUnit(bis.base,'bis_ratio')}`, '', deltaClass(bis.delta)),
+      summaryCard('연체율 증감', deltaWithUnit(delinquency.delta,'delinquency_ratio'), `기준 ${valueWithUnit(delinquency.base,'delinquency_ratio')}`, '', deltaClass(delinquency.delta)),
     ].join('');
   }
 
-  function renderSingleSummary(data) {
+  function renderSingleSummary(data, prevData, yearEndData) {
     const root = document.getElementById('mr-summary');
     const w = data.woori;
     if (!w) {
       root.innerHTML = summaryCard('우리금융', '-', '선택 분기에 우리금융 데이터가 없습니다.');
       return;
     }
+
+    const prevW = prevData?.woori || null;
+    const yearW = yearEndData?.woori || null;
     const m = w.metrics || {};
+    const pm = prevW?.metrics || {};
+    const ym = yearW?.metrics || {};
+    const rankDelta = prevW ? prevW.rank_change : null;
+
     root.innerHTML = [
-      summaryCard('우리금융 총자산 순위', `${w.rank || '-'}위`, `${data.rows.length}개사 중`, 'mr-summary-woori'),
-      summaryCard('총자산', valueWithUnit(m.total_assets?.base,'total_assets'), data.base_label),
-      summaryCard('가계대출', valueWithUnit(m.household_loans?.base,'household_loans'), data.base_label),
-      summaryCard('총대출', valueWithUnit(m.total_loans?.base,'total_loans'), data.base_label),
-      summaryCard('당기순이익', valueWithUnit(m.net_income?.base,'net_income'), '공시 누적값'),
-      summaryCard('BIS비율', valueWithUnit(m.bis_ratio?.base,'bis_ratio'), data.base_label),
-      summaryCard('연체율', valueWithUnit(m.delinquency_ratio?.base,'delinquency_ratio'), data.base_label),
+      summaryCard(
+        '우리금융 총자산 순위',
+        `${w.rank || '-'}위`,
+        prevW
+          ? `전분기 ${prevW.compare_rank || '-'}위 · <b class="${rankDeltaClass(rankDelta)}">${rankDeltaText(rankDelta)}</b>`
+          : '전분기比 -',
+        'mr-summary-woori'
+      ),
+      summaryCard(
+        '총자산',
+        valueWithUnit(m.total_assets?.base,'total_assets'),
+        yearW ? compareNote('전년말比', ym.total_assets?.delta, 'total_assets') : '전년말比 -'
+      ),
+      summaryCard(
+        '가계대출',
+        valueWithUnit(m.household_loans?.base,'household_loans'),
+        prevW ? compareNote('전분기比', pm.household_loans?.delta, 'household_loans') : '전분기比 -'
+      ),
+      summaryCard(
+        '총대출',
+        valueWithUnit(m.total_loans?.base,'total_loans'),
+        yearW ? compareNote('전년말比', ym.total_loans?.delta, 'total_loans') : '전년말比 -'
+      ),
+      summaryCard(
+        '당기순이익',
+        valueWithUnit(m.net_income?.base,'net_income'),
+        yearW ? compareNote('전년말比', ym.net_income?.delta, 'net_income') : '전년말比 -'
+      ),
+      summaryCard(
+        'BIS비율',
+        valueWithUnit(m.bis_ratio?.base,'bis_ratio'),
+        prevW ? compareNote('전분기比', pm.bis_ratio?.delta, 'bis_ratio') : '전분기比 -'
+      ),
+      summaryCard(
+        '연체율',
+        valueWithUnit(m.delinquency_ratio?.base,'delinquency_ratio'),
+        prevW ? compareNote('전분기比', pm.delinquency_ratio?.delta, 'delinquency_ratio') : '전분기比 -'
+      ),
     ].join('');
   }
 
@@ -500,29 +610,55 @@
     table.innerHTML = top + body;
   }
 
-  function renderSingleTable(data) {
+  function renderSingleTable(data, prevData, yearEndData) {
     const table = document.getElementById('mr-table');
     table.classList.add('is-single');
     table.classList.remove('is-compare');
     const fields = orderedFields(data.fields);
+    const prevRows = rowMap(prevData);
+    const yearRows = rowMap(yearEndData);
+
     let top = '<thead><tr>' +
-      '<th class="mr-sticky mr-col-rank">순위</th>' +
-      '<th class="mr-sticky mr-col-bank">저축은행</th>' +
-      '<th class="mr-sticky mr-col-region">지역</th>';
+      '<th rowspan="2" class="mr-sticky mr-col-rank">순위</th>' +
+      '<th rowspan="2" class="mr-sticky mr-col-rankchg">전분기比</th>' +
+      '<th rowspan="2" class="mr-sticky mr-col-bank">저축은행</th>' +
+      '<th rowspan="2" class="mr-sticky mr-col-region">지역</th>';
+
     fields.forEach(field => {
-      top += `<th class="mr-group-head">${field.label}<small>${field.unit}</small></th>`;
+      if (yearEndDeltaFields.has(field.key)) {
+        top += `<th colspan="2" class="mr-group-head">${field.label}<small>${field.unit}</small></th>`;
+      } else {
+        top += `<th rowspan="2" class="mr-group-head">${field.label}<small>${field.unit}</small></th>`;
+      }
+    });
+
+    top += '</tr><tr>';
+    fields.forEach(field => {
+      if (yearEndDeltaFields.has(field.key)) {
+        top += `<th>${data.base_label.replace('년 ','-')}</th><th>전년말比</th>`;
+      }
     });
     top += '</tr></thead>';
 
     let body = '<tbody>';
     (data.rows || []).forEach(item => {
+      const prevItem = prevRows.get(String(item.bank || ''));
+      const yearItem = yearRows.get(String(item.bank || ''));
+      const rankChange = prevItem ? prevItem.rank_change : null;
+
       body += `<tr class="${item.is_woori ? 'mr-woori-row' : ''}">`;
       body += `<td class="mr-sticky mr-col-rank">${item.rank || '-'}</td>`;
+      body += `<td class="mr-sticky mr-col-rankchg ${rankDeltaClass(rankChange)}">${rankDeltaText(rankChange)}</td>`;
       body += `<td class="mr-sticky mr-col-bank">${item.bank}</td>`;
       body += `<td class="mr-sticky mr-col-region">${item.region || '-'}</td>`;
+
       fields.forEach(field => {
         const metric = item.metrics[field.key] || {};
         body += `<td>${fmt(metric.base,field.key)}</td>`;
+        if (yearEndDeltaFields.has(field.key)) {
+          const yearMetric = yearItem?.metrics?.[field.key] || {};
+          body += `<td class="${deltaClass(yearMetric.delta)}">${deltaText(yearMetric.delta,field.key)}</td>`;
+        }
       });
       body += '</tr>';
     });
