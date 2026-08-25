@@ -1,8 +1,11 @@
+import math
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 import sys
 
+
+MIN_QUARTER_COVERAGE = 0.90
 
 _LOCK = threading.Lock()
 _STATE = {
@@ -52,10 +55,11 @@ def _probe_worker(base_result, target, target_month):
     result = dict(base_result)
     try:
         companies = fm._companies()
-        threshold = max(20, int(len(companies) * 0.65))
+        threshold = max(20, math.ceil(len(companies) * MIN_QUARTER_COVERAGE))
         result.update({
             "probe_required": True,
             "company_count": len(companies),
+            "coverage_ratio_required": MIN_QUARTER_COVERAGE,
             "coverage_threshold": threshold,
             "published_asset_count": 0,
         })
@@ -126,6 +130,7 @@ def check_latest_quarter(force_probe=False):
         "current_latest": current_latest or None,
         "target_quarter": target,
         "target_as_of": target_as_of,
+        "coverage_ratio_required": MIN_QUARTER_COVERAGE,
         "probe_required": False,
         "triggered_refresh": False,
     }
