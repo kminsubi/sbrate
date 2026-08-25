@@ -1,7 +1,7 @@
 import sys
 
 
-ASSET_VERSION = "20260826mi2"
+ASSET_VERSION = "20260826mi3"
 
 
 def install_management_report_v5_runtime():
