@@ -1,11 +1,15 @@
 import os
-import string
 import sys
 
 import requests
 
 BASE = "https://fisis.fss.or.kr/openapi"
-TIMEOUT = 20
+TIMEOUT = 25
+SAVINGS_BANK_SECTOR = "E"
+KEYWORDS = (
+    "재무", "자산", "대출", "여신", "기업", "가계", "손익", "순이익",
+    "경영", "BIS", "자본", "건전", "연체", "고정이하", "임직원", "직원", "인원", "생산성",
+)
 
 
 def _rows(payload):
@@ -23,20 +27,22 @@ def _get(path, key, **params):
     query.update({k: v for k, v in params.items() if v not in (None, "")})
     r = requests.get(f"{BASE}/{path}.json", params=query, timeout=TIMEOUT)
     r.raise_for_status()
-    return r.json()
+    payload = r.json()
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if isinstance(result, dict):
+        err_cd = str(result.get("err_cd") or "000")
+        if err_cd not in ("000", "0", ""):
+            raise RuntimeError(f"FISIS {path} err_cd={err_cd} err_msg={result.get('err_msg')}")
+    return payload
 
 
-def _name(row):
-    if not isinstance(row, dict):
-        return ""
-    return str(
-        row.get("finance_nm")
-        or row.get("financeNm")
-        or row.get("finance_name")
-        or row.get("kor_co_nm")
-        or row.get("name")
-        or ""
-    )
+def _stat_name(row):
+    return str((row or {}).get("list_nm") or "")
+
+
+def _score_stat(row):
+    text = _stat_name(row)
+    return sum(1 for word in KEYWORDS if word.lower() in text.lower())
 
 
 def install_fisis_probe():
@@ -55,43 +61,76 @@ def install_fisis_probe():
         if not key:
             return jsonify({"ok": False, "configured": False, "error": "FISIS_API_KEY missing"}), 503
 
-        out = {"ok": True, "configured": True, "company_part_candidates": [], "company_unfiltered": None}
+        out = {"ok": True, "configured": True, "sector": SAVINGS_BANK_SECTOR}
         errors = []
 
-        # First try an unfiltered company lookup. Some FISIS deployments allow this.
         try:
-            payload = _get("companySearch", key)
-            rows = _rows(payload)
-            out["company_unfiltered"] = {
-                "count": len(rows),
-                "sample_keys": sorted(rows[0].keys()) if rows and isinstance(rows[0], dict) else [],
-                "matching": [row for row in rows if any(t in _name(row) for t in ("우리금융", "SBI", "OK", "웰컴", "KB"))][:12],
+            companies = _rows(_get("companySearch", key, partDiv=SAVINGS_BANK_SECTOR))
+            out["companies"] = {
+                "count": len(companies),
+                "sample_keys": sorted(companies[0].keys()) if companies else [],
+                "woori": [r for r in companies if "우리금융" in str(r.get("finance_nm") or "")],
+                "sample": companies[:5],
             }
         except Exception as exc:
-            errors.append(f"company-unfiltered: {type(exc).__name__}: {exc}")
+            out["companies"] = {"count": 0}
+            errors.append(f"companies: {type(exc).__name__}: {exc}")
 
-        # Discover the savings-bank partDiv without hard-coding a possibly stale code.
-        for code in list(string.ascii_uppercase) + [str(i) for i in range(10)]:
+        statistics = []
+        try:
+            statistics = _rows(_get("statisticsListSearch", key, lrgDiv=SAVINGS_BANK_SECTOR))
+            out["statistics"] = {
+                "count": len(statistics),
+                "sample_keys": sorted(statistics[0].keys()) if statistics else [],
+                "all": statistics,
+            }
+        except Exception as exc:
+            errors.append(f"statistics-all: {type(exc).__name__}: {exc}")
+            # Some deployments require a category. Merge A-D instead.
+            merged = {}
+            for category in ("A", "B", "C", "D"):
+                try:
+                    for row in _rows(_get("statisticsListSearch", key, lrgDiv=SAVINGS_BANK_SECTOR, smlDiv=category)):
+                        list_no = str(row.get("list_no") or "")
+                        if list_no:
+                            merged[list_no] = row
+                except Exception as sub_exc:
+                    errors.append(f"statistics-{category}: {type(sub_exc).__name__}: {sub_exc}")
+            statistics = list(merged.values())
+            out["statistics"] = {
+                "count": len(statistics),
+                "sample_keys": sorted(statistics[0].keys()) if statistics else [],
+                "all": statistics,
+            }
+
+        candidates = sorted(
+            [row for row in statistics if _score_stat(row) > 0],
+            key=lambda row: (-_score_stat(row), str(row.get("list_no") or "")),
+        )[:30]
+        account_map = []
+        for row in candidates:
+            list_no = str(row.get("list_no") or "")
+            if not list_no:
+                continue
             try:
-                payload = _get("companySearch", key, partDiv=code)
-                rows = _rows(payload)
-                if not rows:
-                    continue
-                names = [_name(r) for r in rows]
-                hits = [n for n in names if any(t in n for t in ("우리금융", "SBI", "OK", "웰컴", "KB"))]
-                if hits or 60 <= len(rows) <= 100:
-                    out["company_part_candidates"].append({
-                        "partDiv": code,
-                        "count": len(rows),
-                        "hits": hits[:10],
-                        "sample_keys": sorted(rows[0].keys()) if isinstance(rows[0], dict) else [],
-                        "sample": rows[:3],
-                    })
+                accounts = _rows(_get("accountListSearch", key, listNo=list_no))
+                matching = [
+                    a for a in accounts
+                    if any(word.lower() in str(a.get("account_nm") or "").lower() for word in KEYWORDS)
+                ]
+                account_map.append({
+                    "list_no": list_no,
+                    "list_nm": row.get("list_nm"),
+                    "score": _score_stat(row),
+                    "account_count": len(accounts),
+                    "accounts": accounts,
+                    "matching_accounts": matching,
+                })
             except Exception as exc:
-                if len(errors) < 8:
-                    errors.append(f"partDiv={code}: {type(exc).__name__}: {exc}")
+                errors.append(f"accounts-{list_no}: {type(exc).__name__}: {exc}")
 
-        out["errors"] = errors
+        out["candidate_accounts"] = account_map
+        out["errors"] = errors[:30]
         return jsonify(out)
 
     app_module._fisis_probe_installed = True
