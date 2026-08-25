@@ -1,12 +1,13 @@
+import io
 import json
 import re
+import zipfile
 from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
 
 PAGE = 'https://www.fsb.or.kr/busmagequar_0100.act'
-QUAR = 'https://www.fsb.or.kr/js/jex/hsspb/cpspt/bus/mage/sumy/busmagequar_0100.js?251354'
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0 Safari/537.36',
     'Accept-Language': 'ko-KR,ko;q=0.9',
@@ -18,48 +19,51 @@ HEADERS = {
 def call(session, service, data):
     url = urljoin(PAGE, f'/{service}.jct')
     r = session.post(url, data=data, timeout=40)
-    print('POST', service, 'status=', r.status_code, 'type=', r.headers.get('content-type'), 'bytes=', len(r.content))
     r.raise_for_status()
-    try:
-        payload = r.json()
-    except Exception:
-        print('NONJSON=', r.text[:1200])
-        return None
+    payload = r.json()
     head = payload.get('COMMON_HEAD') if isinstance(payload, dict) else None
-    if head:
-        print('COMMON_HEAD=', json.dumps(head, ensure_ascii=False)[:800])
+    if isinstance(head, dict) and str(head.get('ERROR') or '') not in ('', '0', 'false', 'False'):
+        raise RuntimeError(f'{service} COMMON_HEAD={head}')
     return payload
 
 
-def find_global_candidates(text, name):
-    values = []
-    patterns = [
-        rf'\b{name}\s*=\s*["\']([^"\']*)["\']',
-        rf'\bvar\s+{name}\s*=\s*["\']([^"\']*)["\']',
+def qkey(title):
+    m = re.search(r'\((20\d{2})\.(\d{2})\.(\d{2})\)', str(title or ''))
+    if not m:
+        return None
+    year, month, day = map(int, m.groups())
+    if month not in (3, 6, 9, 12):
+        return None
+    return f'{year}Q{month // 3}'
+
+
+def compact_values(payload):
+    keys = [
+        'ASSET_A','ASSET_TOT_SUM_A','LOAN_A','LOAN_SUM_A','STAFF_A',
+        'NET_PROFIT_QUAR_A','NET_PROFIT_QUAR_TOT_A',
+        'CAPITAL_RATIO_A','CREDIT_RATIO_A','SMALL_LOAN_OVER_A',
+        'LOAN_DEPOSIT_RATIO_A','YEAR_A','MON_A','QUAR_A','GUBUN_A',
     ]
-    for pat in patterns:
-        for m in re.finditer(pat, text, re.I):
-            value = m.group(1)
-            if value not in values:
-                values.append(value)
-    return values
+    return {k: payload.get(k) for k in keys if k in payload}
 
 
-def print_selected(payload, service):
-    if not isinstance(payload, dict):
-        return
-    keys = sorted(k for k in payload.keys() if k != 'COMMON_HEAD')
-    print(f'SERVICE {service} KEY_COUNT=', len(keys))
-    print('KEYS=', keys)
-    interesting = {}
-    tokens = (
-        'ASSET', 'LOAN', 'CREDIT', 'CAPITAL', 'OVER', 'DELAY', 'ARREAR',
-        'PROFIT', 'STAFF', 'YEAR', 'MON', 'QUAR', 'GUBUN', 'AREA', 'REGION',
-    )
-    for key in keys:
-        if any(token in key.upper() for token in tokens):
-            interesting[key] = payload.get(key)
-    print('INTERESTING=', json.dumps(interesting, ensure_ascii=False)[:16000])
+def inspect_xlsx(content):
+    if not content.startswith(b'PK'):
+        return {'xlsx': False, 'prefix': content[:120].decode('utf-8', 'replace')}
+    zf = zipfile.ZipFile(io.BytesIO(content))
+    strings = []
+    for name in zf.namelist():
+        if not name.endswith('.xml'):
+            continue
+        try:
+            text = zf.read(name).decode('utf-8', 'ignore')
+        except Exception:
+            continue
+        if any(token in text for token in ('기업자금','가계자금','연체율','고정이하','BIS','총자산','임직원')):
+            plain = re.sub(r'<[^>]+>', ' ', text)
+            plain = re.sub(r'\s+', ' ', plain)
+            strings.append((name, plain[:12000]))
+    return {'xlsx': True, 'files': strings[:12]}
 
 
 def main():
@@ -67,80 +71,68 @@ def main():
     s.headers.update(HEADERS)
     page = s.get(PAGE, timeout=40)
     page.raise_for_status()
-    html = page.text
-    quar = s.get(QUAR, timeout=40).text
-    print('PAGE=', page.url, 'STATUS=', page.status_code, 'cookies=', s.cookies.get_dict())
+    soup = BeautifulSoup(page.text, 'html.parser')
 
-    print('\n=== GLOBAL CANDIDATES ===')
-    for name in ('AREA', 'G_GUBUN', 'bankCode', 'seq'):
-        values = find_global_candidates(html + '\n' + quar, name)
-        print(name, values[:20])
+    banks = call(s, 'busmagequar_0100_01', {'AREA':'', 'BANK_NAME':''}).get('REC') or []
+    print('BANK_COUNT=', len(banks))
+    woori_candidates = []
+    for row in banks:
+        if not isinstance(row, dict):
+            continue
+        hay = ' '.join(str(row.get(k) or '') for k in ('BANK_NAME','OFFICENOTICE_URL','BANK_CODE'))
+        if '우리' in hay.lower() or 'woori' in hay.lower() or 'woolee' in hay.lower():
+            woori_candidates.append(row)
+    print('WOORI_CANDIDATES=', json.dumps(woori_candidates, ensure_ascii=False, indent=2))
 
-    soup = BeautifulSoup(html, 'html.parser')
-    area_values = ['']
-    for node in soup.select('select option, input'):
-        if str(node.get('name') or node.get('id') or '').upper() == 'AREA':
-            value = str(node.get('value') or '')
-            if value not in area_values:
-                area_values.append(value)
-    for value in ('01','02','03','04','05','06'):
-        if value not in area_values:
-            area_values.append(value)
+    target = next((r for r in woori_candidates if '우리금융' in str(r.get('BANK_NAME') or '')), None)
+    if target is None:
+        target = next((r for r in banks if 'woorisavingsbank' in str(r.get('OFFICENOTICE_URL') or '').lower()), None)
+    if target is None:
+        raise SystemExit('우리금융저축은행 정확한 bank row를 찾지 못함')
 
-    print('\n=== BANK LIST ===')
-    banks = {}
-    successful_area = None
-    for area in area_values:
-        payload = call(s, 'busmagequar_0100_01', {'AREA': area, 'BANK_NAME': ''})
-        rec = payload.get('REC') if isinstance(payload, dict) else None
-        if isinstance(rec, list):
-            print('AREA', repr(area), 'REC=', len(rec), 'sample=', json.dumps(rec[:3], ensure_ascii=False)[:1800])
-            if rec and successful_area is None:
-                successful_area = area
-            for row in rec:
-                if isinstance(row, dict) and row.get('BANK_CODE'):
-                    banks[str(row['BANK_CODE'])] = row
-    print('BANK_UNIQUE=', len(banks))
-    woori = next((row for row in banks.values() if '우리' in str(row.get('BANK_NAME') or '')), None)
-    print('WOORI=', json.dumps(woori, ensure_ascii=False))
-    target = woori or next(iter(banks.values()), None)
-    if not target:
-        raise SystemExit('No bank row from service 01')
+    bank_code = str(target.get('BANK_CODE') or '')
+    print('TARGET=', json.dumps(target, ensure_ascii=False))
+    qrows = call(s, 'busmagequar_0100_02', {'BANK_CODE':bank_code,'G_GUBUN':'1','SEQ':''}).get('REC') or []
+    print('QUARTERS=', json.dumps([{k:r.get(k) for k in ('SEQ','G_TITLE','WRITE_DATE')} for r in qrows[:12]], ensure_ascii=False, indent=2))
+    q1 = next((r for r in qrows if qkey(r.get('G_TITLE')) == '2026Q1'), None)
+    if not q1:
+        raise SystemExit('우리금융 2026Q1 분기공시 없음')
+    seq = str(q1.get('SEQ'))
+    params = {'SEQ':seq,'UPDATE_CNT':'','BANK_CODE':bank_code,'G_GUBUN':'1'}
 
-    bank_code = str(target.get('BANK_CODE'))
-    g_candidates = find_global_candidates(html + '\n' + quar, 'G_GUBUN')
-    for value in ('', '1', '01', '0'):
-        if value not in g_candidates:
-            g_candidates.append(value)
-
-    print('\n=== QUARTER LIST FOR', target.get('BANK_NAME'), bank_code, '===')
-    quarter_payload = None
-    chosen_g = None
-    for g in g_candidates:
-        payload = call(s, 'busmagequar_0100_02', {'BANK_CODE': bank_code, 'G_GUBUN': g, 'SEQ': ''})
-        rec = payload.get('REC') if isinstance(payload, dict) else None
-        if isinstance(rec, list):
-            print('G_GUBUN', repr(g), 'REC=', len(rec), 'sample=', json.dumps(rec[:8], ensure_ascii=False)[:5000])
-            if rec and quarter_payload is None:
-                quarter_payload = payload
-                chosen_g = g
-    if not quarter_payload:
-        raise SystemExit('No quarter list from service 02')
-
-    rec = quarter_payload.get('REC') or []
-    seq = str(rec[0].get('SEQ'))
-    print('CHOSEN G_GUBUN=', repr(chosen_g), 'SEQ=', seq, 'TITLE=', rec[0].get('G_TITLE'))
-
-    print('\n=== DETAIL RESPONSES ===')
-    detail_params = {
-        'SEQ': seq,
-        'UPDATE_CNT': '',
-        'BANK_CODE': bank_code,
-        'G_GUBUN': chosen_g,
-    }
+    details = {}
     for service in ('03','04','05','06'):
-        payload = call(s, f'busmagequar_0100_{service}', detail_params)
-        print_selected(payload, service)
+        payload = call(s, f'busmagequar_0100_{service}', params)
+        details[service] = payload
+        print('DETAIL', service, compact_values(payload))
+        print('KEYS', service, sorted(k for k in payload.keys() if k != 'COMMON_HEAD'))
+
+    print('EXPECTED_SCREENSHOT= assets 21238, corporate 8515, household 9217, total_loans 17732, BIS 16.54, NPL 5.73, delinquency 4.45, net_income 33, employees 145')
+
+    # Inspect the official Excel download generated by the same quarterly page.
+    form = soup.find('form', id='gongsiForm') or soup.find('form', attrs={'name':'gongsiForm'})
+    form_data = {}
+    if form:
+        for node in form.find_all(['input','select']):
+            name = node.get('name')
+            if not name:
+                continue
+            value = node.get('value') or ''
+            if node.name == 'select':
+                selected = node.find('option', selected=True) or node.find('option')
+                value = selected.get('value') if selected else value
+            form_data[name] = value
+    form_data.update({
+        'SEQ': seq,
+        'BANK_CODE': bank_code,
+        'G_GUBUN': '1',
+        'FILE_NM': f"{target.get('BANK_NAME')}_{q1.get('G_TITLE')}",
+    })
+    print('EXCEL_FORM_DATA=', json.dumps(form_data, ensure_ascii=False))
+    excel_url = urljoin(PAGE, '/busmagequar_0100_07.act')
+    er = s.post(excel_url, data=form_data, timeout=60, allow_redirects=True)
+    print('EXCEL_RESPONSE status=', er.status_code, 'type=', er.headers.get('content-type'), 'disp=', er.headers.get('content-disposition'), 'bytes=', len(er.content), 'url=', er.url)
+    print('EXCEL_INSPECT=', json.dumps(inspect_xlsx(er.content), ensure_ascii=False)[:24000])
 
 
 if __name__ == '__main__':
