@@ -3,7 +3,7 @@ name: Verify Management Intelligence
 on:
   push:
     paths:
-      - 'fisis_intelligence_patch.py'
+      - 'fisis_intelligence_store.py'
       - 'management_intelligence.py'
       - 'management_report_v5_runtime.py'
       - 'static/js/management_intelligence.js'
@@ -21,120 +21,121 @@ jobs:
 
       - name: Static syntax checks
         run: |
-          python -m py_compile fisis_intelligence_patch.py management_intelligence.py management_report_v5_runtime.py scheduler.py
+          python -m py_compile fisis_intelligence_store.py management_intelligence.py management_report_v5_runtime.py scheduler.py
           node --check static/js/management_intelligence.js
           node --check static/js/management_intelligence_polish.js
 
-      - name: Wait for Render management intelligence deployment
+      - name: Wait for Render separate intelligence deployment
         run: |
           set -e
           for i in $(seq 1 80); do
-            html="$(curl -fsS --max-time 90 https://sbrate.onrender.com/ || true)"
-            if printf '%s' "$html" | grep -q 'management_intelligence_polish.js?v=20260826mi3'; then
-              if curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-intelligence/insight' >/tmp/insight.json; then
-                echo 'Management intelligence deployment is live'
+            if curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/intelligence-status' >/tmp/status.json; then
+              if python - <<'PY'
+          import json, sys
+          try:
+              d=json.load(open('/tmp/status.json',encoding='utf-8'))
+          except Exception:
+              sys.exit(1)
+          sys.exit(0 if d.get('ok') and int(d.get('schema_version') or 0) >= 4 else 1)
+          PY
+              then
+                echo 'Separate management intelligence deployment is live'
                 exit 0
               fi
             fi
             echo "waiting for Render deploy... $i/80"
             sleep 10
           done
-          echo 'Management intelligence deployment did not become live in time'
+          echo 'Separate management intelligence deployment did not become live in time'
+          cat /tmp/status.json 2>/dev/null || true
           exit 1
 
-      - name: Wait for expanded FISIS cache
+      - name: Wait for lightweight intelligence cache
         run: |
           set -e
-          for i in $(seq 1 80); do
-            curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json || true
-            python - <<'PY' >/tmp/qparams.env || true
-          import json
-          try:
-              d=json.load(open('/tmp/quarters.json',encoding='utf-8'))
-              qs=d.get('quarters') or []
-              if not d.get('ok') or not qs:
-                  raise SystemExit
-              latest=qs[0]['key']
-              previous=qs[1]['key'] if len(qs)>1 else ''
-              print('LATEST='+latest)
-              print('PREVIOUS='+previous)
-          except Exception:
-              pass
-          PY
-            if [ -s /tmp/qparams.env ]; then
-              . /tmp/qparams.env
-              curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=funding&base=${LATEST}&compare=${PREVIOUS}" >/tmp/funding.json || true
-              curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=soundness&base=${LATEST}&compare=${PREVIOUS}" >/tmp/soundness.json || true
-              curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=profitability&base=${LATEST}&compare=${PREVIOUS}" >/tmp/profitability.json || true
-              if python - <<'PY'
+          for i in $(seq 1 60); do
+            curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/intelligence-status' >/tmp/status.json || true
+            if python - <<'PY'
           import json, sys
           try:
-              f=json.load(open('/tmp/funding.json',encoding='utf-8'))
-              s=json.load(open('/tmp/soundness.json',encoding='utf-8'))
-              p=json.load(open('/tmp/profitability.json',encoding='utf-8'))
+              d=json.load(open('/tmp/status.json',encoding='utf-8'))
           except Exception:
               sys.exit(1)
-          def val(d,key):
-              return (((d.get('woori') or {}).get('metrics') or {}).get(key) or {}).get('base')
           ok=(
-              f.get('ok') and f.get('ready') and int(f.get('intelligence_schema_version') or 0) >= 3 and len(f.get('rows') or []) >= 70 and
-              val(f,'deposits') is not None and val(f,'time_deposits') is not None and
-              s.get('ok') and s.get('ready') and int(s.get('intelligence_schema_version') or 0) >= 3 and len(s.get('rows') or []) >= 70 and
-              val(s,'liquidity_ratio') is not None and val(s,'delinquency_ratio') is not None and
-              p.get('ok') and p.get('ready') and int(p.get('intelligence_schema_version') or 0) >= 3 and len(p.get('rows') or []) >= 70 and
-              val(p,'roa') is not None and val(p,'roe') is not None and val(p,'operating_profit') is not None and
-              val(p,'interest_expense') is not None and val(p,'deposit_interest_expense') is not None and val(p,'time_deposit_interest_expense') is not None
+              d.get('ok') is True and d.get('ready') is True and
+              int(d.get('schema_version') or 0) >= 4 and
+              int(d.get('quarter_count') or 0) >= 2 and
+              int(d.get('bank_count') or 0) >= 70 and
+              d.get('woori_available') is True
           )
           sys.exit(0 if ok else 1)
           PY
-              then
-                echo 'Expanded FISIS management cache is ready'
-                exit 0
-              fi
+            then
+              echo 'Lightweight FISIS intelligence cache is ready'
+              cat /tmp/status.json
+              exit 0
             fi
-            echo "waiting for expanded FISIS cache... $i/80"
+            echo "waiting for lightweight cache... $i/60"
+            if [ $((i % 10)) -eq 0 ]; then cat /tmp/status.json 2>/dev/null || true; fi
             sleep 15
           done
-          echo 'Expanded FISIS cache was not ready in time'
-          echo 'Funding:'; cat /tmp/funding.json 2>/dev/null || true
-          echo 'Soundness:'; cat /tmp/soundness.json 2>/dev/null || true
-          echo 'Profitability:'; cat /tmp/profitability.json 2>/dev/null || true
+          echo 'Lightweight intelligence cache was not ready in time'
+          cat /tmp/status.json 2>/dev/null || true
           exit 1
+
+      - name: Verify stable base report is unchanged
+        run: |
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json
+          python - <<'PY' >/tmp/qparams.env
+          import json
+          d=json.load(open('/tmp/quarters.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          qs=d.get('quarters') or []
+          assert len(qs) >= 2, d
+          assert int(qs[0].get('bank_count') or 0) >= 70, qs[0]
+          print('LATEST='+qs[0]['key'])
+          print('PREVIOUS='+qs[1]['key'])
+          PY
+          . /tmp/qparams.env
+          curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${PREVIOUS}" >/tmp/base-report.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/base-report.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          rows=d.get('rows') or []
+          assert len(rows) >= 70, len(rows)
+          w=next((x for x in rows if '우리금융' in str(x.get('bank') or '')),None)
+          assert w, 'Woori missing from base report'
+          print('stable_base', {'base':d.get('base'),'compare':d.get('compare'),'rows':len(rows),'woori_rank':w.get('rank')})
+          PY
 
       - name: Verify live intelligence payloads
         run: |
+          . /tmp/qparams.env
+          for section in funding soundness profitability; do
+            curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=${section}&base=${LATEST}&compare=${PREVIOUS}" >"/tmp/${section}.json"
+          done
           python - <<'PY'
           import json
-          for name in ('funding','soundness','profitability'):
-              d=json.load(open(f'/tmp/{name}.json',encoding='utf-8'))
-              w=d.get('woori') or {}
-              print(name, {
-                  'ready': d.get('ready'),
-                  'schema': d.get('intelligence_schema_version'),
-                  'base': d.get('base'),
-                  'compare': d.get('compare'),
-                  'bank_count': d.get('bank_count'),
-                  'woori_rank': w.get('section_rank'),
-              })
-          f=json.load(open('/tmp/funding.json',encoding='utf-8'))
-          fm=(f.get('woori') or {}).get('metrics') or {}
-          print('woori_funding', {
-              'deposits': (fm.get('deposits') or {}).get('base'),
-              'time_deposits': (fm.get('time_deposits') or {}).get('base'),
-              'deposit_market_share': (fm.get('deposit_market_share') or {}).get('base'),
-              'simple_loan_deposit_ratio': (fm.get('simple_loan_deposit_ratio') or {}).get('base'),
-          })
-          p=json.load(open('/tmp/profitability.json',encoding='utf-8'))
-          pm=(p.get('woori') or {}).get('metrics') or {}
-          print('woori_profitability', {
-              'net_income': (pm.get('net_income') or {}).get('base'),
-              'operating_profit': (pm.get('operating_profit') or {}).get('base'),
-              'roa': (pm.get('roa') or {}).get('base'),
-              'roe': (pm.get('roe') or {}).get('base'),
-              'interest_expense': (pm.get('interest_expense') or {}).get('base'),
-              'deposit_interest_expense': (pm.get('deposit_interest_expense') or {}).get('base'),
-              'time_deposit_interest_expense': (pm.get('time_deposit_interest_expense') or {}).get('base'),
-          })
+          def load(name): return json.load(open(f'/tmp/{name}.json',encoding='utf-8'))
+          def val(d,key): return (((d.get('woori') or {}).get('metrics') or {}).get(key) or {}).get('base')
+          f,s,p=load('funding'),load('soundness'),load('profitability')
+          for name,d in [('funding',f),('soundness',s),('profitability',p)]:
+              assert d.get('ok') is True, (name,d)
+              assert d.get('ready') is True, (name,d)
+              assert int(d.get('intelligence_schema_version') or 0) >= 4, (name,d)
+              assert int(d.get('intelligence_quarter_count') or 0) >= 2, (name,d)
+              assert len(d.get('rows') or []) >= 70, (name,len(d.get('rows') or []))
+          assert val(f,'deposits') is not None, f
+          assert val(f,'time_deposits') is not None, f
+          assert val(s,'liquidity_ratio') is not None, s
+          assert val(s,'delinquency_ratio') is not None, s
+          assert val(p,'roa') is not None, p
+          assert val(p,'roe') is not None, p
+          assert val(p,'operating_profit') is not None, p
+          print('funding', {'base':f.get('base'),'banks':f.get('bank_count'),'deposits':val(f,'deposits'),'time_deposits':val(f,'time_deposits')})
+          print('soundness', {'bis':val(s,'bis_ratio'),'delinquency':val(s,'delinquency_ratio'),'liquidity':val(s,'liquidity_ratio')})
+          print('profitability', {'net_income':val(p,'net_income'),'operating_profit':val(p,'operating_profit'),'roa':val(p,'roa'),'roe':val(p,'roe')})
           print('current_market', f.get('current_market'))
           print('rate_history', f.get('rate_history'))
           PY
