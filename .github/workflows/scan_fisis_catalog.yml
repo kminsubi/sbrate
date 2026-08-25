@@ -26,9 +26,9 @@ jobs:
               d=json.load(open('/tmp/catalog-lite.json',encoding='utf-8'))
           except Exception:
               sys.exit(1)
-          sys.exit(0 if d.get('ok') and d.get('table_count',0) > 0 else 1)
+          sys.exit(0 if d.get('ok') and d.get('table_count',0) > 0 and int(d.get('probe_version') or 0) >= 2 else 1)
           PY
-              echo 'FISIS catalog endpoint is live'
+              echo 'FISIS catalog endpoint v2 is live'
               exit 0
             fi
             echo "waiting for Render... $i/60"
@@ -49,6 +49,7 @@ jobs:
           path=Path('data/fisis_catalog_scan.json')
           d=json.loads(path.read_text(encoding='utf-8'))
           assert d.get('ok') is True, d
+          assert int(d.get('probe_version') or 0) >= 2, d
           assert d.get('table_count',0) > 0, d
 
           def pick(row,*keys):
@@ -60,6 +61,7 @@ jobs:
 
           summary={
               'ok': True,
+              'probe_version': d.get('probe_version'),
               'source': d.get('source'),
               'sector': d.get('sector'),
               'table_count': d.get('table_count'),
@@ -103,7 +105,6 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git pull --rebase origin main
           git add -f data/fisis_catalog_scan.json data/fisis_catalog_summary.json
           if git diff --cached --quiet; then
             echo 'No catalog changes'
