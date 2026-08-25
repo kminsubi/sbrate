@@ -10,6 +10,9 @@ KEYWORDS = (
     "가계", "기업", "중소기업", "부동산", "PF", "프로젝트", "점포", "임직원",
 )
 
+# FISIS 경영정보 공식 분류: 일반현황 / 재무현황 / 주요경영지표 / 주요영업활동.
+STAT_CATEGORIES = "ABCD"
+
 
 def _rows(value):
     if value is None:
@@ -24,7 +27,6 @@ def _rows(value):
 def _clean_row(row):
     if not isinstance(row, dict):
         return {}
-    # FISIS metadata only. Do not return auth/request information even if the API changes.
     blocked = {"auth", "api_key", "apikey", "key", "token"}
     return {
         str(k): v
@@ -76,9 +78,7 @@ def scan_fisis_catalog(include_accounts=True, max_account_tables=60):
     tables = {}
     category_errors = []
 
-    # FISIS uses lrgDiv=financial sector and smlDiv=statistics category.
-    # Probe A-Z so we discover the live category set instead of hard-coding it.
-    for sml_div in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+    for sml_div in STAT_CATEGORIES:
         try:
             result = fm._api_get(
                 "statisticsListSearch",
