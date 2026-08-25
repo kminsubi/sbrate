@@ -14,8 +14,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
 from fisis_history_patch import install_fisis_history_patch
 from fisis_management import install_fisis_management
+from fisis_region_patch import install_fisis_region_patch
 from management_report import install_management_report
+from management_report_auto_update import check_latest_quarter, install_management_report_auto_update
 from management_report_v4_runtime import install_management_report_v4_runtime
+from management_report_v5_runtime import install_management_report_v5_runtime
 from rate_simulator import install_rate_simulator
 from rate_simulator_v2 import install_rate_simulator_v2
 from rate_simulator_v2_polish import install_rate_simulator_v2_polish
@@ -111,6 +114,14 @@ scheduler = BackgroundScheduler(
 )
 
 
+def run_fisis_quarter_check():
+    try:
+        result = check_latest_quarter(force_probe=False)
+        print("FISIS latest-quarter check:", result)
+    except Exception as e:
+        print("FISIS latest-quarter check error:", e)
+
+
 def start_scheduler():
 
     scheduler.add_job(
@@ -122,6 +133,16 @@ def start_scheduler():
         replace_existing=True
     )
 
+    # 로컬 직접 실행 시에도 새 분기 공시를 자동 감지한다.
+    scheduler.add_job(
+        run_fisis_quarter_check,
+        "cron",
+        hour="7,19",
+        minute=10,
+        id="fisis_quarter_check",
+        replace_existing=True
+    )
+
     scheduler.start()
 
     print()
@@ -130,6 +151,9 @@ def start_scheduler():
     )
     print(
         "업데이트 시간 : 매일 00:30 (정기예금 → ISA/퇴직연금 순차 실행)"
+    )
+    print(
+        "FISIS 최신분기 확인 : 매일 07:10 / 19:10"
     )
 
 
@@ -143,13 +167,16 @@ install_verified_visitor_tracking()
 install_visitor_stats_hooks()
 install_data_quality_endpoint()
 
-# V4 asset hook을 먼저 등록해야 Flask after_request 역순 실행에서
-# management_report가 주입한 기존 asset URL을 마지막에 v4로 교체할 수 있다.
+# after_request는 등록 역순으로 실행된다. V5를 먼저 등록해
+# management_report -> V4 -> V5 순서로 최종 HTML을 보정한다.
+install_management_report_v5_runtime()
 install_management_report_v4_runtime()
 install_management_report()
 
-# 2020Q1부터 FISIS 이력을 확장한 뒤 기존 warm-up을 실행한다.
+# FISIS: 2020Q1 이력 -> 주소기준 지역 -> 자동 최신분기 감지 순으로 설치한다.
 install_fisis_history_patch()
+install_fisis_region_patch()
+install_management_report_auto_update()
 install_fisis_management()
 
 install_rate_simulator()
