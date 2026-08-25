@@ -12,6 +12,7 @@ from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
+from fisis_catalog_probe import install_fisis_catalog_probe
 from fisis_history_patch import install_fisis_history_patch
 from fisis_management import install_fisis_management
 from fisis_quality_patch import install_fisis_quality_patch
@@ -179,6 +180,7 @@ install_fisis_history_patch()
 install_fisis_region_patch()
 install_fisis_quality_patch()
 install_management_report_auto_update()
+install_fisis_catalog_probe()
 install_fisis_management()
 
 install_rate_simulator()
