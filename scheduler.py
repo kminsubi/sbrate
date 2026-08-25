@@ -14,9 +14,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
 from fisis_catalog_probe import install_fisis_catalog_probe
 from fisis_history_patch import install_fisis_history_patch
+from fisis_intelligence_patch import install_fisis_intelligence_patch
 from fisis_management import install_fisis_management
 from fisis_quality_patch import install_fisis_quality_patch
 from fisis_region_patch import install_fisis_region_patch
+from management_intelligence import install_management_intelligence
 from management_report import install_management_report
 from management_report_auto_update import check_latest_quarter, install_management_report_auto_update
 from management_report_v4_runtime import install_management_report_v4_runtime
@@ -72,7 +74,9 @@ def run_crawler():
         print(f"[{name}] 업데이트 시작")
         print("실행 파일:", script_path)
 
-        if not os.path.exists(script_path):
+        if not os.path.exists(
+            script_path
+        ):
             print(f"[{name}] 실행 파일 없음 - 건너뜀")
             results.append((name, False, "실행 파일 없음"))
             continue
@@ -175,12 +179,14 @@ install_management_report_v5_runtime()
 install_management_report_v4_runtime()
 install_management_report()
 
-# FISIS: 2020Q1 이력 -> 권역 -> 90% 완결성 기준 -> 자동 최신분기 감지.
+# FISIS: 2020Q1 이력 -> 권역 -> 확장 경영지표 -> 90% 완결성 -> 최신분기 감지.
 install_fisis_history_patch()
 install_fisis_region_patch()
+install_fisis_intelligence_patch()
 install_fisis_quality_patch()
 install_management_report_auto_update()
 install_fisis_catalog_probe()
+install_management_intelligence()
 install_fisis_management()
 
 install_rate_simulator()
