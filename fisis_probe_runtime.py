@@ -4,13 +4,9 @@ import sys
 import requests
 
 BASE = "https://fisis.fss.or.kr/openapi"
-TIMEOUT = 25
+TIMEOUT = 20
 SAVINGS_BANK_SECTOR = "E"
 WOORI_FINANCE_CD = "0010488"
-KEYWORDS = (
-    "재무", "자산", "대출", "여신", "기업", "가계", "손익", "순이익",
-    "경영", "BIS", "자본", "건전", "연체", "고정이하", "임직원", "직원", "인원", "생산성",
-)
 VALIDATION_METRICS = {
     "total_assets": ("SE003", "A"),
     "corporate_loans": ("SE020", "A"),
@@ -26,12 +22,8 @@ VALIDATION_METRICS = {
 
 
 def _rows(payload):
-    if not isinstance(payload, dict):
-        return []
-    result = payload.get("result")
-    if not isinstance(result, dict):
-        return []
-    rows = result.get("list")
+    result = payload.get("result") if isinstance(payload, dict) else None
+    rows = result.get("list") if isinstance(result, dict) else None
     return rows if isinstance(rows, list) else []
 
 
@@ -47,15 +39,6 @@ def _get(path, key, **params):
         if err_cd not in ("000", "0", ""):
             raise RuntimeError(f"FISIS {path} err_cd={err_cd} err_msg={result.get('err_msg')}")
     return payload
-
-
-def _stat_name(row):
-    return str((row or {}).get("list_nm") or "")
-
-
-def _score_stat(row):
-    text = _stat_name(row)
-    return sum(1 for word in KEYWORDS if word.lower() in text.lower())
 
 
 def _safe_stat_result(payload):
@@ -87,74 +70,16 @@ def install_fisis_probe():
             return jsonify({"ok": False, "configured": False, "error": "FISIS_API_KEY missing"}), 503
 
         out = {"ok": True, "configured": True, "sector": SAVINGS_BANK_SECTOR}
-        errors = []
-
         try:
             companies = _rows(_get("companySearch", key, partDiv=SAVINGS_BANK_SECTOR))
             active = [r for r in companies if "[폐]" not in str(r.get("finance_nm") or "")]
             out["companies"] = {
                 "count": len(companies),
                 "active_name_count": len(active),
-                "sample_keys": sorted(companies[0].keys()) if companies else [],
-                "woori": [r for r in companies if "우리금융" in str(r.get("finance_nm") or "")],
-                "sample": companies[:5],
+                "woori": [r for r in companies if str(r.get("finance_cd") or "") == WOORI_FINANCE_CD],
             }
         except Exception as exc:
-            out["companies"] = {"count": 0}
-            errors.append(f"companies: {type(exc).__name__}: {exc}")
-
-        statistics = []
-        try:
-            statistics = _rows(_get("statisticsListSearch", key, lrgDiv=SAVINGS_BANK_SECTOR))
-            out["statistics"] = {
-                "count": len(statistics),
-                "sample_keys": sorted(statistics[0].keys()) if statistics else [],
-                "all": statistics,
-            }
-        except Exception as exc:
-            errors.append(f"statistics-all: {type(exc).__name__}: {exc}")
-            merged = {}
-            for category in ("A", "B", "C", "D", "P"):
-                try:
-                    for row in _rows(_get("statisticsListSearch", key, lrgDiv=SAVINGS_BANK_SECTOR, smlDiv=category)):
-                        list_no = str(row.get("list_no") or "")
-                        if list_no:
-                            merged[list_no] = row
-                except Exception as sub_exc:
-                    errors.append(f"statistics-{category}: {type(sub_exc).__name__}: {sub_exc}")
-            statistics = list(merged.values())
-            out["statistics"] = {
-                "count": len(statistics),
-                "sample_keys": sorted(statistics[0].keys()) if statistics else [],
-                "all": statistics,
-            }
-
-        candidates = sorted(
-            [row for row in statistics if _score_stat(row) > 0],
-            key=lambda row: (-_score_stat(row), str(row.get("list_no") or "")),
-        )[:30]
-        account_map = []
-        for row in candidates:
-            list_no = str(row.get("list_no") or "")
-            if not list_no:
-                continue
-            try:
-                accounts = _rows(_get("accountListSearch", key, listNo=list_no))
-                matching = [
-                    a for a in accounts
-                    if any(word.lower() in str(a.get("account_nm") or "").lower() for word in KEYWORDS)
-                ]
-                account_map.append({
-                    "list_no": list_no,
-                    "list_nm": row.get("list_nm"),
-                    "score": _score_stat(row),
-                    "account_count": len(accounts),
-                    "accounts": accounts,
-                    "matching_accounts": matching,
-                })
-            except Exception as exc:
-                errors.append(f"accounts-{list_no}: {type(exc).__name__}: {exc}")
-        out["candidate_accounts"] = account_map
+            out["companies"] = {"count": 0, "error": f"{type(exc).__name__}: {exc}"}
 
         validation = {}
         for metric, (list_no, account_cd) in VALIDATION_METRICS.items():
@@ -181,7 +106,6 @@ def install_fisis_probe():
                     "error": f"{type(exc).__name__}: {exc}",
                 }
         out["validation_2026q1"] = validation
-        out["errors"] = errors[:30]
         return jsonify(out)
 
     app_module._fisis_probe_installed = True
