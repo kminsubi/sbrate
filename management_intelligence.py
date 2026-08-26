@@ -7,7 +7,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 HISTORY_DIR = DATA_DIR / "history"
-INTELLIGENCE_SCHEMA_VERSION = 5
+INTELLIGENCE_SCHEMA_VERSION = 7
 
 SECTION_FIELDS = {
     "funding": [
@@ -44,6 +44,12 @@ SECTION_FIELDS = {
         ("deposit_interest_expense", "예수금 이자비용", "억원", "lower"),
         ("time_deposit_interest_expense", "정기예금 이자비용", "억원", "lower"),
     ],
+}
+
+
+PROFITABILITY_CUMULATIVE_FIELDS = {
+    "net_income", "operating_profit", "net_interest_income", "interest_income",
+    "interest_expense", "deposit_interest_expense", "time_deposit_interest_expense",
 }
 
 
@@ -249,23 +255,10 @@ def _derived_row(row, total_deposits=None, quarter=None):
     source["deposit_market_share"] = _round(deposits / total_deposits * 100, 4) if deposits is not None and total_deposits not in (None, 0) else None
     source["real_estate_corp_share"] = _round(real_estate / industry_corp * 100, 4) if real_estate is not None and industry_corp not in (None, 0) else None
 
-    # FISIS SE010 exposes the official ROA/ROE accounts but some quarterly
-    # responses leave C/D blank. In that case use the same table's average
-    # assets/equity and cumulative net income to calculate an annualised
-    # quarterly ratio. We mark the fallback so the UI can disclose it.
-    q = _quarter_no(quarter)
-    factor = (4.0 / q) if q else None
-    profit = _number(source.get("profit_net_income"))
-    if profit is None:
-        profit = _number(source.get("net_income"))
-    avg_assets = _number(source.get("avg_assets"))
-    avg_equity = _number(source.get("avg_equity"))
-    if source.get("roa") is None and profit is not None and avg_assets not in (None, 0) and factor:
-        source["roa"] = _round(profit / avg_assets * 100 * factor, 4)
-        source["roa_derived"] = True
-    if source.get("roe") is None and profit is not None and avg_equity not in (None, 0) and factor:
-        source["roe"] = _round(profit / avg_equity * 100 * factor, 4)
-        source["roe_derived"] = True
+    source["roa"] = None
+    source["roe"] = None
+    source.pop("roa_derived", None)
+    source.pop("roe_derived", None)
     return source
 
 
@@ -331,6 +324,12 @@ def build_intelligence(section="funding", base=None, compare=None):
         compare_row = _derived_row(compare_raw, compare_total_deposits, compare) if compare_raw else {}
         yoy_row = _derived_row(yoy_raw, yoy_total_deposits, yoy_key) if yoy_raw else {}
         metrics = {field[0]: _metric_pack(base_row, compare_row, yoy_row, field[0]) for field in SECTION_FIELDS[section]}
+        if section == "profitability" and _quarter_no(base) != _quarter_no(compare):
+            for metric_key in PROFITABILITY_CUMULATIVE_FIELDS:
+                if metric_key in metrics:
+                    metrics[metric_key]["delta"] = None
+                    metrics[metric_key]["comparable"] = False
+                    metrics[metric_key]["delta_reason"] = "누적기간이 다른 손익 수치는 증감 비교하지 않습니다."
         base_rows.append({
             "bank": base_row.get("bank"), "finance_cd": base_row.get("finance_cd"),
             "region": base_row.get("region"), "asset_rank": asset_ranks.get(key_id),
@@ -365,7 +364,7 @@ def build_intelligence(section="funding", base=None, compare=None):
             item["section_rank"] = item.get("asset_rank")
 
     woori = next((row for row in base_rows if row.get("is_woori")), None)
-    anchor = {"funding": "deposits", "soundness": "liquidity_ratio", "profitability": "roa"}[section]
+    anchor = {"funding": "deposits", "soundness": "liquidity_ratio", "profitability": "operating_profit"}[section]
     ready = (
         int(store.get("intelligence_schema_version") or 0) >= INTELLIGENCE_SCHEMA_VERSION
         and store.get("intelligence_target_latest") == base
@@ -384,6 +383,7 @@ def build_intelligence(section="funding", base=None, compare=None):
         "yoy_compare": yoy_key if yoy_key in quarters else None,
         "yoy_compare_label": yoy_meta.get("label") if yoy_key in quarters else None,
         "bank_count": len(base_rows), "fields": _fields(section), "woori": woori, "rows": base_rows,
+        "comparison_period_compatible": section != "profitability" or _quarter_no(base) == _quarter_no(compare),
         "current_market": _current_rate_market() if section == "funding" else None,
         "rate_history": _rate_history_for_quarter(base) if section == "funding" else None,
         "notes": {
@@ -391,7 +391,7 @@ def build_intelligence(section="funding", base=None, compare=None):
             "fisis_basis": "FISIS 수치는 선택한 분기 말 기준이며 손익 지표는 공시 누적값입니다.",
             "loan_deposit_ratio": "단순 예대율은 총대출/총예수금으로 계산한 참고지표이며 규제상 예대율과 다를 수 있습니다.",
             "profitability_compare": "수익성 단일분기 해석은 전년동기 비교를 우선 사용합니다.",
-            "roa_roe_basis": "FISIS 분기 ROA/ROE 원계정이 공란이면 같은 수익성 표의 평균자산·평균자본과 누적 순이익으로 연환산한 참고값을 표시합니다.",
+            "roa_roe_basis": "FISIS 저축은행 수익성(SE010)은 분기(Q) 조회를 지원하지 않아 ROA·ROE를 추정하지 않고 -로 표시합니다.",
             "cache_basis": "확장 경영지표는 기존 경영현황 캐시와 분리된 최근분기 전용 캐시를 사용합니다.",
         },
     }

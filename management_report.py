@@ -35,6 +35,15 @@ def _load_store():
         return {}
 
 
+def _valid_quarter(value):
+    return bool(re.fullmatch(r"\d{4}Q[1-4]", str(value or "")))
+
+
+def _quarter_no(value):
+    m = re.fullmatch(r"\d{4}Q([1-4])", str(value or ""))
+    return int(m.group(1)) if m else None
+
+
 def _quarter_sort_key(value):
     m = re.fullmatch(r"(\d{4})Q([1-4])", str(value or ""))
     if not m:
@@ -112,10 +121,13 @@ def _comparison_payload(base_quarter, compare_quarter):
         for field, label, unit, kind in FIELDS:
             base_value = _num(row.get(field))
             compare_value = _num(old.get(field))
-            delta = base_value - compare_value if base_value is not None and compare_value is not None else None
+            comparable = not (field == "net_income" and _quarter_no(base_quarter) != _quarter_no(compare_quarter))
+            delta = base_value - compare_value if comparable and base_value is not None and compare_value is not None else None
             metrics[field] = {
                 "label": label, "unit": unit, "kind": kind,
                 "base": base_value, "compare": compare_value, "delta": delta,
+                "comparable": comparable,
+                "delta_reason": None if comparable else "누적기간이 다른 손익 수치는 증감 비교하지 않습니다.",
             }
         out.append({
             "rank": b_rank,
@@ -137,6 +149,7 @@ def _comparison_payload(base_quarter, compare_quarter):
         "compare_source_url": compare_meta.get("source_url"),
         "source_name": "금융감독원 금융통계정보시스템(FISIS)",
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "cumulative_comparison_note": "당기순이익 증감은 누적기간이 같은 동일 분기번호끼리만 계산합니다.",
         "fields": [
             {"key": field, "label": label, "unit": unit, "kind": kind}
             for field, label, unit, kind in FIELDS
@@ -187,7 +200,7 @@ def _xlsx_bytes(payload):
         rows.append((row, item.get("is_woori")))
 
     title = f"SBRate 경영현황 비교 - {payload['base_label']} vs {payload['compare_label']}"
-    subtitle = "출처: 금융감독원 금융통계정보시스템(FISIS) | 금액: 억원 / 비율 증감: %p"
+    subtitle = "출처: 금융감독원 금융통계정보시스템(FISIS) | 금액: 억원 / 비율 증감: %p | 누적 손익 증감은 동일 분기번호 비교 시만 표시"
     xml_rows = []
     max_col = len(headers)
     xml_rows.append(f'<row r="1" ht="28" customHeight="1">{_xml_cell(1,1,title,1)}</row>')
@@ -318,14 +331,20 @@ def install_management_report():
         store = _load_store()
         quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
         items = []
+        active_count = int(store.get("active_company_count") or 0)
         for key in sorted(quarters.keys(), key=_quarter_sort_key, reverse=True):
             meta = quarters.get(key) if isinstance(quarters.get(key), dict) else {}
             rows = meta.get("banks") if isinstance(meta.get("banks"), list) else []
+            asset_count = int(meta.get("asset_bank_count") or 0)
+            if not asset_count:
+                asset_count = sum(1 for row in rows if isinstance(row, dict) and _num(row.get("total_assets")) is not None)
             items.append({
                 "key": key,
                 "label": meta.get("label") or _quarter_label(key),
                 "as_of": meta.get("as_of"),
                 "bank_count": len(rows),
+                "asset_bank_count": asset_count,
+                "asset_coverage_ratio": round(asset_count / active_count, 4) if active_count else None,
                 "source_url": meta.get("source_url"),
             })
         return jsonify({
@@ -339,6 +358,10 @@ def install_management_report():
     def management_report_data():
         base = str(request.args.get("base") or "").strip()
         compare = str(request.args.get("compare") or "").strip()
+        if base and not _valid_quarter(base):
+            return jsonify({"ok": False, "error": "기준분기 형식이 올바르지 않습니다."}), 400
+        if compare and not _valid_quarter(compare):
+            return jsonify({"ok": False, "error": "비교분기 형식이 올바르지 않습니다."}), 400
         store = _load_store()
         available = sorted(list((store.get("quarters") or {}).keys()), key=_quarter_sort_key, reverse=True)
         if not base and available:
@@ -347,6 +370,8 @@ def install_management_report():
             compare = available[1]
         if not base or not compare:
             return jsonify({"ok": False, "error": "비교 가능한 분기 데이터가 아직 없습니다."}), 404
+        if base == compare:
+            return jsonify({"ok": False, "error": "기준분기와 비교분기는 서로 달라야 합니다."}), 400
         payload, error = _comparison_payload(base, compare)
         if error:
             return jsonify({"ok": False, "error": error}), 404
@@ -356,6 +381,20 @@ def install_management_report():
     def management_report_export():
         base = str(request.args.get("base") or "").strip()
         compare = str(request.args.get("compare") or "").strip()
+        if base and not _valid_quarter(base):
+            return jsonify({"ok": False, "error": "기준분기 형식이 올바르지 않습니다."}), 400
+        if compare and not _valid_quarter(compare):
+            return jsonify({"ok": False, "error": "비교분기 형식이 올바르지 않습니다."}), 400
+        store = _load_store()
+        available = sorted(list((store.get("quarters") or {}).keys()), key=_quarter_sort_key, reverse=True)
+        if not base and available:
+            base = available[0]
+        if not compare and len(available) > 1:
+            compare = available[1]
+        if not base or not compare:
+            return jsonify({"ok": False, "error": "비교 가능한 분기 데이터가 아직 없습니다."}), 404
+        if base == compare:
+            return jsonify({"ok": False, "error": "기준분기와 비교분기는 서로 달라야 합니다."}), 400
         payload, error = _comparison_payload(base, compare)
         if error:
             return jsonify({"ok": False, "error": error}), 404

@@ -10,7 +10,6 @@ from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from data_quality_runtime import install_data_quality_endpoint
-from fisis_catalog_probe import install_fisis_catalog_probe
 from fisis_history_patch import install_fisis_history_patch
 import fisis_intelligence_store
 from fisis_profitability_period_patch import install_fisis_profitability_period_patch
@@ -127,7 +126,6 @@ install_fisis_history_patch()
 install_fisis_region_patch()
 install_fisis_quality_patch()
 install_management_report_auto_update()
-install_fisis_catalog_probe()
 
 # 확장 지표는 기존 경영현황 캐시와 분리한다. SE010 수익성 표는
 # FISIS가 term=Q를 지원하지 않으므로 분기 화면에서 ROA/ROE를 추정하지

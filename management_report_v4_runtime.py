@@ -42,16 +42,16 @@ def install_management_report_v4_runtime():
                 html = response.get_data(as_text=True)
                 html = html.replace(
                     "/static/css/management_report.css?v=20260825v2",
-                    "/static/css/management_report.css?v=20260825v4",
+                    "/static/css/management_report.css?v=20260826v8",
                 )
                 html = html.replace(
                     "/static/js/management_report.js?v=20260825v2",
-                    "/static/js/management_report.js?v=20260825v4",
+                    "/static/js/management_report.js?v=20260826v8",
                 )
                 if "management_report_v4.css" not in html:
                     html = html.replace(
                         "</head>",
-                        '<link rel="stylesheet" href="/static/css/management_report_v4.css?v=20260825v4">\n</head>',
+                        '<link rel="stylesheet" href="/static/css/management_report_v4.css?v=20260826v8">\n</head>',
                         1,
                     )
                 response.set_data(html)

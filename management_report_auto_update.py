@@ -120,7 +120,7 @@ def _acquire_probe_lock(fm):
         return token if str(result or "").upper() == "OK" else None
     except Exception as exc:
         print("FISIS latest-quarter distributed lock error:", exc)
-        return token
+        return None
 
 
 def _release_probe_lock(fm, token):
@@ -154,12 +154,13 @@ def _probe_worker(base_result, target, target_month, lock_token=None):
     result = dict(base_result)
     try:
         companies = fm._companies()
-        threshold = max(20, math.ceil(len(companies) * MIN_QUARTER_COVERAGE))
+        coverage_ratio = float(getattr(fm, "MIN_QUARTER_COVERAGE", MIN_QUARTER_COVERAGE))
+        threshold = max(20, math.ceil(len(companies) * coverage_ratio))
         stored_count = int(result.get("stored_asset_count") or 0)
         result.update({
             "probe_required": True,
             "company_count": len(companies),
-            "coverage_ratio_required": MIN_QUARTER_COVERAGE,
+            "coverage_ratio_required": coverage_ratio,
             "coverage_threshold": threshold,
             "published_asset_count": 0,
         })
@@ -239,7 +240,7 @@ def check_latest_quarter(force_probe=False, wait=False):
         "current_latest": current_latest or None,
         "target_quarter": target,
         "target_as_of": target_as_of,
-        "coverage_ratio_required": MIN_QUARTER_COVERAGE,
+        "coverage_ratio_required": float(getattr(fm, "MIN_QUARTER_COVERAGE", MIN_QUARTER_COVERAGE)),
         "stored_asset_count": stored_target_count,
         "active_company_count": active_count,
         "probe_required": False,
@@ -341,13 +342,12 @@ def install_management_report_auto_update():
         return True
 
     flask_app = app_module.app
-    from flask import jsonify, request
+    from flask import jsonify
 
     @flask_app.get("/api/management-report/check-latest")
     def management_report_check_latest():
-        force_probe = str(request.args.get("force") or "").strip() == "1"
         try:
-            return jsonify(check_latest_quarter(force_probe=force_probe, wait=False))
+            return jsonify(check_latest_quarter(force_probe=False, wait=False))
         except Exception as exc:
             return jsonify({"ok": False, "error": str(exc)}), 500
 

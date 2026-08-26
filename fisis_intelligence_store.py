@@ -14,7 +14,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
 
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 CACHE_KEY = "sbrate:management:intelligence:v1"
 CACHE_MAX_AGE = timedelta(days=14)
 MAX_QUARTERS = 6
@@ -25,10 +25,6 @@ TABLES = {
     "SE028": {"deposits": "A1", "time_deposits": "A14"},
     "SE031": {"personal_deposits": "A", "corporate_deposits": "B", "sole_prop_deposits": "B1"},
     "SE006": {"operating_profit": "C"},
-    "SE010": {
-        "avg_assets": "A", "avg_equity": "B", "roa": "C",
-        "profit_net_income": "C1", "roe": "D",
-    },
     "SE014": {
         "net_interest_income": "A", "interest_income": "A1", "loan_interest_income": "A13",
         "interest_expense": "A2", "deposit_interest_expense": "A21",
@@ -42,12 +38,8 @@ TABLES = {
     "SE036": {"industry_corporate_loans": "A", "real_estate_industry_loans": "A6"},
 }
 
-# Schema 4 already proved these core tables for all 79 banks.  Schema 6 can
-# therefore migrate by reusing them and querying only the two corrected tables.
-UPGRADE_TABLES = {
-    "SE010": TABLES["SE010"],
-    "SE014": TABLES["SE014"],
-}
+# Schema 7 removes unsupported quarterly SE010 entirely.
+UPGRADE_TABLES = {}
 
 AMOUNT_METRICS = {
     "deposits", "time_deposits", "personal_deposits", "corporate_deposits", "sole_prop_deposits",
@@ -233,6 +225,8 @@ def _normalize_cached_amount(value):
 
 def _normalize_seed_row(row):
     result = dict(row or {})
+    for unsupported in ("avg_assets", "avg_equity", "profit_net_income", "roa", "roe"):
+        result.pop(unsupported, None)
     for metric in AMOUNT_METRICS:
         if metric in result and result.get(metric) is not None:
             result[metric] = _normalize_cached_amount(result.get(metric))

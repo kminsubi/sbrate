@@ -192,7 +192,15 @@ def install_fisis_region_patch():
             @flask_app.get("/api/management-report/region-diagnostic")
             def management_region_diagnostic():
                 try:
-                    companies = fm._companies()
+                    store = fm.get_management_store(trigger_refresh=False) or {}
+                    quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
+                    latest_key = max(quarters.keys(), default="")
+                    latest = quarters.get(latest_key) if isinstance(quarters.get(latest_key), dict) else {}
+                    cached_rows = latest.get("banks") if isinstance(latest.get("banks"), list) else []
+                    companies = [
+                        {"finance_nm": row.get("bank"), "address": "", "region": row.get("region")}
+                        for row in cached_rows if isinstance(row, dict)
+                    ]
                     with_address = [x for x in companies if x.get("address")]
                     with_region = [x for x in companies if x.get("region") and x.get("region") != "기타"]
                     unmatched = [

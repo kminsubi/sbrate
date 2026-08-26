@@ -24,7 +24,8 @@ def install_fisis_quality_patch():
             return store
 
         active_count = int(store.get("active_company_count") or 0)
-        threshold = max(20, math.ceil(active_count * MIN_QUARTER_COVERAGE))
+        coverage_ratio = float(getattr(fm, "MIN_QUARTER_COVERAGE", MIN_QUARTER_COVERAGE))
+        threshold = max(20, math.ceil(active_count * coverage_ratio))
         quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
         removed = []
 
@@ -48,7 +49,7 @@ def install_fisis_quality_patch():
 
         store["quarters"] = quarters
         store["quality_schema_version"] = 1
-        store["minimum_quarter_coverage_ratio"] = MIN_QUARTER_COVERAGE
+        store["minimum_quarter_coverage_ratio"] = coverage_ratio
         store["minimum_quarter_asset_count"] = threshold
         store["withheld_partial_quarters"] = removed[-12:]
         return store

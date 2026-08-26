@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import re
 import threading
@@ -18,6 +19,7 @@ FISIS_SOURCE_NAME = "금융감독원 금융통계정보시스템(FISIS)"
 FISIS_SOURCE_URL = "https://fisis.fss.or.kr/"
 CACHE_KEY = "sbrate:management:fisis:v1"
 CACHE_MAX_AGE = timedelta(days=14)
+MIN_QUARTER_COVERAGE = 0.90
 KST = timezone(timedelta(hours=9))
 
 # One FISIS table call returns every account in that table across the requested
@@ -448,13 +450,14 @@ def _build_store():
     # Only expose quarters with broad industry coverage. This prevents a newly
     # opening reporting quarter from becoming the default while most banks are
     # still unpublished.
-    minimum_assets = max(20, int(len(companies) * 0.65))
+    minimum_assets = max(20, math.ceil(len(companies) * MIN_QUARTER_COVERAGE))
     quarters = {}
     for key, rows in gathered.items():
         valid_assets = [row for row in rows if row.get("total_assets") is not None]
         if len(valid_assets) < minimum_assets:
             continue
         rows.sort(key=lambda row: (-(row.get("total_assets") or -1), str(row.get("bank") or "")))
+        valid_assets = [row for row in rows if row.get("total_assets") is not None]
         for idx, row in enumerate(valid_assets, 1):
             row["asset_rank"] = idx
         quarters[key] = {
@@ -476,6 +479,8 @@ def _build_store():
         "updated_at": _now().strftime("%Y-%m-%d %H:%M:%S"),
         "quarter_range": {"start": start_month, "end": end_month},
         "active_company_count": len(companies),
+        "minimum_quarter_coverage_ratio": MIN_QUARTER_COVERAGE,
+        "minimum_quarter_asset_count": minimum_assets,
         "quarters": quarters,
         "last_errors": errors[-50:],
         "note": "당기순이익은 FISIS 공시 기준 누적값입니다.",

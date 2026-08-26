@@ -13,7 +13,8 @@
 
   const moneyFields = new Set(['total_assets','corporate_loans','household_loans','total_loans','net_income']);
   const ratioFields = new Set(['bis_ratio','npl_ratio','delinquency_ratio']);
-  const yearEndDeltaFields = new Set(['total_assets','total_loans','net_income']);
+  const yearEndDeltaFields = new Set(['total_assets','total_loans']);
+  const yoyDeltaFields = new Set(['net_income']);
   const preferredFieldOrder = [
     'total_assets',
     'household_loans',
@@ -31,6 +32,15 @@
     if (cls) node.className = cls;
     if (text !== undefined) node.textContent = text;
     return node;
+  }
+
+  function esc(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   function fmt(value, fieldKey) {
@@ -117,6 +127,11 @@
   function previousYearEndQuarter(key) {
     const parts = quarterParts(key);
     return parts ? `${parts.year - 1}Q4` : '';
+  }
+
+  function previousYearSameQuarter(key) {
+    const parts = quarterParts(key);
+    return parts ? `${parts.year - 1}Q${parts.quarter}` : '';
   }
 
   function hasQuarter(key) {
@@ -295,7 +310,7 @@
             <div class="mr-legend">
               <span class="mr-legend-good">● 증가 +</span>
               <span class="mr-legend-bad">● 감소 ▲</span>
-              <span>※ SBRate 공통 증감 표기 · 연체율·고정이하여신비율은 하락 시 건전성 개선 · 당기순이익은 공시 누적값</span>
+              <span>※ SBRate 공통 증감 표기 · 연체율·고정이하여신비율은 하락 시 건전성 개선 · 당기순이익은 공시 누적값이며 동일 누적기간만 증감 비교</span>
             </div>
           </div>
           <div class="mr-table-wrap">
@@ -437,9 +452,11 @@
 
     const prevKeyCandidate = calendarPreviousQuarter(selected);
     const yearEndKeyCandidate = previousYearEndQuarter(selected);
+    const yoyKeyCandidate = previousYearSameQuarter(selected);
     const prevKey = hasQuarter(prevKeyCandidate) ? prevKeyCandidate : '';
     const yearEndKey = hasQuarter(yearEndKeyCandidate) ? yearEndKeyCandidate : '';
-    const primaryCompare = prevKey || yearEndKey || anyOtherQuarter(selected);
+    const yoyKey = hasQuarter(yoyKeyCandidate) ? yoyKeyCandidate : '';
+    const primaryCompare = prevKey || yearEndKey || yoyKey || anyOtherQuarter(selected);
 
     if (!primaryCompare) {
       status.textContent = '분기현황을 조회할 수 있는 비교 기준 데이터가 없습니다.';
@@ -453,6 +470,7 @@
       const currentData = await fetchJson(`/api/management-report?base=${encodeURIComponent(selected)}&compare=${encodeURIComponent(primaryCompare)}`);
       let prevData = null;
       let yearEndData = null;
+      let yoyData = null;
 
       if (prevKey) {
         prevData = primaryCompare === prevKey
@@ -466,9 +484,16 @@
         else yearEndData = await fetchJson(`/api/management-report?base=${encodeURIComponent(selected)}&compare=${encodeURIComponent(yearEndKey)}`);
       }
 
+      if (yoyKey) {
+        if (primaryCompare === yoyKey) yoyData = currentData;
+        else if (prevKey === yoyKey && prevData) yoyData = prevData;
+        else if (yearEndKey === yoyKey && yearEndData) yoyData = yearEndData;
+        else yoyData = await fetchJson(`/api/management-report?base=${encodeURIComponent(selected)}&compare=${encodeURIComponent(yoyKey)}`);
+      }
+
       state.payload = currentData;
-      renderSingleSummary(currentData, prevData, yearEndData);
-      renderSingleTable(currentData, prevData, yearEndData);
+      renderSingleSummary(currentData, prevData, yearEndData, yoyData);
+      renderSingleTable(currentData, prevData, yearEndData, yoyData);
       document.getElementById('mr-source-line').textContent = `${currentData.source_name} · ${currentData.base_label}`;
       document.getElementById('mr-table-title').textContent = `${currentData.base_label} 경영현황`;
       status.textContent = `${currentData.rows.length}개 저축은행 · ${currentData.base_label} 총자산 순 정렬`;
@@ -509,13 +534,13 @@
       summaryCard('총자산 증감', deltaWithUnit(totalAssets.delta,'total_assets'), `기준 ${valueWithUnit(totalAssets.base,'total_assets')}`, '', deltaClass(totalAssets.delta)),
       summaryCard('가계대출 증감', deltaWithUnit(household.delta,'household_loans'), `기준 ${valueWithUnit(household.base,'household_loans')}`, '', deltaClass(household.delta)),
       summaryCard('총대출 증감', deltaWithUnit(totalLoans.delta,'total_loans'), `기준 ${valueWithUnit(totalLoans.base,'total_loans')}`, '', deltaClass(totalLoans.delta)),
-      summaryCard('당기순이익 증감', deltaWithUnit(netIncome.delta,'net_income'), `기준 ${valueWithUnit(netIncome.base,'net_income')}`, '', deltaClass(netIncome.delta)),
+      summaryCard('당기순이익 증감', netIncome.comparable === false ? '기간상이' : deltaWithUnit(netIncome.delta,'net_income'), `기준 ${valueWithUnit(netIncome.base,'net_income')}`, '', deltaClass(netIncome.delta)),
       summaryCard('BIS 증감', deltaWithUnit(bis.delta,'bis_ratio'), `기준 ${valueWithUnit(bis.base,'bis_ratio')}`, '', deltaClass(bis.delta)),
       summaryCard('연체율 증감', deltaWithUnit(delinquency.delta,'delinquency_ratio'), `기준 ${valueWithUnit(delinquency.base,'delinquency_ratio')}`, '', deltaClass(delinquency.delta)),
     ].join('');
   }
 
-  function renderSingleSummary(data, prevData, yearEndData) {
+  function renderSingleSummary(data, prevData, yearEndData, yoyData) {
     const root = document.getElementById('mr-summary');
     const w = data.woori;
     if (!w) {
@@ -525,9 +550,11 @@
 
     const prevW = prevData?.woori || null;
     const yearW = yearEndData?.woori || null;
+    const yoyW = yoyData?.woori || null;
     const m = w.metrics || {};
     const pm = prevW?.metrics || {};
     const ym = yearW?.metrics || {};
+    const yoym = yoyW?.metrics || {};
     const rankDelta = prevW ? prevW.rank_change : null;
 
     root.innerHTML = [
@@ -557,7 +584,7 @@
       summaryCard(
         '당기순이익',
         valueWithUnit(m.net_income?.base,'net_income'),
-        yearW ? compareNote('전년말比', ym.net_income?.delta, 'net_income') : '전년말比 -'
+        yoyW ? compareNote('전년동기比', yoym.net_income?.delta, 'net_income') : '전년동기比 -'
       ),
       summaryCard(
         'BIS비율',
@@ -596,13 +623,13 @@
       body += `<tr class="${item.is_woori ? 'mr-woori-row' : ''}">`;
       body += `<td class="mr-sticky mr-col-rank">${item.rank || '-'}</td>`;
       body += `<td class="mr-sticky mr-col-rankchg ${rankDeltaClass(item.rank_change)}">${rankDeltaText(item.rank_change)}</td>`;
-      body += `<td class="mr-sticky mr-col-bank">${item.bank}</td>`;
-      body += `<td class="mr-sticky mr-col-region">${item.region || '-'}</td>`;
+      body += `<td class="mr-sticky mr-col-bank">${esc(item.bank)}</td>`;
+      body += `<td class="mr-sticky mr-col-region">${esc(item.region || '-')}</td>`;
       fields.forEach(field => {
         const metric = item.metrics[field.key] || {};
         body += `<td>${fmt(metric.base,field.key)}</td>`;
         body += `<td class="mr-compare-cell">${fmt(metric.compare,field.key)}</td>`;
-        body += `<td class="${deltaClass(metric.delta)}">${deltaText(metric.delta,field.key)}</td>`;
+        body += `<td class="${deltaClass(metric.delta)}">${metric.comparable === false ? '기간상이' : deltaText(metric.delta,field.key)}</td>`;
       });
       body += '</tr>';
     });
@@ -610,13 +637,14 @@
     table.innerHTML = top + body;
   }
 
-  function renderSingleTable(data, prevData, yearEndData) {
+  function renderSingleTable(data, prevData, yearEndData, yoyData) {
     const table = document.getElementById('mr-table');
     table.classList.add('is-single');
     table.classList.remove('is-compare');
     const fields = orderedFields(data.fields);
     const prevRows = rowMap(prevData);
     const yearRows = rowMap(yearEndData);
+    const yoyRows = rowMap(yoyData);
 
     let top = '<thead><tr>' +
       '<th rowspan="2" class="mr-sticky mr-col-rank">순위</th>' +
@@ -625,7 +653,7 @@
       '<th rowspan="2" class="mr-sticky mr-col-region">지역</th>';
 
     fields.forEach(field => {
-      if (yearEndDeltaFields.has(field.key)) {
+      if (yearEndDeltaFields.has(field.key) || yoyDeltaFields.has(field.key)) {
         top += `<th colspan="2" class="mr-group-head">${field.label}<small>${field.unit}</small></th>`;
       } else {
         top += `<th rowspan="2" class="mr-group-head">${field.label}<small>${field.unit}</small></th>`;
@@ -634,8 +662,9 @@
 
     top += '</tr><tr>';
     fields.forEach(field => {
-      if (yearEndDeltaFields.has(field.key)) {
-        top += `<th>${data.base_label.replace('년 ','-')}</th><th>전년말比</th>`;
+      if (yearEndDeltaFields.has(field.key) || yoyDeltaFields.has(field.key)) {
+        const compareHead = yearEndDeltaFields.has(field.key) ? '전년말比' : '전년동기比';
+        top += `<th>${data.base_label.replace('년 ','-')}</th><th>${compareHead}</th>`;
       }
     });
     top += '</tr></thead>';
@@ -644,13 +673,14 @@
     (data.rows || []).forEach(item => {
       const prevItem = prevRows.get(String(item.bank || ''));
       const yearItem = yearRows.get(String(item.bank || ''));
+      const yoyItem = yoyRows.get(String(item.bank || ''));
       const rankChange = prevItem ? prevItem.rank_change : null;
 
       body += `<tr class="${item.is_woori ? 'mr-woori-row' : ''}">`;
       body += `<td class="mr-sticky mr-col-rank">${item.rank || '-'}</td>`;
       body += `<td class="mr-sticky mr-col-rankchg ${rankDeltaClass(rankChange)}">${rankDeltaText(rankChange)}</td>`;
-      body += `<td class="mr-sticky mr-col-bank">${item.bank}</td>`;
-      body += `<td class="mr-sticky mr-col-region">${item.region || '-'}</td>`;
+      body += `<td class="mr-sticky mr-col-bank">${esc(item.bank)}</td>`;
+      body += `<td class="mr-sticky mr-col-region">${esc(item.region || '-')}</td>`;
 
       fields.forEach(field => {
         const metric = item.metrics[field.key] || {};
@@ -658,6 +688,9 @@
         if (yearEndDeltaFields.has(field.key)) {
           const yearMetric = yearItem?.metrics?.[field.key] || {};
           body += `<td class="${deltaClass(yearMetric.delta)}">${deltaText(yearMetric.delta,field.key)}</td>`;
+        } else if (yoyDeltaFields.has(field.key)) {
+          const yoyMetric = yoyItem?.metrics?.[field.key] || {};
+          body += `<td class="${deltaClass(yoyMetric.delta)}">${deltaText(yoyMetric.delta,field.key)}</td>`;
         }
       });
       body += '</tr>';

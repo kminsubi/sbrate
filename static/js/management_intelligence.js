@@ -89,7 +89,7 @@
     return `
       <div class="mi-warmup">
         <strong>FISIS 확장 경영지표를 최초 수집 중입니다.</strong><br>
-        총예수금·정기예금·유동성·ROA/ROE 등 신규 지표를 79개 저축은행 기준으로 채우고 있습니다.<br>
+        총예수금·정기예금·유동성·손익 등 신규 지표를 저축은행 업권 기준으로 채우고 있습니다.<br>
         기존 종합현황은 정상 이용할 수 있으며, 수집이 끝나면 이 화면도 자동으로 표시됩니다.<br>
         <span style="font-size:10px;color:#8b98aa">현재 캐시 갱신: ${esc(data?.updated_at || '-')}</span>
       </div>`;
@@ -221,7 +221,7 @@
     }).join('');
     return `<div class="mi-table-wrap"><table class="mi-table"><thead><tr>
       <th>총자산순위</th><th>저축은행</th><th>지역</th><th>BIS</th><th>${dLabel}</th><th>연체율</th><th>${dLabel}</th>
-      <th>고정이하여신</th><th>유동성비율</th><th>NPL커버리지</th><th>부동산업 기업대출비중</th>
+      <th>고정이하여신비율</th><th>유동성비율</th><th>NPL커버리지</th><th>부동산업 기업대출비중</th>
     </tr></thead><tbody>${body}</tbody></table></div>`;
   }
 
@@ -305,7 +305,7 @@
         ${card('예수금 이자비용', valueText(de.base, '억원'), `${label} ${deltaHtml(pickDelta(de), '억원')}`)}
         ${card('정기예금 이자비용', valueText(tde.base, '억원'), `${label} ${deltaHtml(pickDelta(tde), '억원')}`)}
       </div>
-      <div class="mi-note">손익은 FISIS 공시 누적값입니다. 단일분기 화면에서는 누적기간이 다른 전분기와 직접 비교하지 않고 전년동기比를 우선 표시합니다.</div>`
+      <div class="mi-note">손익은 FISIS 공시 누적값입니다. 단일분기 화면에서는 누적기간이 다른 전분기와 직접 비교하지 않고 전년동기比를 우선 표시합니다.<br>${esc(data.notes?.roa_roe_basis || '')}</div>`
     ) + block('업권 수익성 현황', `${data.bank_count || 0}개사`, profitabilityTable(data));
   }
 
