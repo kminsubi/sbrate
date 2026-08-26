@@ -34,7 +34,7 @@ jobs:
             region="$(curl -fsS --max-time 90 https://sbrate.onrender.com/api/management-report/region-diagnostic || true)"
             printf '%s' "$region" > /tmp/region.json
             if echo "$html" | grep -q '20260826v7' \
-              && echo "$html" | grep -q '20260826mi4' \
+              && echo "$html" | grep -q '20260826mi5' \
               && python - <<'PY'
           import json, sys
           try:
