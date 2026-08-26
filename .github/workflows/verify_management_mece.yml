@@ -67,8 +67,8 @@ jobs:
           ready=0
           for i in $(seq 1 90); do
             html="$(curl -fsS --max-time 90 'https://sbrate.onrender.com/' || true)"
-            if echo "$html" | grep -q 'management_report.js?v=20260826v8' \
-              && echo "$html" | grep -q '20260826mi5'; then
+            if [[ "$html" == *"management_report.js?v=20260826v8"* \
+              && "$html" == *"20260826mi5"* ]]; then
               ready=1
               printf '%s' "$html" >/tmp/root.html
               break
