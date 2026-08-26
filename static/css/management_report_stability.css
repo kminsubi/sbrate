@@ -1,5 +1,69 @@
 /* SBRate management report stability patch - 2026-08-26 */
 
+/* =========================================================
+   DESKTOP DASHBOARD HEADER
+   - keep CI/title visible while scrolling
+   - keep management/error actions near the product tabs
+   - restore readable live clock size
+========================================================= */
+@media(min-width:901px){
+  body > header{
+    position:sticky!important;
+    top:0!important;
+    z-index:220!important;
+    justify-content:flex-start!important;
+    column-gap:0!important;
+    background:rgba(255,255,255,.97)!important;
+    backdrop-filter:blur(12px)!important;
+    -webkit-backdrop-filter:blur(12px)!important;
+    box-shadow:0 2px 14px rgba(15,23,42,.055)!important;
+    isolation:isolate!important;
+  }
+
+  body > header > div:first-child{
+    flex:0 0 auto!important;
+    min-width:0!important;
+  }
+
+  body > header > div:last-child{
+    flex:0 1 auto!important;
+    min-width:0!important;
+    margin-left:18px!important;
+    justify-content:flex-start!important;
+    gap:8px!important;
+  }
+
+  #header-current-datetime{
+    display:block!important;
+    flex:0 0 auto!important;
+    min-width:160px!important;
+    font-size:12px!important;
+    line-height:1.25!important;
+    font-weight:500!important;
+    color:#64748b!important;
+    font-variant-numeric:tabular-nums!important;
+    white-space:nowrap!important;
+  }
+
+  #management-report-open,
+  #error-report-open{
+    flex:0 0 auto!important;
+  }
+}
+
+@media(min-width:901px) and (max-width:1800px){
+  #dashboard-market-label{display:none!important;}
+  body > header > div:last-child{margin-left:14px!important;gap:7px!important;}
+}
+
+@media(min-width:901px) and (max-width:1500px){
+  body > header{padding-left:14px!important;padding-right:14px!important;}
+  body > header > div:last-child{margin-left:10px!important;gap:6px!important;}
+  #header-current-datetime{font-size:12px!important;min-width:154px!important;}
+  #management-report-open,
+  #error-report-open{padding-left:9px!important;padding-right:9px!important;}
+}
+
 /* Desktop/tablet: report shell may scroll vertically if content exceeds viewport. */
 #management-report-modal .mr-shell{
   overflow-y:auto!important;
