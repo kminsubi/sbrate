@@ -38,9 +38,9 @@
     if (n === null) return '-';
     if (unit === '억원') {
       const digits = Math.abs(n) >= 100 ? 0 : Math.abs(n) >= 10 ? 1 : 2;
-      return `${n.toLocaleString('ko-KR', {minimumFractionDigits: digits, maximumFractionDigits: digits})}억원`;
+      return n.toLocaleString('ko-KR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
     }
-    if (unit === '%') return `${n.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}%`;
+    if (unit === '%') return `${n.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
     return n.toLocaleString('ko-KR');
   }
 
@@ -48,8 +48,8 @@
     const n = num(value);
     if (n === null || Math.abs(n) < 0.0000001) return '<span class="mp-delta mp-flat">-</span>';
     const digits = unit === '억원' ? (Math.abs(n) >= 100 ? 0 : 1) : 2;
-    const body = Math.abs(n).toLocaleString('ko-KR', {minimumFractionDigits: digits, maximumFractionDigits: digits});
-    const suffix = unit === '%' ? '%p' : unit;
+    const body = Math.abs(n).toLocaleString('ko-KR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+    const suffix = unit === '%' ? '%p' : '억';
     return n > 0
       ? `<span class="mp-delta mp-up">+${body}${suffix}</span>`
       : `<span class="mp-delta mp-down">▲${body}${suffix}</span>`;
@@ -95,38 +95,49 @@
     return true;
   }
 
-  function setBaseVisible(show) {
+  function setGeneralVisible(show) {
     const modal = document.getElementById('management-report-modal');
     if (!modal) return;
     const status = document.getElementById('mr-status');
     const summary = document.getElementById('mr-summary');
     const table = modal.querySelector('.mr-table-card');
-    const miContent = document.getElementById('mi-content');
     if (status) status.style.display = show ? '' : 'none';
     if (summary) summary.style.display = show ? '' : 'none';
     if (table) table.style.display = show ? '' : 'none';
-    if (miContent) miContent.hidden = true;
+  }
+
+  function restoreSection(section) {
+    const miContent = document.getElementById('mi-content');
+    if (section === 'general') {
+      setGeneralVisible(true);
+      if (miContent) miContent.hidden = true;
+    } else {
+      setGeneralVisible(false);
+      if (miContent) miContent.hidden = false;
+    }
   }
 
   function activatePeer() {
     if (!ensureUI()) return;
     peerActive = true;
-    const modal = document.getElementById('management-report-modal');
-    modal?.classList.add('mp-peer-active');
+    document.getElementById('management-report-modal')?.classList.add('mp-peer-active');
     document.querySelectorAll('#mi-section-tabs [data-mi-section]').forEach(btn => {
       btn.classList.toggle('is-active', btn.dataset.miSection === PEER_KEY);
     });
-    setBaseVisible(false);
+    setGeneralVisible(false);
+    const miContent = document.getElementById('mi-content');
+    if (miContent) miContent.hidden = true;
     const content = document.getElementById('mp-content');
     if (content) content.hidden = false;
     loadPeer();
   }
 
-  function deactivatePeer() {
+  function deactivatePeer(section) {
     peerActive = false;
     document.getElementById('management-report-modal')?.classList.remove('mp-peer-active');
     const content = document.getElementById('mp-content');
     if (content) content.hidden = true;
+    if (section) restoreSection(section);
   }
 
   function exportPeer() {
@@ -135,24 +146,14 @@
     const base = currentBase();
     const compare = currentCompare();
     if (!base || (mode === 'compare' && (!compare || compare === base))) return;
-    const params = new URLSearchParams({mode, base});
+    const params = new URLSearchParams({ mode, base });
     if (mode === 'compare') params.set('compare', compare);
     window.location.href = `/api/management-peer/export.xlsx?${params.toString()}`;
   }
 
-  function summaryCard(label, rank, value, note = '') {
-    return `<div class="mp-summary-card">
-      <div class="mp-summary-label">${esc(label)}</div>
-      <div class="mp-summary-rank">${esc(peerRankText(rank))}</div>
-      <div class="mp-summary-value">${esc(value)}</div>
-      ${note ? `<div class="mp-summary-note">${esc(note)}</div>` : ''}
-    </div>`;
-  }
-
   function avgDiff(data, key) {
-    const w = getMetric(data.woori, key).base;
-    const avg = data.peer_average?.[key];
-    const a = num(w), b = num(avg);
+    const a = num(getMetric(data.woori, key).base);
+    const b = num(data.peer_average?.[key]);
     return a !== null && b !== null ? a - b : null;
   }
 
@@ -160,58 +161,71 @@
     const n = num(value);
     if (n === null) return '-';
     const digits = unit === '억원' ? 0 : 2;
-    const body = Math.abs(n).toLocaleString('ko-KR', {minimumFractionDigits: digits, maximumFractionDigits: digits});
-    return `${n >= 0 ? '+' : '-'}${body}${unit === '%' ? '%p' : unit}`;
+    const body = Math.abs(n).toLocaleString('ko-KR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+    return `${n >= 0 ? '+' : '-'}${body}${unit === '%' ? '%p' : '억'}`;
+  }
+
+  function summaryBar(data) {
+    const ranks = data.woori_peer_ranks || {};
+    const items = [
+      ['총자산', ranks.total_assets],
+      ['총예수금', ranks.deposits],
+      ['BIS', ranks.bis_ratio],
+      ['연체율', ranks.delinquency_ratio],
+      ['ROE', ranks.roe],
+    ];
+    return `<div class="mp-summary-bar">
+      <span class="mp-summary-prefix">우리금융 Peer 위치</span>
+      ${items.map(([label, rank]) => `<span class="mp-summary-item"><b>${esc(label)}</b> ${esc(peerRankText(rank))}</span>`).join('')}
+    </div>`;
   }
 
   function insightHtml(data) {
-    const ranks = data.woori_peer_ranks || {};
     const bisGap = avgDiff(data, 'bis_ratio');
     const delinGap = avgDiff(data, 'delinquency_ratio');
     const roeGap = avgDiff(data, 'roe');
-    const assetRank = ranks.total_assets ? `${ranks.total_assets}/4위` : '-';
-    const depositRank = ranks.deposits ? `${ranks.deposits}/4위` : '-';
     return `<div class="mp-insight">
-      <div class="mp-insight-title">우리금융 Peer 인사이트</div>
-      <div class="mp-insight-text">
-        우리금융은 4개사 중 <b>총자산 ${esc(assetRank)}</b>, <b>총예수금 ${esc(depositRank)}</b>입니다.
-        BIS는 Peer 평균 대비 <b>${esc(signedText(bisGap, '%'))}</b>, 연체율은 <b>${esc(signedText(delinGap, '%'))}</b>, ROE(산출)는 <b>${esc(signedText(roeGap, '%'))}</b>입니다.
-        <span class="mp-insight-help">연체율은 낮을수록 건전성 측면에서 유리합니다.</span>
-      </div>
+      <span class="mp-insight-title">우리금융 Peer 인사이트</span>
+      <span class="mp-insight-text">BIS 평균 대비 <b>${esc(signedText(bisGap, '%'))}</b> · 연체율 <b>${esc(signedText(delinGap, '%'))}</b> · ROE(산출) <b>${esc(signedText(roeGap, '%'))}</b></span>
+      <span class="mp-insight-help">연체율은 낮을수록 양호</span>
     </div>`;
+  }
+
+  function fieldHeader(field) {
+    const compareLabel = field.compare_quarter
+      ? `${field.delta_label || ''} ${field.compare_quarter}`
+      : (field.delta_label || '');
+    return `<th data-mp-field="${esc(field.key)}">
+      <strong>${esc(field.label)}</strong>
+      <small>${esc(field.unit)}${compareLabel ? ` · ${esc(compareLabel)}` : ''}</small>
+    </th>`;
   }
 
   function metricCell(peer, field) {
     const pack = getMetric(peer, field.key);
-    return `<td class="${peer?.id === 'woori' ? 'mp-woori-col' : ''}">
-      <div class="mp-cell-value">${esc(fmt(pack.base, field.unit))}</div>
+    return `<td data-mp-field="${esc(field.key)}">
+      <div class="mp-cell-value">${esc(fmt(pack.base, field.unit))}${field.unit === '억원' && num(pack.base) !== null ? '<span class="mp-unit">억</span>' : ''}</div>
       <div class="mp-cell-delta">${deltaHtml(pack.delta, field.unit)}</div>
     </td>`;
   }
 
-  function comparisonTable(data) {
-    const peers = data.peers || [];
-    const headers = peers.map(peer => `<th class="${peer.id === 'woori' ? 'mp-woori-col' : ''}">
-      <strong>${esc(peer.label)}</strong>
-      <small>${peer.industry_asset_rank ? `업권 자산 ${peer.industry_asset_rank}위` : ''}</small>
-    </th>`).join('');
+  function bankCell(peer) {
+    const rank = peer.industry_asset_rank ? `업권 자산 ${peer.industry_asset_rank}위` : '';
+    return `<td class="mp-bank-col"><strong>${esc(peer.label)}</strong><small>${esc(rank)}</small></td>`;
+  }
 
-    const rows = (data.fields || []).map(field => {
-      const cells = peers.map(peer => metricCell(peer, field)).join('');
-      const compareLabel = field.compare_quarter ? `${field.delta_label} · ${field.compare_quarter}` : field.delta_label;
-      return `<tr>
-        <td class="mp-metric-col">
-          <span class="mp-category">${esc(field.category)}</span>
-          <strong>${esc(field.label)}</strong>
-          <small>${esc(field.unit)} · ${esc(compareLabel || '')}</small>
-        </td>
-        ${cells}
-      </tr>`;
-    }).join('');
+  function comparisonTable(data) {
+    const fields = data.fields || [];
+    const peers = data.peers || [];
+    const headers = fields.map(fieldHeader).join('');
+    const rows = peers.map(peer => `<tr class="${peer.id === 'woori' ? 'mp-woori-row' : ''}" data-peer-id="${esc(peer.id)}">
+      ${bankCell(peer)}
+      ${fields.map(field => metricCell(peer, field)).join('')}
+    </tr>`).join('');
 
     return `<div class="mp-table-wrap">
       <table class="mp-table">
-        <thead><tr><th class="mp-metric-col">지표</th>${headers}</tr></thead>
+        <thead><tr><th class="mp-bank-col">금융사</th>${headers}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
@@ -219,16 +233,6 @@
 
   function render(data) {
     if (!data?.ok) return `<div class="mi-warmup">4대금융 비교 데이터를 불러오지 못했습니다.<br>${esc(data?.error || '')}</div>`;
-    const w = data.woori || {};
-    const ranks = data.woori_peer_ranks || {};
-    const summary = `<div class="mp-summary-grid">
-      ${summaryCard('총자산', ranks.total_assets, fmt(getMetric(w, 'total_assets').base, '억원'), `업권 ${w.industry_asset_rank ?? '-'}위`)}
-      ${summaryCard('총예수금', ranks.deposits, fmt(getMetric(w, 'deposits').base, '억원'), `업권 ${w.industry_deposit_rank ?? '-'}위`)}
-      ${summaryCard('BIS비율', ranks.bis_ratio, fmt(getMetric(w, 'bis_ratio').base, '%'), '높을수록 양호')}
-      ${summaryCard('연체율', ranks.delinquency_ratio, fmt(getMetric(w, 'delinquency_ratio').base, '%'), '낮을수록 양호')}
-      ${summaryCard('ROE(산출)', ranks.roe, fmt(getMetric(w, 'roe').base, '%'), 'FISIS 원천자료 산출')}
-    </div>`;
-
     const warning = (data.missing_peers || []).length
       ? `<div class="mp-warning">일부 Peer 데이터가 없습니다: ${esc(data.missing_peers.join(', '))}</div>`
       : '';
@@ -246,11 +250,9 @@
         </div>
       </div>
       ${warning}
-      ${summary}
+      ${summaryBar(data)}
       ${insightHtml(data)}
-      <div class="mp-table-head">
-        <div><strong>4개사 핵심 경영지표</strong><span>현재값과 비교기준 증감을 함께 표시</span></div>
-      </div>
+      <div class="mp-table-head"><strong>4개사 핵심 경영지표</strong><span>현재값 아래에 비교기준 증감 표시</span></div>
       ${comparisonTable(data)}
       <div class="mp-note">${esc(data.notes?.comparison_basis || '')}<br>${esc(data.notes?.roa_roe || '')}<br>출처: ${esc(data.source || '금융감독원 금융통계정보시스템(FISIS)')}</div>
     </section>`;
@@ -269,10 +271,10 @@
     }
     const seq = ++loadSeq;
     content.innerHTML = '<div class="mi-warmup">4대 금융지주 저축은행 데이터를 비교하고 있습니다.</div>';
-    const params = new URLSearchParams({mode, base});
+    const params = new URLSearchParams({ mode, base });
     if (mode === 'compare') params.set('compare', compare);
     try {
-      const response = await fetch(`/api/management-peer?${params.toString()}`, {cache: 'no-store'});
+      const response = await fetch(`/api/management-peer?${params.toString()}`, { cache: 'no-store' });
       const data = await response.json();
       if (seq !== loadSeq || !peerActive) return;
       content.innerHTML = render(data);
@@ -293,11 +295,12 @@
       }
       const section = event.target.closest?.('#mi-section-tabs [data-mi-section]');
       if (section) {
-        if (section.dataset.miSection === PEER_KEY) {
+        const key = section.dataset.miSection;
+        if (key === PEER_KEY) {
           event.preventDefault();
           activatePeer();
         } else {
-          deactivatePeer();
+          deactivatePeer(key);
         }
         return;
       }
@@ -327,10 +330,10 @@
         const content = document.getElementById('mp-content');
         if (content) content.hidden = false;
       }
-    }, 40);
+    }, 50);
   });
-  observer.observe(document.documentElement, {childList: true, subtree: true});
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once: true});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
 })();
