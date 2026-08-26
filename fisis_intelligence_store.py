@@ -1,9 +1,9 @@
 """Recent-quarter FISIS cache for management intelligence.
 
-This cache is deliberately separate from the proven management-report cache.
-It collects only the additional metrics needed by funding, soundness and
-profitability views, so deploying these views never forces a full 2020Q1+
-rebuild of the base report. FISIS authentication remains server-side only.
+The stable base management-report cache is never modified here.  Expanded
+funding/soundness/profitability fields live in their own Upstash key.  When an
+older intelligence cache already contains the 79-bank core dataset, schema
+upgrades re-use those rows and fetch only the newly required FISIS tables.
 """
 
 import json
@@ -14,7 +14,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 CACHE_KEY = "sbrate:management:intelligence:v1"
 CACHE_MAX_AGE = timedelta(days=14)
 MAX_QUARTERS = 6
@@ -42,6 +42,13 @@ TABLES = {
     "SE036": {"industry_corporate_loans": "A", "real_estate_industry_loans": "A6"},
 }
 
+# Schema 4 already proved these core tables for all 79 banks.  Schema 6 can
+# therefore migrate by reusing them and querying only the two corrected tables.
+UPGRADE_TABLES = {
+    "SE010": TABLES["SE010"],
+    "SE014": TABLES["SE014"],
+}
+
 AMOUNT_METRICS = {
     "deposits", "time_deposits", "personal_deposits", "corporate_deposits", "sole_prop_deposits",
     "operating_profit", "avg_assets", "avg_equity", "profit_net_income", "net_interest_income",
@@ -58,8 +65,15 @@ _MEMORY_STORE = None
 _REFRESH_LOCK = threading.Lock()
 _REFRESH_THREAD = None
 _REFRESH_STATE = {
-    "running": False, "phase": "idle", "started_at": None, "finished_at": None,
-    "company_total": 0, "company_done": 0, "errors": [],
+    "running": False,
+    "phase": "idle",
+    "mode": None,
+    "started_at": None,
+    "finished_at": None,
+    "company_total": 0,
+    "company_done": 0,
+    "table_count": 0,
+    "errors": [],
 }
 
 
@@ -71,6 +85,13 @@ def _quarter_rank(key):
 def _quarter_month(key):
     match = re.fullmatch(r"(\d{4})Q([1-4])", str(key or ""))
     return f"{match.group(1)}{int(match.group(2)) * 3:02d}" if match else None
+
+
+def _row_key(row):
+    code = str((row or {}).get("finance_cd") or "").strip()
+    if code:
+        return code
+    return re.sub(r"\s+", "", str((row or {}).get("bank") or "")).replace("저축은행", "")
 
 
 def _base_store():
@@ -141,7 +162,8 @@ def _load_upstash():
 
 def _save_upstash(store):
     import fisis_management as fm
-    fm._upstash_command(["SET", CACHE_KEY, json.dumps(store, ensure_ascii=False, separators=(",", ":"))], timeout=20)
+    raw = json.dumps(store, ensure_ascii=False, separators=(",", ":"))
+    fm._upstash_command(["SET", CACHE_KEY, raw], timeout=20)
 
 
 def _load_local():
@@ -188,6 +210,49 @@ def get_intelligence_refresh_state():
         return dict(_REFRESH_STATE)
 
 
+def _number(value):
+    try:
+        if value in (None, "", "-", "--"):
+            return None
+        return float(str(value).replace(",", ""))
+    except Exception:
+        return None
+
+
+def _normalize_cached_amount(value):
+    """Convert legacy raw-KRW values to 억원 without touching already-converted rows."""
+    number = _number(value)
+    if number is None:
+        return value
+    # No Korean savings-bank intelligence amount in 억원 approaches one
+    # million.  Legacy raw KRW values do, so this is a conservative signature.
+    if abs(number) >= 1_000_000:
+        return round(number / 100_000_000.0, 2)
+    return number
+
+
+def _normalize_seed_row(row):
+    result = dict(row or {})
+    for metric in AMOUNT_METRICS:
+        if metric in result and result.get(metric) is not None:
+            result[metric] = _normalize_cached_amount(result.get(metric))
+    return result
+
+
+def _legacy_store_usable(store, targets):
+    if int((store or {}).get("schema_version") or 0) < 4:
+        return False
+    if str((store or {}).get("target_latest") or "") != (targets[0] if targets else ""):
+        return False
+    quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
+    latest = quarters.get(targets[0]) if targets else {}
+    rows = latest.get("banks") if isinstance(latest, dict) else []
+    if len(rows or []) < 70:
+        return False
+    coverage = latest.get("coverage") if isinstance(latest, dict) else {}
+    return int((coverage or {}).get("deposits") or 0) >= 70 and int((coverage or {}).get("liquidity_ratio") or 0) >= 70
+
+
 def _legend_with_unit_fallback(result):
     import fisis_management as fm
     legend = fm._legend(result)
@@ -206,8 +271,11 @@ def _legend_with_unit_fallback(result):
 def _fetch_table(finance_cd, list_no, metric_accounts, start_month, end_month):
     import fisis_management as fm
     params = {
-        "financeCd": finance_cd, "listNo": list_no, "term": "Q",
-        "startBaseMm": start_month, "endBaseMm": end_month,
+        "financeCd": finance_cd,
+        "listNo": list_no,
+        "term": "Q",
+        "startBaseMm": start_month,
+        "endBaseMm": end_month,
     }
     if list_no == "SE006" and len(metric_accounts) == 1:
         params["accountCd"] = next(iter(metric_accounts.values()))
@@ -224,21 +292,27 @@ def _fetch_table(finance_cd, list_no, metric_accounts, start_month, end_month):
             continue
         value = fm._choose_value(row, legend, METRIC_KIND[metric])
         if value is not None:
+            # Defensive normalization handles FISIS responses whose unit legend
+            # is absent even after the common-unit fallback.
+            if metric in AMOUNT_METRICS:
+                value = _normalize_cached_amount(value)
             values.setdefault(quarter, {})[metric] = value
     return values
 
 
-def _fetch_company(company, start_month, end_month, targets):
+def _fetch_company(company, start_month, end_month, targets, tables):
     code, name = company["finance_cd"], company["finance_nm"]
     quarters, errors, target_set = {}, [], set(targets)
-    for list_no, metric_accounts in TABLES.items():
+    for list_no, metric_accounts in tables.items():
         try:
             table_values = _fetch_table(code, list_no, metric_accounts, start_month, end_month)
             for quarter, metrics in table_values.items():
                 if quarter not in target_set:
                     continue
                 row = quarters.setdefault(quarter, {
-                    "bank": name, "finance_cd": code, "region": company.get("region"),
+                    "bank": name,
+                    "finance_cd": code,
+                    "region": company.get("region"),
                 })
                 row.update(metrics)
         except Exception as exc:
@@ -246,8 +320,33 @@ def _fetch_company(company, start_month, end_month, targets):
     return quarters, errors
 
 
-def _build_store():
+def _seed_gathered(existing, targets, companies):
+    gathered = {quarter: {} for quarter in targets}
+    quarters = existing.get("quarters") if isinstance(existing.get("quarters"), dict) else {}
+    company_keys = {company["finance_cd"] for company in companies}
+    for quarter in targets:
+        meta = quarters.get(quarter) if isinstance(quarters.get(quarter), dict) else {}
+        for row in meta.get("banks") or []:
+            if not isinstance(row, dict):
+                continue
+            key = _row_key(row)
+            if key in company_keys:
+                gathered[quarter][key] = _normalize_seed_row(row)
+    for quarter in targets:
+        for company in companies:
+            key = company["finance_cd"]
+            gathered[quarter].setdefault(key, {
+                "bank": company["finance_nm"],
+                "finance_cd": key,
+                "region": company.get("region"),
+            })
+    return gathered
+
+
+def _build_store(existing=None):
     import fisis_management as fm
+
+    existing = existing if isinstance(existing, dict) else {}
     with _REFRESH_LOCK:
         _REFRESH_STATE["phase"] = "loading_base"
     base = _base_store()
@@ -258,19 +357,37 @@ def _build_store():
     if len(companies) < 50:
         raise RuntimeError(f"기본 경영현황의 활성 저축은행이 부족합니다: {len(companies)}")
 
+    incremental = _legacy_store_usable(existing, targets)
+    tables = UPGRADE_TABLES if incremental else TABLES
+    mode = "incremental-upgrade" if incremental else "full-build"
     latest = targets[0]
     start_month, end_month = _quarter_month(targets[-1]), _quarter_month(latest)
+    gathered = _seed_gathered(existing, targets, companies) if incremental else {
+        quarter: {
+            company["finance_cd"]: {
+                "bank": company["finance_nm"],
+                "finance_cd": company["finance_cd"],
+                "region": company.get("region"),
+            }
+            for company in companies
+        }
+        for quarter in targets
+    }
+
     with _REFRESH_LOCK:
         _REFRESH_STATE.update({
-            "phase": "fetching_metrics", "company_total": len(companies),
-            "company_done": 0, "errors": [],
+            "phase": "fetching_metrics",
+            "mode": mode,
+            "company_total": len(companies),
+            "company_done": 0,
+            "table_count": len(tables),
+            "errors": [],
         })
 
-    gathered = {quarter: [] for quarter in targets}
     errors = []
-    with ThreadPoolExecutor(max_workers=min(6, max(2, len(companies)))) as executor:
+    with ThreadPoolExecutor(max_workers=min(8, max(2, len(companies)))) as executor:
         future_map = {
-            executor.submit(_fetch_company, company, start_month, end_month, targets): company
+            executor.submit(_fetch_company, company, start_month, end_month, targets, tables): company
             for company in companies
         }
         for future in as_completed(future_map):
@@ -279,7 +396,13 @@ def _build_store():
                 qdata, qerrors = future.result()
                 errors.extend(qerrors)
                 for quarter, row in qdata.items():
-                    gathered.setdefault(quarter, []).append(row)
+                    key = company["finance_cd"]
+                    target = gathered.setdefault(quarter, {}).setdefault(key, {
+                        "bank": company["finance_nm"],
+                        "finance_cd": key,
+                        "region": company.get("region"),
+                    })
+                    target.update(row)
             except Exception as exc:
                 errors.append(f"{company.get('finance_nm')}: {type(exc).__name__}: {exc}")
             with _REFRESH_LOCK:
@@ -291,16 +414,26 @@ def _build_store():
     metric_names = sorted(METRIC_KIND.keys())
     quarters = {}
     for quarter in targets:
-        rows = gathered.get(quarter) or []
+        rows = [_normalize_seed_row(row) for row in gathered.get(quarter, {}).values()]
+        # Rows with only identifiers can occur only on a failed full build; do
+        # not count them as successfully collected institutions.
+        rows = [row for row in rows if any(row.get(metric) is not None for metric in metric_names)]
         rows.sort(key=lambda row: str(row.get("bank") or ""))
         quarters[quarter] = {
             "bank_count": len(rows),
-            "coverage": {metric: sum(1 for row in rows if row.get(metric) is not None) for metric in metric_names},
+            "coverage": {
+                metric: sum(1 for row in rows if row.get(metric) is not None)
+                for metric in metric_names
+            },
             "banks": rows,
         }
+
     latest_rows = quarters.get(latest, {}).get("banks") or []
-    if len(latest_rows) < 50:
-        raise RuntimeError(f"확장 FISIS 최신분기 수집 은행 수 부족: latest={latest} banks={len(latest_rows)} errors={len(errors)}")
+    if len(latest_rows) < 70:
+        raise RuntimeError(
+            f"확장 FISIS 최신분기 수집 은행 수 부족: latest={latest} banks={len(latest_rows)} errors={len(errors)}"
+        )
+
     return {
         "schema_version": SCHEMA_VERSION,
         "source_name": fm.FISIS_SOURCE_NAME,
@@ -310,7 +443,8 @@ def _build_store():
         "target_quarters": targets,
         "quarter_count": len(quarters),
         "active_company_count": len(companies),
-        "fetch_mode": "separate-recent-quarter-cache-v5",
+        "fetch_mode": mode,
+        "fetched_tables": list(tables.keys()),
         "quarters": quarters,
         "last_errors": errors[-50:],
     }
@@ -321,7 +455,7 @@ def refresh_intelligence_cache(force=False):
     current = get_intelligence_store(trigger_refresh=False)
     if not force and _cache_is_fresh(current):
         return current
-    store = _build_store()
+    store = _build_store(existing=current)
     try:
         _save_upstash(store)
     except Exception as exc:
@@ -338,12 +472,15 @@ def _refresh_worker(force):
     except Exception as exc:
         print("FISIS INTELLIGENCE REFRESH ERROR:", exc)
         with _REFRESH_LOCK:
-            _REFRESH_STATE["errors"] = (_REFRESH_STATE.get("errors") or [])[-19:] + [f"refresh: {type(exc).__name__}: {exc}"]
+            _REFRESH_STATE["errors"] = (_REFRESH_STATE.get("errors") or [])[-19:] + [
+                f"refresh: {type(exc).__name__}: {exc}"
+            ]
     finally:
         import fisis_management as fm
         with _REFRESH_LOCK:
             _REFRESH_STATE.update({
-                "running": False, "phase": "idle",
+                "running": False,
+                "phase": "idle",
                 "finished_at": fm._now().strftime("%Y-%m-%d %H:%M:%S"),
             })
 
@@ -356,15 +493,25 @@ def trigger_intelligence_refresh(force=False):
     with _REFRESH_LOCK:
         if _REFRESH_STATE["running"]:
             return False
-        if not force and _cache_is_fresh(get_intelligence_store(trigger_refresh=False)):
+        current = get_intelligence_store(trigger_refresh=False)
+        if not force and _cache_is_fresh(current):
             return False
         _REFRESH_STATE.update({
-            "running": True, "phase": "starting",
+            "running": True,
+            "phase": "starting",
+            "mode": None,
             "started_at": fm._now().strftime("%Y-%m-%d %H:%M:%S"),
-            "finished_at": None, "company_total": 0, "company_done": 0, "errors": [],
+            "finished_at": None,
+            "company_total": 0,
+            "company_done": 0,
+            "table_count": 0,
+            "errors": [],
         })
         _REFRESH_THREAD = threading.Thread(
-            target=_refresh_worker, args=(force,), name="sbrate-fisis-intelligence-refresh", daemon=True,
+            target=_refresh_worker,
+            args=(force,),
+            name="sbrate-fisis-intelligence-refresh",
+            daemon=True,
         )
         _REFRESH_THREAD.start()
     return True
@@ -378,11 +525,17 @@ def intelligence_status():
     rows = meta.get("banks") if isinstance(meta, dict) else []
     woori = next((row for row in (rows or []) if "우리금융" in str(row.get("bank") or "")), None)
     return {
-        "ok": True, "ready": _cache_is_fresh(store),
-        "schema_version": store.get("schema_version"), "code_schema_version": SCHEMA_VERSION,
-        "updated_at": store.get("updated_at"), "target_latest": latest,
-        "quarter_count": len(store.get("quarters") or {}), "bank_count": len(rows or []),
+        "ok": True,
+        "ready": _cache_is_fresh(store),
+        "schema_version": store.get("schema_version"),
+        "code_schema_version": SCHEMA_VERSION,
+        "updated_at": store.get("updated_at"),
+        "target_latest": latest,
+        "quarter_count": len(store.get("quarters") or {}),
+        "bank_count": len(rows or []),
         "woori_available": bool(woori),
+        "fetch_mode": store.get("fetch_mode"),
+        "fetched_tables": store.get("fetched_tables") or [],
         "coverage": meta.get("coverage") if isinstance(meta, dict) else {},
         "refresh": get_intelligence_refresh_state(),
     }
@@ -393,17 +546,20 @@ def install_fisis_intelligence_store():
         trigger_intelligence_refresh(force=False)
     except Exception as exc:
         print("FISIS INTELLIGENCE STORE INSTALL ERROR:", exc)
+
     app_module = sys.modules.get("app") or sys.modules.get("__main__")
     if app_module is not None and hasattr(app_module, "app"):
         flask_app = app_module.app
         existing = {rule.rule for rule in flask_app.url_map.iter_rules()}
         if "/api/management-report/intelligence-status" not in existing:
             from flask import jsonify
+
             @flask_app.get("/api/management-report/intelligence-status")
             def management_intelligence_status_api():
                 try:
                     return jsonify(intelligence_status())
                 except Exception as exc:
                     return jsonify({"ok": False, "error": f"{type(exc).__name__}: {exc}"}), 500
+
     print("FISIS separate intelligence store installed: schema", SCHEMA_VERSION)
     return True
