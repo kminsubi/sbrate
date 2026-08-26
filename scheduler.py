@@ -78,7 +78,10 @@ scheduler = BackgroundScheduler(timezone="Asia/Seoul")
 
 def run_fisis_quarter_check():
     try:
-        result = check_latest_quarter(force_probe=False)
+        # Scheduled runs finish the lightweight 79-bank publication probe in
+        # this scheduler job.  This avoids losing a daemon thread between
+        # Render workers/restarts and persists the result to Upstash.
+        result = check_latest_quarter(force_probe=False, wait=True)
         print("FISIS latest-quarter check:", result)
     except Exception as e:
         print("FISIS latest-quarter check error:", e)
