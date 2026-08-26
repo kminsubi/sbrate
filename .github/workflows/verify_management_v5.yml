@@ -5,6 +5,8 @@ on:
     paths:
       - 'static/js/management_report_v5_patch.js'
       - 'static/css/management_report_v5_patch.css'
+      - 'static/js/management_report_bank_focus.js'
+      - 'static/css/management_report_bank_focus.css'
       - 'management_report_v5_runtime.py'
       - 'management_report_auto_update.py'
       - 'fisis_region_patch.py'
@@ -23,6 +25,7 @@ jobs:
         run: |
           python -m py_compile scheduler.py fisis_region_patch.py fisis_quality_patch.py management_report_auto_update.py management_report_v5_runtime.py
           node --check static/js/management_report_v5_patch.js
+          node --check static/js/management_report_bank_focus.js
           node --check static/js/management_intelligence.js
           node --check static/js/management_intelligence_polish.js
 
@@ -33,8 +36,10 @@ jobs:
             html="$(curl -fsS --max-time 90 https://sbrate.onrender.com/ || true)"
             region="$(curl -fsS --max-time 90 https://sbrate.onrender.com/api/management-report/region-diagnostic || true)"
             printf '%s' "$region" > /tmp/region.json
-            if echo "$html" | grep -q '20260826v7' \
-              && echo "$html" | grep -q '20260826mi5' \
+            if echo "$html" | grep -q '20260826v8' \
+              && echo "$html" | grep -q '20260826mi6' \
+              && echo "$html" | grep -q 'management_report_bank_focus.js' \
+              && echo "$html" | grep -q 'management_report_bank_focus.css' \
               && python - <<'PY'
           import json, sys
           try:
