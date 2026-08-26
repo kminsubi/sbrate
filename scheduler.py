@@ -15,6 +15,7 @@ import fisis_intelligence_store
 from fisis_profitability_period_patch import install_fisis_profitability_period_patch
 from fisis_quality_patch import install_fisis_quality_patch
 from fisis_region_patch import install_fisis_region_patch
+from management_export_v2 import install_management_export_v2
 from management_intelligence import install_management_intelligence
 from management_report import install_management_report
 from management_report_auto_update import check_latest_quarter, install_management_report_auto_update
@@ -135,6 +136,7 @@ fisis_intelligence_store._base_store = lambda: _fm.get_management_store(trigger_
 install_fisis_profitability_period_patch()
 fisis_intelligence_store.install_fisis_intelligence_store()
 install_management_intelligence()
+install_management_export_v2()
 
 install_rate_simulator()
 install_rate_simulator_v2()
