@@ -26,14 +26,16 @@
       || document.getElementById('management-report-open');
     const error = cleanByText(header, /오류\s*제보/, 'error-report-open')
       || document.getElementById('error-report-open');
+    const marketLabel = document.getElementById('dashboard-market-label');
 
-    // 경영현황과 오류제보를 같은 우측 action group에 연속 배치한다.
-    // 서로 다른 flex group에 있을 때 좁은 화면에서 겹치던 구조를 제거한다.
+    // Desktop action order:
+    // 상품탭 → 경영현황 → 오류제보 → 시장현황 배지 → 업데이트기준 → 현재시각.
+    // 경영현황/오류제보를 먼저 배치해 우측 끝으로 밀리는 느낌을 없앤다.
     if (management && error && error.parentElement) {
       const parent = error.parentElement;
-      if (management.parentElement !== parent || management.nextElementSibling !== error) {
-        parent.insertBefore(management, error);
-      }
+      const anchor = marketLabel && marketLabel.parentElement === parent ? marketLabel : parent.firstChild;
+      parent.insertBefore(management, anchor);
+      parent.insertBefore(error, management.nextSibling);
     }
   }
 
