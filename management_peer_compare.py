@@ -250,6 +250,38 @@ def build_peer_compare(base=None, compare=None, mode="single"):
     }
 
 
+def _peer_excel(data):
+    import management_export_v2 as export_v2
+
+    headers = ["저축은행", "업권 총자산순위", "업권 예수금순위"]
+    kinds = ["text", "int", "int"]
+    for field in data.get("fields") or []:
+        headers.extend([f"{field['label']}({field['unit']})", field.get("delta_label") or "증감"])
+        if field.get("unit") == "%":
+            kinds.extend(["ratio", "delta_ratio"])
+        else:
+            kinds.extend(["amount", "delta_amount"])
+
+    rows = []
+    for peer in data.get("peers") or []:
+        values = [peer.get("label"), peer.get("industry_asset_rank"), peer.get("industry_deposit_rank")]
+        for field in data.get("fields") or []:
+            pack = (peer.get("metrics") or {}).get(field["key"]) or {}
+            values.extend([pack.get("base"), pack.get("delta")])
+        rows.append({"values": values, "is_woori": peer.get("id") == "woori"})
+
+    if data.get("mode") == "compare":
+        title = f"SBRate 4대금융 비교 분기비교 - {data.get('base_label') or data.get('base')} vs {data.get('compare_label') or data.get('compare')}"
+        subtitle = f"출처: FISIS | 금융사 순서: 우리금융 → 신한 → 하나 → KB | 기준분기 {data.get('base') or '-'} | 비교분기 {data.get('compare') or '-'}"
+    else:
+        title = f"SBRate 4대금융 비교 분기현황 - {data.get('base_label') or data.get('base')}"
+        subtitle = (
+            f"출처: FISIS | 금융사 순서: 우리금융 → 신한 → 하나 → KB | "
+            f"규모 전년말比 {data.get('previous_year_end') or '-'} · 수신/건전성 전분기比 {data.get('previous_quarter') or '-'} · 손익/ROA/ROE 전년동기比 {data.get('yoy_quarter') or '-'}"
+        )
+    return export_v2._xlsx_bytes(title, subtitle, "4대금융 비교", headers, kinds, rows)
+
+
 def install_management_peer_compare():
     app_module = sys.modules.get("app") or sys.modules.get("__main__")
     if app_module is None or not hasattr(app_module, "app"):
@@ -258,7 +290,7 @@ def install_management_peer_compare():
         return True
 
     flask_app = app_module.app
-    from flask import jsonify, request
+    from flask import jsonify, request, send_file
 
     @flask_app.get("/api/management-peer")
     def management_peer_api():
@@ -268,6 +300,35 @@ def install_management_peer_compare():
                 compare=request.args.get("compare"),
                 mode=request.args.get("mode") or "single",
             ))
+        except ValueError as exc:
+            return jsonify({"ok": False, "error": str(exc)}), 400
+        except Exception as exc:
+            return jsonify({"ok": False, "error": f"{type(exc).__name__}: {exc}"}), 500
+
+    @flask_app.get("/api/management-peer/export.xlsx")
+    def management_peer_export():
+        try:
+            data = build_peer_compare(
+                base=request.args.get("base"),
+                compare=request.args.get("compare"),
+                mode=request.args.get("mode") or "single",
+            )
+            if not data.get("ok"):
+                return jsonify(data), 404
+            stream = _peer_excel(data)
+            base_key = data.get("base") or "latest"
+            filename = (
+                f"SBRate_4대금융_비교_{base_key}_vs_{data.get('compare')}.xlsx"
+                if data.get("mode") == "compare"
+                else f"SBRate_4대금융_비교_{base_key}.xlsx"
+            )
+            return send_file(
+                stream,
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                as_attachment=True,
+                download_name=filename,
+                max_age=0,
+            )
         except ValueError as exc:
             return jsonify({"ok": False, "error": str(exc)}), 400
         except Exception as exc:
