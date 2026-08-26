@@ -3,6 +3,7 @@ import sys
 
 ASSET_VERSION = "20260826mi7"
 STABILITY_VERSION = "20260826mi14"
+DASHBOARD_GUARD_VERSION = "20260826df1"
 
 
 def install_management_report_v5_runtime():
@@ -76,6 +77,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</body>",
                         f'<script src="/static/js/management_report_stability.js?v={STABILITY_VERSION}"></script>\n</body>',
+                        1,
+                    )
+                if "dashboard_final_guard.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/dashboard_final_guard.js?v={DASHBOARD_GUARD_VERSION}"></script>\n</body>',
                         1,
                     )
                 response.set_data(html)
