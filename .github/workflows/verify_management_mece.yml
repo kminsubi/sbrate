@@ -1,0 +1,248 @@
+name: Verify Management MECE
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'fisis_management.py'
+      - 'fisis_quality_patch.py'
+      - 'fisis_region_patch.py'
+      - 'fisis_intelligence_store.py'
+      - 'fisis_profitability_period_patch.py'
+      - 'management_report.py'
+      - 'management_report_auto_update.py'
+      - 'management_intelligence.py'
+      - 'management_report_v4_runtime.py'
+      - 'management_report_v5_runtime.py'
+      - 'static/js/management_report.js'
+      - 'static/js/management_intelligence.js'
+      - 'static/js/management_report_v5_patch.js'
+      - 'scheduler.py'
+      - '.github/workflows/verify_management_mece.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: verify-management-mece
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Static MECE guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            fisis_management.py fisis_quality_patch.py fisis_region_patch.py \
+            fisis_intelligence_store.py fisis_profitability_period_patch.py \
+            management_report.py management_report_auto_update.py \
+            management_intelligence.py management_report_v4_runtime.py \
+            management_report_v5_runtime.py scheduler.py
+          node --check static/js/management_report.js
+          node --check static/js/management_intelligence.js
+          node --check static/js/management_report_v5_patch.js
+
+          grep -q 'MIN_QUARTER_COVERAGE = 0.90' fisis_management.py
+          grep -q 'math.ceil(len(companies) \* MIN_QUARTER_COVERAGE)' fisis_management.py
+          grep -q 'valid_assets = \[row for row in rows if row.get("total_assets") is not None\]' fisis_management.py
+          grep -q 'return jsonify(check_latest_quarter(force_probe=False, wait=False))' management_report_auto_update.py
+          ! grep -q 'request.args.get("force")' management_report_auto_update.py
+          ! grep -q 'install_fisis_catalog_probe' scheduler.py
+          ! grep -q 'TABLES\["SE010"\]' fisis_intelligence_store.py
+          grep -q 'source\["roa"\] = None' management_intelligence.py
+          grep -q 'source\["roe"\] = None' management_intelligence.py
+          grep -q 'previousYearSameQuarter' static/js/management_report.js
+          grep -q '전년동기比' static/js/management_report.js
+          grep -q '고정이하여신비율' static/js/management_intelligence.js
+          grep -q '20260826v8' management_report_v4_runtime.py
+          grep -q '20260826mi5' management_report_v5_runtime.py
+
+      - name: Wait for audited Render deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          ready=0
+          for i in $(seq 1 90); do
+            html="$(curl -fsS --max-time 90 'https://sbrate.onrender.com/' || true)"
+            if echo "$html" | grep -q 'management_report.js?v=20260826v8' \
+              && echo "$html" | grep -q '20260826mi5'; then
+              ready=1
+              printf '%s' "$html" >/tmp/root.html
+              break
+            fi
+            echo "waiting for audited Render deployment... $i/90"
+            sleep 10
+          done
+          test "$ready" = 1
+
+      - name: Verify quarter universe and coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json
+          python - <<'PY' >/tmp/quarters.env
+          import json
+          d=json.load(open('/tmp/quarters.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          assert 'FISIS' in str(d.get('source') or ''), d
+          qs=d.get('quarters') or []
+          assert len(qs) >= 2, qs
+          for q in qs:
+              assert int(q.get('bank_count') or 0) >= 70, q
+              coverage=q.get('asset_coverage_ratio')
+              assert coverage is not None and float(coverage) >= 0.90, q
+              assert int(q.get('asset_bank_count') or 0) >= 70, q
+          print('LATEST='+qs[0]['key'])
+          print('PREVIOUS='+qs[1]['key'])
+          latest=qs[0]['key']
+          year=int(latest[:4])-1
+          yoy=f'{year}Q{latest[-1]}'
+          keys={x['key'] for x in qs}
+          print('YOY='+ (yoy if yoy in keys else ''))
+          PY
+          cat /tmp/quarters.env
+
+      - name: Verify base report correctness and period safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /tmp/quarters.env
+          curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${PREVIOUS}" >/tmp/report.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/report.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          rows=d.get('rows') or []
+          assert len(rows) >= 70, len(rows)
+          names=[str(x.get('bank') or '') for x in rows]
+          assert len(names)==len(set(names)), 'duplicate bank rows'
+          assets=[x.get('metrics',{}).get('total_assets',{}).get('base') for x in rows]
+          present=[float(x) for x in assets if x is not None]
+          assert present==sorted(present, reverse=True), 'rows not sorted by total assets'
+          ranks=[int(x.get('rank')) for x in rows if x.get('rank') is not None]
+          assert ranks==list(range(1,len(ranks)+1)), ranks[:20]
+          w=d.get('woori') or {}
+          assert w.get('is_woori') is True, w
+          m=w.get('metrics') or {}
+          required=['total_assets','corporate_loans','household_loans','total_loans','bis_ratio','npl_ratio','delinquency_ratio','net_income','employees']
+          assert all(k in m for k in required), m.keys()
+          assert 0 < float(m['bis_ratio']['base']) < 100, m['bis_ratio']
+          assert 0 <= float(m['npl_ratio']['base']) <= 100, m['npl_ratio']
+          assert 0 <= float(m['delinquency_ratio']['base']) <= 100, m['delinquency_ratio']
+          base=str(d.get('base_quarter') or '')
+          compare=str(d.get('compare_quarter') or '')
+          if base[-1:] != compare[-1:]:
+              assert m['net_income'].get('comparable') is False, m['net_income']
+              assert m['net_income'].get('delta') is None, m['net_income']
+          print('BASE_REPORT_OK', {'base':base,'compare':compare,'rows':len(rows),'woori_rank':w.get('rank')})
+          PY
+
+          code=$(curl -sS -o /tmp/bad-quarter.json -w '%{http_code}' --max-time 90 'https://sbrate.onrender.com/api/management-report?base=BAD&compare=2025Q4')
+          test "$code" = '400'
+          code=$(curl -sS -o /tmp/same-quarter.json -w '%{http_code}' --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${LATEST}")
+          test "$code" = '400'
+
+      - name: Verify YoY cumulative P&L when available
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /tmp/quarters.env
+          if [ -z "${YOY:-}" ]; then
+            echo 'YoY quarter not available; skip'
+            exit 0
+          fi
+          curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${YOY}" >/tmp/yoy.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/yoy.json',encoding='utf-8'))
+          w=d.get('woori') or {}
+          n=((w.get('metrics') or {}).get('net_income') or {})
+          assert n.get('comparable') is True, n
+          if n.get('base') is not None and n.get('compare') is not None:
+              assert n.get('delta') is not None, n
+          print('YOY_PNL_OK', n)
+          PY
+
+      - name: Verify funding soundness profitability intelligence
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /tmp/quarters.env
+          for section in funding soundness profitability; do
+            curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=${section}&base=${LATEST}&compare=${PREVIOUS}" >"/tmp/${section}.json"
+          done
+          python - <<'PY'
+          import json
+          def load(n): return json.load(open(f'/tmp/{n}.json',encoding='utf-8'))
+          def metric(d,k): return ((((d.get('woori') or {}).get('metrics') or {}).get(k)) or {})
+          for name in ['funding','soundness','profitability']:
+              d=load(name)
+              assert d.get('ok') is True, (name,d)
+              assert d.get('ready') is True, (name,d)
+              assert len(d.get('rows') or []) >= 70, (name,len(d.get('rows') or []))
+          f,s,p=load('funding'),load('soundness'),load('profitability')
+          assert metric(f,'deposits').get('base') is not None, f
+          assert metric(s,'liquidity_ratio').get('base') is not None, s
+          assert metric(p,'operating_profit').get('base') is not None, p
+          assert metric(p,'roa').get('base') is None, metric(p,'roa')
+          assert metric(p,'roe').get('base') is None, metric(p,'roe')
+          if str(p.get('base') or '')[-1:] != str(p.get('compare') or '')[-1:]:
+              for key in ['net_income','operating_profit','net_interest_income','interest_income','interest_expense','deposit_interest_expense','time_deposit_interest_expense']:
+                  m=metric(p,key)
+                  assert m.get('delta') is None, (key,m)
+                  assert m.get('comparable') is False, (key,m)
+          note=(p.get('notes') or {}).get('roa_roe_basis') or ''
+          assert '추정하지 않고' in note, note
+          print('INTELLIGENCE_OK')
+          PY
+
+      - name: Verify region diagnostic uses cached coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/region-diagnostic' >/tmp/region.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/region.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          assert int(d.get('company_count') or 0) >= 70, d
+          assert int(d.get('region_count') or 0) >= 70, d
+          w=d.get('woori') or {}
+          assert w.get('bank') == '우리금융저축은행', w
+          assert w.get('region') == '충청', w
+          PY
+
+      - name: Verify Excel endpoint and defaults
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /tmp/quarters.env
+          curl -fsS --max-time 120 'https://sbrate.onrender.com/api/management-report/export.xlsx' -o /tmp/default.xlsx
+          curl -fsS --max-time 120 "https://sbrate.onrender.com/api/management-report/export.xlsx?base=${LATEST}&compare=${PREVIOUS}" -o /tmp/explicit.xlsx
+          python - <<'PY'
+          import zipfile
+          for path in ['/tmp/default.xlsx','/tmp/explicit.xlsx']:
+              assert zipfile.is_zipfile(path), path
+              with zipfile.ZipFile(path) as z:
+                  names=set(z.namelist())
+                  assert '[Content_Types].xml' in names, path
+                  assert 'xl/workbook.xml' in names, path
+                  assert any(x.startswith('xl/worksheets/sheet') for x in names), path
+          print('XLSX_OK')
+          PY
+
+      - name: Verify public latest check is non-forced
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/check-latest?force=1' >/tmp/latest.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/latest.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          assert float(d.get('coverage_ratio_required') or 0) >= 0.90, d
+          print('LATEST_CHECK_OK', d.get('status'))
+          PY
