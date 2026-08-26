@@ -4,11 +4,10 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 HISTORY_DIR = DATA_DIR / "history"
-INTELLIGENCE_SCHEMA_VERSION = 4
+INTELLIGENCE_SCHEMA_VERSION = 5
 
 SECTION_FIELDS = {
     "funding": [
@@ -69,9 +68,18 @@ def _round(value, digits=2):
     return None if value is None else round(value, digits)
 
 
+def _row_key(row):
+    return str((row or {}).get("finance_cd") or _normalize_bank((row or {}).get("bank")))
+
+
 def _quarter_rank(key):
     match = re.fullmatch(r"(\d{4})Q([1-4])", str(key or ""))
     return int(match.group(1)) * 4 + int(match.group(2)) if match else -1
+
+
+def _quarter_no(key):
+    match = re.fullmatch(r"\d{4}Q([1-4])", str(key or ""))
+    return int(match.group(1)) if match else None
 
 
 def _previous_quarter(key):
@@ -152,7 +160,7 @@ def _rate_history_for_quarter(quarter):
             snap_date = datetime.strptime(path.stem, "%Y-%m-%d").date()
         except Exception:
             continue
-        if snap_date < start or snap_date > end:
+        if not (start <= snap_date <= end):
             continue
         payload = _load_json(path, {}) or {}
         best, ranked = _best_12m_by_bank(payload.get("deposit") if isinstance(payload, dict) else None)
@@ -161,18 +169,13 @@ def _rate_history_for_quarter(quarter):
             continue
         values = [row["rate"] for row in ranked]
         snapshots.append({
-            "date": snap_date.isoformat(),
-            "woori_rate": woori.get("rate"),
-            "woori_rank": woori.get("rank"),
+            "date": snap_date.isoformat(), "woori_rate": woori.get("rate"), "woori_rank": woori.get("rank"),
             "market_average": round(sum(values) / len(values), 4) if values else None,
             "market_max": max(values) if values else None,
         })
     if not snapshots:
         return {
-            "available": False,
-            "status": "no_history",
-            "quarter": quarter,
-            "snapshot_count": 0,
+            "available": False, "status": "no_history", "quarter": quarter, "snapshot_count": 0,
             "note": "SBRate 일별 금리 이력이 해당 분기에 존재하지 않습니다.",
         }
     rates = [row["woori_rate"] for row in snapshots if row.get("woori_rate") is not None]
@@ -181,21 +184,14 @@ def _rate_history_for_quarter(quarter):
     last_date = datetime.strptime(last["date"], "%Y-%m-%d").date()
     full = (first_date - start).days <= 3 and (end - last_date).days <= 3
     return {
-        "available": bool(rates),
-        "status": "full" if full else "partial",
-        "quarter": quarter,
-        "snapshot_count": len(snapshots),
-        "first_date": first["date"],
-        "last_date": last["date"],
-        "first_rate": first.get("woori_rate"),
-        "last_rate": last.get("woori_rate"),
+        "available": bool(rates), "status": "full" if full else "partial", "quarter": quarter,
+        "snapshot_count": len(snapshots), "first_date": first["date"], "last_date": last["date"],
+        "first_rate": first.get("woori_rate"), "last_rate": last.get("woori_rate"),
         "average_rate": round(sum(rates) / len(rates), 4) if rates else None,
-        "max_rate": max(rates) if rates else None,
-        "min_rate": min(rates) if rates else None,
+        "max_rate": max(rates) if rates else None, "min_rate": min(rates) if rates else None,
         "rate_change": _round(last["woori_rate"] - first["woori_rate"], 4)
             if first.get("woori_rate") is not None and last.get("woori_rate") is not None else None,
-        "first_rank": first.get("woori_rank"),
-        "last_rank": last.get("woori_rank"),
+        "first_rank": first.get("woori_rank"), "last_rank": last.get("woori_rank"),
         "note": None if full else "분기 전체가 아닌 보유 중인 SBRate 일별 금리 이력 구간만 반영합니다.",
     }
 
@@ -203,13 +199,11 @@ def _rate_history_for_quarter(quarter):
 def _merge_store():
     import fisis_management as fm
     from fisis_intelligence_store import get_intelligence_store
-
-    base = fm.get_management_store(trigger_refresh=True) or {}
+    base = fm.get_management_store(trigger_refresh=False) or {}
     intel = get_intelligence_store(trigger_refresh=True) or {}
     base_quarters = base.get("quarters") if isinstance(base.get("quarters"), dict) else {}
     intel_quarters = intel.get("quarters") if isinstance(intel.get("quarters"), dict) else {}
     quarters = {}
-
     for quarter, meta in base_quarters.items():
         meta = meta if isinstance(meta, dict) else {}
         intel_meta = intel_quarters.get(quarter) if isinstance(intel_quarters.get(quarter), dict) else {}
@@ -233,7 +227,6 @@ def _merge_store():
         merged_meta["banks"] = merged_rows
         merged_meta["intelligence_coverage"] = intel_meta.get("coverage") or {}
         quarters[quarter] = merged_meta
-
     result = dict(base)
     result["quarters"] = quarters
     result["intelligence_schema_version"] = int(intel.get("schema_version") or 0)
@@ -243,7 +236,7 @@ def _merge_store():
     return result
 
 
-def _derived_row(row, total_deposits=None):
+def _derived_row(row, total_deposits=None, quarter=None):
     source = dict(row or {})
     deposits = _number(source.get("deposits"))
     time_deposits = _number(source.get("time_deposits"))
@@ -255,22 +248,34 @@ def _derived_row(row, total_deposits=None):
     source["simple_loan_deposit_ratio"] = _round(total_loans / deposits * 100, 4) if deposits not in (None, 0) and total_loans is not None else None
     source["deposit_market_share"] = _round(deposits / total_deposits * 100, 4) if deposits is not None and total_deposits not in (None, 0) else None
     source["real_estate_corp_share"] = _round(real_estate / industry_corp * 100, 4) if real_estate is not None and industry_corp not in (None, 0) else None
+
+    # FISIS SE010 exposes the official ROA/ROE accounts but some quarterly
+    # responses leave C/D blank. In that case use the same table's average
+    # assets/equity and cumulative net income to calculate an annualised
+    # quarterly ratio. We mark the fallback so the UI can disclose it.
+    q = _quarter_no(quarter)
+    factor = (4.0 / q) if q else None
+    profit = _number(source.get("profit_net_income"))
+    if profit is None:
+        profit = _number(source.get("net_income"))
+    avg_assets = _number(source.get("avg_assets"))
+    avg_equity = _number(source.get("avg_equity"))
+    if source.get("roa") is None and profit is not None and avg_assets not in (None, 0) and factor:
+        source["roa"] = _round(profit / avg_assets * 100 * factor, 4)
+        source["roa_derived"] = True
+    if source.get("roe") is None and profit is not None and avg_equity not in (None, 0) and factor:
+        source["roe"] = _round(profit / avg_equity * 100 * factor, 4)
+        source["roe_derived"] = True
     return source
 
 
 def _bank_map(quarter_meta):
     rows = quarter_meta.get("banks") if isinstance(quarter_meta, dict) else []
-    return {
-        str(row.get("finance_cd") or _normalize_bank(row.get("bank"))): row
-        for row in rows if isinstance(row, dict)
-    }
+    return {_row_key(row): row for row in rows if isinstance(row, dict)}
 
 
 def _fields(section):
-    return [
-        {"key": key, "label": label, "unit": unit, "direction": direction}
-        for key, label, unit, direction in SECTION_FIELDS[section]
-    ]
+    return [{"key": key, "label": label, "unit": unit, "direction": direction} for key, label, unit, direction in SECTION_FIELDS[section]]
 
 
 def _metric_pack(base_row, compare_row, yoy_row, key):
@@ -278,12 +283,17 @@ def _metric_pack(base_row, compare_row, yoy_row, key):
     compare = _number((compare_row or {}).get(key))
     yoy = _number((yoy_row or {}).get(key))
     return {
-        "base": _round(base, 4),
-        "compare": _round(compare, 4),
+        "base": _round(base, 4), "compare": _round(compare, 4),
         "delta": _round(base - compare, 4) if base is not None and compare is not None else None,
         "yoy_compare": _round(yoy, 4),
         "yoy_delta": _round(base - yoy, 4) if base is not None and yoy is not None else None,
     }
+
+
+def _asset_ranks(rows):
+    valid = [row for row in rows if _number(row.get("total_assets")) is not None]
+    valid.sort(key=lambda row: (-_number(row.get("total_assets")), str(row.get("bank") or "")))
+    return {_row_key(row): idx for idx, row in enumerate(valid, 1)}
 
 
 def build_intelligence(section="funding", base=None, compare=None):
@@ -296,38 +306,36 @@ def build_intelligence(section="funding", base=None, compare=None):
     ordered = sorted(quarters.keys(), key=_quarter_rank, reverse=True)
     if not ordered:
         return {"ok": False, "ready": False, "error": "FISIS 분기 데이터가 없습니다."}
-
     base = base if base in quarters else ordered[0]
     compare = compare if compare in quarters else _previous_quarter(base)
     if compare not in quarters:
         compare = ordered[1] if len(ordered) > 1 else None
     yoy_key = _yoy_quarter(base)
     yoy_meta = quarters.get(yoy_key) if yoy_key in quarters else {}
-    base_meta = quarters.get(base) or {}
-    compare_meta = quarters.get(compare) or {}
+    base_meta, compare_meta = quarters.get(base) or {}, quarters.get(compare) or {}
     base_rows_raw = [row for row in (base_meta.get("banks") or []) if isinstance(row, dict)]
-    compare_map_raw = _bank_map(compare_meta)
-    yoy_map_raw = _bank_map(yoy_meta)
+    compare_map_raw, yoy_map_raw = _bank_map(compare_meta), _bank_map(yoy_meta)
+    asset_ranks = _asset_ranks(base_rows_raw)
 
     total_deposits = sum(_number(row.get("deposits")) or 0 for row in base_rows_raw)
-    compare_total_deposits = sum(_number(row.get("deposits")) or 0 for row in (compare_meta.get("banks") or []) if isinstance(row, dict))
-    yoy_total_deposits = sum(_number(row.get("deposits")) or 0 for row in (yoy_meta.get("banks") or []) if isinstance(row, dict))
+    compare_rows_raw = [row for row in (compare_meta.get("banks") or []) if isinstance(row, dict)]
+    yoy_rows_raw = [row for row in (yoy_meta.get("banks") or []) if isinstance(row, dict)]
+    compare_total_deposits = sum(_number(row.get("deposits")) or 0 for row in compare_rows_raw)
+    yoy_total_deposits = sum(_number(row.get("deposits")) or 0 for row in yoy_rows_raw)
 
     base_rows = []
     for raw in base_rows_raw:
-        key_id = str(raw.get("finance_cd") or _normalize_bank(raw.get("bank")))
-        base_row = _derived_row(raw, total_deposits)
-        compare_raw = compare_map_raw.get(key_id)
-        yoy_raw = yoy_map_raw.get(key_id)
-        compare_row = _derived_row(compare_raw, compare_total_deposits) if compare_raw else {}
-        yoy_row = _derived_row(yoy_raw, yoy_total_deposits) if yoy_raw else {}
+        key_id = _row_key(raw)
+        base_row = _derived_row(raw, total_deposits, base)
+        compare_raw, yoy_raw = compare_map_raw.get(key_id), yoy_map_raw.get(key_id)
+        compare_row = _derived_row(compare_raw, compare_total_deposits, compare) if compare_raw else {}
+        yoy_row = _derived_row(yoy_raw, yoy_total_deposits, yoy_key) if yoy_raw else {}
         metrics = {field[0]: _metric_pack(base_row, compare_row, yoy_row, field[0]) for field in SECTION_FIELDS[section]}
         base_rows.append({
-            "bank": base_row.get("bank"),
-            "finance_cd": base_row.get("finance_cd"),
-            "region": base_row.get("region"),
-            "asset_rank": base_row.get("asset_rank"),
+            "bank": base_row.get("bank"), "finance_cd": base_row.get("finance_cd"),
+            "region": base_row.get("region"), "asset_rank": asset_ranks.get(key_id),
             "is_woori": _normalize_bank(base_row.get("bank")) == _normalize_bank("우리금융"),
+            "roa_derived": bool(base_row.get("roa_derived")), "roe_derived": bool(base_row.get("roe_derived")),
             "metrics": metrics,
         })
 
@@ -338,8 +346,12 @@ def build_intelligence(section="funding", base=None, compare=None):
         )
         for idx, item in enumerate(ranked, 1):
             item["section_rank"] = idx
+        compare_derived = {
+            key: _derived_row(row, compare_total_deposits, compare)
+            for key, row in compare_map_raw.items()
+        }
         comp_ranked = sorted(
-            [(key, _number(row.get("deposits"))) for key, row in compare_map_raw.items() if _number(row.get("deposits")) is not None],
+            [(key, _number(row.get("deposits"))) for key, row in compare_derived.items() if _number(row.get("deposits")) is not None],
             key=lambda item: (-item[1], item[0]),
         )
         comp_ranks = {key: idx for idx, (key, _) in enumerate(comp_ranked, 1)}
@@ -360,27 +372,18 @@ def build_intelligence(section="funding", base=None, compare=None):
         and woori is not None
         and woori.get("metrics", {}).get(anchor, {}).get("base") is not None
     )
-
     return {
-        "ok": True,
-        "ready": ready,
-        "section": section,
+        "ok": True, "ready": ready, "section": section,
         "source_name": store.get("source_name"),
         "updated_at": store.get("intelligence_updated_at") or store.get("updated_at"),
         "base_store_updated_at": store.get("updated_at"),
         "intelligence_schema_version": store.get("intelligence_schema_version"),
         "intelligence_quarter_count": store.get("intelligence_quarter_count"),
-        "base": base,
-        "base_label": base_meta.get("label") or base,
-        "as_of": base_meta.get("as_of"),
-        "compare": compare,
-        "compare_label": compare_meta.get("label") or compare,
+        "base": base, "base_label": base_meta.get("label") or base, "as_of": base_meta.get("as_of"),
+        "compare": compare, "compare_label": compare_meta.get("label") or compare,
         "yoy_compare": yoy_key if yoy_key in quarters else None,
         "yoy_compare_label": yoy_meta.get("label") if yoy_key in quarters else None,
-        "bank_count": len(base_rows),
-        "fields": _fields(section),
-        "woori": woori,
-        "rows": base_rows,
+        "bank_count": len(base_rows), "fields": _fields(section), "woori": woori, "rows": base_rows,
         "current_market": _current_rate_market() if section == "funding" else None,
         "rate_history": _rate_history_for_quarter(base) if section == "funding" else None,
         "notes": {
@@ -388,6 +391,7 @@ def build_intelligence(section="funding", base=None, compare=None):
             "fisis_basis": "FISIS 수치는 선택한 분기 말 기준이며 손익 지표는 공시 누적값입니다.",
             "loan_deposit_ratio": "단순 예대율은 총대출/총예수금으로 계산한 참고지표이며 규제상 예대율과 다를 수 있습니다.",
             "profitability_compare": "수익성 단일분기 해석은 전년동기 비교를 우선 사용합니다.",
+            "roa_roe_basis": "FISIS 분기 ROA/ROE 원계정이 공란이면 같은 수익성 표의 평균자산·평균자본과 누적 순이익으로 연환산한 참고값을 표시합니다.",
             "cache_basis": "확장 경영지표는 기존 경영현황 캐시와 분리된 최근분기 전용 캐시를 사용합니다.",
         },
     }
@@ -399,17 +403,11 @@ def build_latest_insight():
     profitability = build_intelligence("profitability")
     ready = all(payload.get("ready") for payload in (funding, soundness, profitability))
     return {
-        "ok": True,
-        "ready": ready,
-        "latest": funding.get("base"),
-        "latest_label": funding.get("base_label"),
-        "as_of": funding.get("as_of"),
-        "updated_at": funding.get("updated_at"),
-        "current_market": funding.get("current_market"),
-        "funding": funding.get("woori"),
-        "soundness": soundness.get("woori"),
-        "profitability": profitability.get("woori"),
-        "notes": funding.get("notes"),
+        "ok": True, "ready": ready, "latest": funding.get("base"),
+        "latest_label": funding.get("base_label"), "as_of": funding.get("as_of"),
+        "updated_at": funding.get("updated_at"), "current_market": funding.get("current_market"),
+        "funding": funding.get("woori"), "soundness": soundness.get("woori"),
+        "profitability": profitability.get("woori"), "notes": funding.get("notes"),
     }
 
 
@@ -419,7 +417,6 @@ def install_management_intelligence():
         return False
     if getattr(app_module, "_management_intelligence_installed", False):
         return True
-
     flask_app = app_module.app
     from flask import jsonify, request
 
@@ -428,8 +425,7 @@ def install_management_intelligence():
         try:
             return jsonify(build_intelligence(
                 section=request.args.get("section") or "funding",
-                base=request.args.get("base"),
-                compare=request.args.get("compare"),
+                base=request.args.get("base"), compare=request.args.get("compare"),
             ))
         except Exception as exc:
             return jsonify({"ok": False, "error": f"{type(exc).__name__}: {exc}"}), 500
@@ -442,5 +438,5 @@ def install_management_intelligence():
             return jsonify({"ok": False, "error": f"{type(exc).__name__}: {exc}"}), 500
 
     app_module._management_intelligence_installed = True
-    print("Management intelligence APIs installed: separate cache")
+    print("Management intelligence APIs installed: separate cache v5")
     return True
