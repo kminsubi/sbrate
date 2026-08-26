@@ -1,6 +1,10 @@
 name: FISIS Management Auto Check
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fisis_management_auto_check.yml'
   schedule:
     # KST 07:10 / 19:10
     - cron: '10 22 * * *'
