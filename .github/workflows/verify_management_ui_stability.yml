@@ -28,7 +28,7 @@ jobs:
           set -euo pipefail
           python -m py_compile management_export_v2.py management_report_v5_runtime.py scheduler.py
           node --check static/js/management_report_stability.js
-          grep -q 'STABILITY_VERSION = "20260826mi12"' management_report_v5_runtime.py
+          grep -q 'STABILITY_VERSION = "20260826mi13"' management_report_v5_runtime.py
           grep -q 'install_management_export_v2' scheduler.py
           grep -q '/api/management-export.xlsx' static/js/management_report_stability.js
           grep -q "currentSection" static/js/management_report_stability.js
@@ -43,11 +43,13 @@ jobs:
           grep -q "body > header" static/css/management_report_stability.css
           grep -q "position:sticky!important" static/css/management_report_stability.css
           grep -q "max-width:100vw!important" static/css/management_report_stability.css
-          grep -q "overflow-x:hidden!important" static/css/management_report_stability.css
+          grep -q "overflow-x:clip!important" static/css/management_report_stability.css
           grep -q "#dashboard-market-label{display:none!important;}" static/css/management_report_stability.css
           grep -q "#header-current-datetime" static/css/management_report_stability.css
           grep -q "min-width:162px!important" static/css/management_report_stability.css
           grep -q "pointer-events:auto!important" static/css/management_report_stability.css
+          grep -q "mr-header-update > span:first-child" static/css/management_report_stability.css
+          grep -q "display:inline!important" static/css/management_report_stability.css
           grep -q "overflow-y:visible!important" static/css/management_report_stability.css
 
       - name: Wait for live export-aware assets
@@ -64,7 +66,7 @@ jobs:
           import zipfile
           root=Path('/tmp/root.html').read_text(encoding='utf-8',errors='ignore')
           mobile=Path('/tmp/mobile.html').read_text(encoding='utf-8',errors='ignore')
-          version='20260826mi12'
+          version='20260826mi13'
           required=[f'management_report_stability.css?v={version}',f'management_report_stability.js?v={version}']
           ok=all(item in root and item in mobile for item in required) and zipfile.is_zipfile('/tmp/export-probe.xlsx')
           raise SystemExit(0 if ok else 1)
@@ -101,14 +103,15 @@ jobs:
           from pathlib import Path
           root=Path('/tmp/root.html').read_text(encoding='utf-8',errors='ignore')
           mobile=Path('/tmp/mobile.html').read_text(encoding='utf-8',errors='ignore')
-          version='20260826mi12'
+          version='20260826mi13'
           for html,name in [(root,'root'),(mobile,'mobile')]:
               assert html.count(f'management_report_stability.css?v={version}') == 1, name
               assert html.count(f'management_report_stability.js?v={version}') == 1, name
               assert html.count('data-sbrate-management-report="1"') == 2, name
           assert root.count('id="error-report-open"') == 1
           assert mobile.count('id="mobile-error-report"') == 1
-          print('HTML_SINGLETONS_OK')
+          assert '데이터 업데이트 기준' in root
+          print('HTML_SINGLETONS_AND_UPDATE_LABEL_OK')
           PY
 
       - name: Verify all eight Excel views match section and mode
@@ -165,8 +168,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/management_report_stability.js?v=20260826mi12' >/tmp/stability.js
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/css/management_report_stability.css?v=20260826mi12' >/tmp/stability.css
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/management_report_stability.js?v=20260826mi13' >/tmp/stability.js
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/css/management_report_stability.css?v=20260826mi13' >/tmp/stability.css
           node --check /tmp/stability.js
           grep -q '/api/management-export.xlsx' /tmp/stability.js
           grep -q "#mr-export-single,#mr-export" /tmp/stability.js
@@ -175,10 +178,13 @@ jobs:
           ! grep -q "parent.insertBefore(management, anchor)" /tmp/stability.js
           grep -q "resetAccidentalHorizontalScroll" /tmp/stability.js
           grep -q "body > header" /tmp/stability.css
+          grep -q "position:sticky!important" /tmp/stability.css
           grep -q "max-width:100vw!important" /tmp/stability.css
-          grep -q "overflow-x:hidden!important" /tmp/stability.css
+          grep -q "overflow-x:clip!important" /tmp/stability.css
           grep -q "#dashboard-market-label{display:none!important;}" /tmp/stability.css
           grep -q "pointer-events:auto!important" /tmp/stability.css
           grep -q "min-width:162px!important" /tmp/stability.css
+          grep -q "mr-header-update > span:first-child" /tmp/stability.css
+          grep -q "display:inline!important" /tmp/stability.css
           grep -q "overflow-y:visible!important" /tmp/stability.css
-          echo 'UI_HEADER_STABILITY_AND_EXPORTS_LIVE_OK'
+          echo 'UI_HEADER_STICKY_UPDATE_LABEL_AND_EXPORTS_LIVE_OK'
