@@ -22,7 +22,7 @@
     });
   }
 
-  function fixProfitabilityPeriodicity() {
+  function fixProfitabilityBasis() {
     const root = document.getElementById('mi-content');
     if (!root) return;
 
@@ -31,18 +31,33 @@
     );
     if (!profitability) return;
 
-    if (!profitability.querySelector('[data-mi-roa-period-note]')) {
+    profitability.querySelectorAll('.mi-card-label').forEach(label => {
+      const text = (label.textContent || '').trim();
+      if (text === 'ROA') label.textContent = 'ROA(산출)';
+      if (text === 'ROE') label.textContent = 'ROE(산출)';
+    });
+
+    root.querySelectorAll('.mi-table th').forEach(th => {
+      const text = (th.textContent || '').trim();
+      if (text === 'ROA') th.textContent = 'ROA(산출)';
+      if (text === 'ROE') th.textContent = 'ROE(산출)';
+    });
+
+    const oldNote = profitability.querySelector('[data-mi-roa-period-note]');
+    if (oldNote) oldNote.remove();
+
+    if (!profitability.querySelector('[data-mi-roa-derived-note]')) {
       const note = document.createElement('div');
       note.className = 'mi-note';
-      note.dataset.miRoaPeriodNote = 'true';
-      note.innerHTML = '<b>ROA·ROE 안내</b> · FISIS 저축은행 수익성(SE010)은 분기(Q) 조회를 지원하지 않습니다. 최신 분기 화면에서는 값을 추정하지 않고 <b>-</b>로 표시하며, 당기순이익·영업이익·이자수익·이자비용 등 실제 분기 공시 실적만 사용합니다.';
+      note.dataset.miRoaDerivedNote = 'true';
+      note.innerHTML = '<b>ROA·ROE 안내</b> · FISIS 분기 원천자료의 누적 당기순이익과 전년말·분기말 총자산/자기자본 평균을 이용한 연환산 산출값입니다. FISIS SE010 공식 기간평잔 지표와는 소폭 차이가 날 수 있습니다.';
       profitability.appendChild(note);
     }
   }
 
   function polish() {
     fixFundingLabels();
-    fixProfitabilityPeriodicity();
+    fixProfitabilityBasis();
   }
 
   const observer = new MutationObserver(polish);
