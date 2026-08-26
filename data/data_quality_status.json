@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-26 06:53:48",
+  "generated_at": "2026-08-27 01:38:20",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": true,
+  "notify": false,
   "fingerprint": "687639f252741a9b",
-  "previous_fingerprint": "fa8d96c866410efb",
+  "previous_fingerprint": "687639f252741a9b",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -14,7 +14,7 @@
     "deposit": {
       "items": 377,
       "banks": 75,
-      "previous_items": 376,
+      "previous_items": 377,
       "previous_banks": 75,
       "woori_rate_12m": 3.8
     },

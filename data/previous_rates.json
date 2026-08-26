@@ -2487,7 +2487,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -2571,7 +2571,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -2683,7 +2683,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -6156,7 +6156,7 @@
         "change_3": 0.0,
         "change_6": 0.0,
         "change_12": 0.0,
-        "change_24": -0.2,
+        "change_24": 0.0,
         "change_36": 0.0
     },
     {
@@ -7303,7 +7303,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.6,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7443,8 +7443,8 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.04,
-        "change_24": -0.05,
+        "change_12": 0.0,
+        "change_24": 0.0,
         "change_36": 0.0
     },
     {
@@ -7471,8 +7471,8 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.01,
-        "change_24": -0.05,
+        "change_12": 0.0,
+        "change_24": 0.0,
         "change_36": 0.0
     },
     {
@@ -7499,8 +7499,8 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.01,
-        "change_24": -0.05,
+        "change_12": 0.0,
+        "change_24": 0.0,
         "change_36": 0.0
     },
     {
@@ -7834,8 +7834,8 @@
         "tel": "0542754060",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.2,
-        "change_12": 0.2,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7862,8 +7862,8 @@
         "tel": "0542754060",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.2,
-        "change_12": 0.2,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7893,7 +7893,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.2
+        "change_36": 0.0
     },
     {
         "bank": "머스트삼일",
@@ -7921,7 +7921,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.2
+        "change_36": 0.0
     },
     {
         "bank": "오성",
@@ -8759,7 +8759,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -8787,7 +8787,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -8815,7 +8815,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -8843,7 +8843,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -8870,7 +8870,7 @@
         "tel": "18777788",
         "change_1": 0,
         "change_3": 0,
-        "change_6": -0.4,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -8898,7 +8898,7 @@
         "tel": "18777788",
         "change_1": 0,
         "change_3": 0,
-        "change_6": -0.4,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -8927,7 +8927,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -8955,7 +8955,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -9852,6 +9852,34 @@
         "change_3": 0,
         "change_6": 0,
         "change_12": 0.0,
+        "change_24": 0,
+        "change_36": 0
+    },
+    {
+        "bank": "하나",
+        "product": "내맘대로 중도해지 정기예금",
+        "top_1m": null,
+        "top_3m": null,
+        "top_6m": null,
+        "top_12m": null,
+        "top_24m": null,
+        "top_36m": null,
+        "base_1m": null,
+        "base_3m": null,
+        "base_6m": null,
+        "base_12m": null,
+        "base_24m": null,
+        "base_36m": null,
+        "reg_date": "2026-08-25 00:00:00.0",
+        "join_target": "개인 및 개인사업자",
+        "sweetener": "-",
+        "url": "https://www.hanasavings.com",
+        "homepage": "http://www.hanasavings.com/",
+        "tel": "18991122",
+        "change_1": 0,
+        "change_3": 0,
+        "change_6": 0,
+        "change_12": 0,
         "change_24": 0,
         "change_36": 0
     },
