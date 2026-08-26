@@ -11,30 +11,37 @@
 
   function cleanByText(root, pattern, preferredId) {
     if (!root) return null;
+    const preferred = preferredId ? document.getElementById(preferredId) : null;
+    if (preferred && root.contains(preferred)) return preferred;
     const matches = [...root.querySelectorAll('button')].filter(btn => pattern.test(btn.textContent || ''));
-    if (!matches.length) return null;
-    const keep = matches.find(btn => btn.id === preferredId) || matches[0];
-    matches.forEach(btn => { if (btn !== keep) btn.remove(); });
-    return keep;
+    return matches[0] || null;
   }
 
   function normalizeDesktopHeaderActions() {
     const header = document.querySelector('body > header');
     if (!header) return;
 
-    const management = cleanByText(header, /경영현황/, 'management-report-open')
-      || document.getElementById('management-report-open');
-    const error = cleanByText(header, /오류\s*제보/, 'error-report-open')
-      || document.getElementById('error-report-open');
-    const marketLabel = document.getElementById('dashboard-market-label');
+    header.classList.add('mr-header-stable');
 
-    // Desktop action order:
-    // 상품탭 → 경영현황 → 오류제보 → 시장현황 배지 → 업데이트기준 → 현재시각.
+    const management = document.getElementById('management-report-open')
+      || cleanByText(header, /경영현황/, 'management-report-open');
+    const error = document.getElementById('error-report-open')
+      || cleanByText(header, /오류\s*제보/, 'error-report-open');
+    const updateTime = document.getElementById('header-data-update-time');
+    const updateWrap = updateTime?.parentElement;
+    if (updateWrap) updateWrap.classList.add('mr-header-update');
+
+    // Important: do not repeatedly remove/reinsert the two action buttons.
+    // The previous implementation generated a MutationObserver/reflow loop.
+    // Keep the bound management button intact and only move it once if needed.
     if (management && error && error.parentElement) {
       const parent = error.parentElement;
-      const anchor = marketLabel && marketLabel.parentElement === parent ? marketLabel : parent.firstChild;
-      parent.insertBefore(management, anchor);
-      parent.insertBefore(error, management.nextSibling);
+      if (management.parentElement !== parent || management.nextElementSibling !== error) {
+        parent.insertBefore(management, error);
+      }
+      management.style.pointerEvents = 'auto';
+      management.style.position = 'relative';
+      management.style.zIndex = '3';
     }
   }
 
@@ -42,8 +49,8 @@
     const mobileHeader = document.querySelector('.mobile-header');
     if (!mobileHeader) return;
 
-    const management = cleanByText(mobileHeader, /경영현황/, 'management-report-open-mobile')
-      || document.getElementById('management-report-open-mobile');
+    const management = document.getElementById('management-report-open-mobile')
+      || cleanByText(mobileHeader, /경영현황/, 'management-report-open-mobile');
     const simulation = document.getElementById('rate-simulation-open-mobile');
     const row = simulation?.closest('.mobile-simulation-row');
     if (!management || !simulation || !row) return;
@@ -55,15 +62,25 @@
       row.appendChild(actions);
     }
 
-    actions.appendChild(management);
-    actions.appendChild(simulation);
+    if (management.parentElement !== actions || management.nextElementSibling !== simulation) {
+      actions.insertBefore(management, simulation);
+    }
   }
 
   function dedupeHeaderActions() {
-    ['management-report-open','management-report-open-mobile','error-report-open','mobile-error-report']
+    // management-report-open is intentionally not deduped here: it owns the
+    // openReport listener created by management_report.js. Removing/replacing
+    // it can leave a visible but unbound button.
+    ['management-report-open-mobile','error-report-open','mobile-error-report']
       .forEach(dedupeId);
     normalizeDesktopHeaderActions();
     normalizeMobileHeaderActions();
+  }
+
+  function resetAccidentalHorizontalScroll() {
+    if (window.scrollX !== 0) {
+      window.scrollTo({ left: 0, top: window.scrollY, behavior: 'auto' });
+    }
   }
 
   function currentSection() {
@@ -132,6 +149,7 @@
     ensureSingleExport();
     normalizeCompareExport();
     ensureScrollableReport();
+    resetAccidentalHorizontalScroll();
   }
 
   function schedule() {
@@ -157,6 +175,8 @@
       setTimeout(stabilize, 40);
     }
   }, true);
+
+  window.addEventListener('resize', schedule, { passive: true });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', stabilize, { once: true });
