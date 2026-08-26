@@ -5,6 +5,7 @@ ASSET_VERSION = "20260826mi7"
 STABILITY_VERSION = "20260826mi14"
 DASHBOARD_GUARD_VERSION = "20260826df1"
 MOBILE_BANK_PIN_VERSION = "20260826pin1"
+PEER_COMPARE_VERSION = "20260827peer1"
 
 
 def install_management_report_v5_runtime():
@@ -56,6 +57,12 @@ def install_management_report_v5_runtime():
                         f'<link rel="stylesheet" href="/static/css/management_report_mobile_bank_pin.css?v={MOBILE_BANK_PIN_VERSION}">\n</head>',
                         1,
                     )
+                if "management_peer_compare.css" not in html:
+                    html = html.replace(
+                        "</head>",
+                        f'<link rel="stylesheet" href="/static/css/management_peer_compare.css?v={PEER_COMPARE_VERSION}">\n</head>',
+                        1,
+                    )
                 if "management_report_v5_patch.js" not in html:
                     html = html.replace(
                         "</body>",
@@ -78,6 +85,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</body>",
                         f'<script src="/static/js/management_report_bank_focus.js?v={ASSET_VERSION}"></script>\n</body>',
+                        1,
+                    )
+                if "management_peer_compare.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/management_peer_compare.js?v={PEER_COMPARE_VERSION}"></script>\n</body>',
                         1,
                     )
                 if "management_report_stability.js" not in html:
