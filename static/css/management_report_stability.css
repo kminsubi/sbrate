@@ -1,18 +1,30 @@
 /* SBRate management report stability patch - 2026-08-26 */
 
+/* Dashboard itself must never create a page-level horizontal scroller. */
+html,
+body{
+  max-width:100%!important;
+  overflow-x:hidden!important;
+}
+
 /* =========================================================
    DESKTOP DASHBOARD HEADER
    - keep CI/title visible while scrolling
-   - keep management/error actions near the product tabs
-   - restore readable live clock size
+   - keep management/error actions clickable
+   - prevent page-level horizontal overflow
+   - keep the live clock fully visible
 ========================================================= */
 @media(min-width:901px){
   body > header{
     position:sticky!important;
     top:0!important;
     z-index:220!important;
+    width:100%!important;
+    max-width:100vw!important;
+    box-sizing:border-box!important;
     justify-content:flex-start!important;
     column-gap:0!important;
+    overflow:hidden!important;
     background:rgba(255,255,255,.97)!important;
     backdrop-filter:blur(12px)!important;
     -webkit-backdrop-filter:blur(12px)!important;
@@ -21,22 +33,37 @@
   }
 
   body > header > div:first-child{
-    flex:0 0 auto!important;
+    flex:1 1 auto!important;
     min-width:0!important;
+    max-width:none!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+  }
+
+  body > header > div:first-child > img,
+  body > header > div:first-child > h1,
+  #market-product-tabs{
+    flex-shrink:0!important;
   }
 
   body > header > div:last-child{
-    flex:0 1 auto!important;
+    flex:0 0 auto!important;
     min-width:0!important;
-    margin-left:18px!important;
-    justify-content:flex-start!important;
+    max-width:calc(100vw - 620px)!important;
+    margin-left:auto!important;
+    padding-left:12px!important;
+    justify-content:flex-end!important;
     gap:8px!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
   }
 
   #header-current-datetime{
     display:block!important;
     flex:0 0 auto!important;
-    min-width:160px!important;
+    min-width:162px!important;
+    max-width:162px!important;
+    overflow:visible!important;
     font-size:12px!important;
     line-height:1.25!important;
     font-weight:500!important;
@@ -47,21 +74,46 @@
 
   #management-report-open,
   #error-report-open{
+    position:relative!important;
+    z-index:3!important;
     flex:0 0 auto!important;
+    pointer-events:auto!important;
+  }
+
+  .mr-header-update{
+    flex:0 0 auto!important;
+    min-width:0!important;
+    white-space:nowrap!important;
   }
 }
 
-@media(min-width:901px) and (max-width:1800px){
+/* The market/source pill is useful but lower priority than actions/update/clock.
+   Hide it on ordinary desktop and laptop widths so the header can never push
+   the viewport sideways. */
+@media(min-width:901px) and (max-width:2100px){
   #dashboard-market-label{display:none!important;}
-  body > header > div:last-child{margin-left:14px!important;gap:7px!important;}
 }
 
-@media(min-width:901px) and (max-width:1500px){
+@media(min-width:901px) and (max-width:1700px){
   body > header{padding-left:14px!important;padding-right:14px!important;}
-  body > header > div:last-child{margin-left:10px!important;gap:6px!important;}
-  #header-current-datetime{font-size:12px!important;min-width:154px!important;}
+  body > header > div:last-child{gap:6px!important;padding-left:9px!important;}
   #management-report-open,
   #error-report-open{padding-left:9px!important;padding-right:9px!important;}
+}
+
+@media(min-width:901px) and (max-width:1550px){
+  body > header > div:first-child > h1{display:none!important;}
+  body > header > div:last-child{max-width:calc(100vw - 430px)!important;}
+  .mr-header-update > span:first-child{display:none!important;}
+  #header-current-datetime{min-width:158px!important;max-width:158px!important;font-size:11.5px!important;}
+}
+
+@media(min-width:901px) and (max-width:1250px){
+  body > header > div:first-child > img{max-width:180px!important;height:auto!important;}
+  #market-product-tabs{margin-left:0!important;}
+  #market-product-tabs .market-product-tab{padding-left:10px!important;padding-right:10px!important;}
+  body > header > div:last-child{max-width:calc(100vw - 360px)!important;}
+  #error-report-open{display:none!important;}
 }
 
 /* Desktop/tablet: report shell may scroll vertically if content exceeds viewport. */
