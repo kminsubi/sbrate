@@ -2,7 +2,7 @@ import sys
 
 
 ASSET_VERSION = "20260826mi6"
-STABILITY_VERSION = "20260826mi8"
+STABILITY_VERSION = "20260826mi9"
 
 
 def install_management_report_v5_runtime():
