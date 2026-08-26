@@ -1,11 +1,14 @@
 import sys
 
+from management_terminology_patch import install_management_terminology_patch
+
 
 ASSET_VERSION = "20260826mi7"
 STABILITY_VERSION = "20260826mi14"
 DASHBOARD_GUARD_VERSION = "20260826df1"
 MOBILE_BANK_PIN_VERSION = "20260826pin1"
 PEER_COMPARE_VERSION = "20260827peer2"
+TERMINOLOGY_VERSION = "20260827term1"
 
 
 def install_management_report_v5_runtime():
@@ -14,6 +17,8 @@ def install_management_report_v5_runtime():
         return False
     if getattr(app_module, "_management_report_v5_runtime_installed", False):
         return True
+
+    install_management_terminology_patch()
 
     flask_app = app_module.app
     from flask import request
@@ -63,6 +68,12 @@ def install_management_report_v5_runtime():
                         f'<link rel="stylesheet" href="/static/css/management_peer_compare.css?v={PEER_COMPARE_VERSION}">\n</head>',
                         1,
                     )
+                if "management_peer_readability_patch.css" not in html:
+                    html = html.replace(
+                        "</head>",
+                        f'<link rel="stylesheet" href="/static/css/management_peer_readability_patch.css?v={TERMINOLOGY_VERSION}">\n</head>',
+                        1,
+                    )
                 if "management_report_v5_patch.js" not in html:
                     html = html.replace(
                         "</body>",
@@ -91,6 +102,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</body>",
                         f'<script src="/static/js/management_peer_compare.js?v={PEER_COMPARE_VERSION}"></script>\n</body>',
+                        1,
+                    )
+                if "management_terminology_patch.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/management_terminology_patch.js?v={TERMINOLOGY_VERSION}"></script>\n</body>',
                         1,
                     )
                 if "management_report_stability.js" not in html:
