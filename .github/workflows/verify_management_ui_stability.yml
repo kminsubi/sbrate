@@ -26,11 +26,16 @@ jobs:
           set -euo pipefail
           python -m py_compile management_report_v5_runtime.py
           node --check static/js/management_report_stability.js
-          grep -q 'STABILITY_VERSION = "20260826mi9"' management_report_v5_runtime.py
-          grep -q "parent.insertBefore(management, error)" static/js/management_report_stability.js
+          grep -q 'STABILITY_VERSION = "20260826mi10"' management_report_v5_runtime.py
+          grep -q "parent.insertBefore(management, anchor)" static/js/management_report_stability.js
+          grep -q "parent.insertBefore(error, management.nextSibling)" static/js/management_report_stability.js
           grep -q "mr-export-single" static/js/management_report_stability.js
           grep -q "mr-scroll-stable" static/js/management_report_stability.js
-          grep -q "overflow-y:auto!important" static/css/management_report_stability.css
+          grep -q "body > header" static/css/management_report_stability.css
+          grep -q "position:sticky!important" static/css/management_report_stability.css
+          grep -q "#header-current-datetime" static/css/management_report_stability.css
+          grep -q "font-size:12px!important" static/css/management_report_stability.css
+          grep -q "justify-content:flex-start!important" static/css/management_report_stability.css
           grep -q "overflow-y:visible!important" static/css/management_report_stability.css
           grep -q "mr-single-export-btn" static/css/management_report_stability.css
 
@@ -46,7 +51,7 @@ jobs:
           from pathlib import Path
           root=Path('/tmp/root.html').read_text(encoding='utf-8',errors='ignore')
           mobile=Path('/tmp/mobile.html').read_text(encoding='utf-8',errors='ignore')
-          version='20260826mi9'
+          version='20260826mi10'
           required=[
               f'management_report_stability.css?v={version}',
               f'management_report_stability.js?v={version}',
@@ -71,7 +76,7 @@ jobs:
           from pathlib import Path
           root=Path('/tmp/root.html').read_text(encoding='utf-8',errors='ignore')
           mobile=Path('/tmp/mobile.html').read_text(encoding='utf-8',errors='ignore')
-          version='20260826mi9'
+          version='20260826mi10'
           for html,name in [(root,'root'),(mobile,'mobile')]:
               assert html.count(f'management_report_stability.css?v={version}') == 1, name
               assert html.count(f'management_report_stability.js?v={version}') == 1, name
@@ -81,16 +86,22 @@ jobs:
           print('HTML_SINGLETONS_OK')
           PY
 
-      - name: Verify live stability JS CSS and Excel endpoint
+      - name: Verify live header stability JS CSS and Excel endpoint
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/management_report_stability.js?v=20260826mi9' >/tmp/stability.js
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/css/management_report_stability.css?v=20260826mi9' >/tmp/stability.css
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/management_report_stability.js?v=20260826mi10' >/tmp/stability.js
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/css/management_report_stability.css?v=20260826mi10' >/tmp/stability.css
           node --check /tmp/stability.js
-          grep -q "parent.insertBefore(management, error)" /tmp/stability.js
+          grep -q "parent.insertBefore(management, anchor)" /tmp/stability.js
+          grep -q "parent.insertBefore(error, management.nextSibling)" /tmp/stability.js
           grep -q "mr-export-single" /tmp/stability.js
           grep -q "mr-scroll-stable" /tmp/stability.js
+          grep -q "body > header" /tmp/stability.css
+          grep -q "position:sticky!important" /tmp/stability.css
+          grep -q "#header-current-datetime" /tmp/stability.css
+          grep -q "font-size:12px!important" /tmp/stability.css
+          grep -q "justify-content:flex-start!important" /tmp/stability.css
           grep -q "overflow-y:visible!important" /tmp/stability.css
           curl -fsS --max-time 120 'https://sbrate.onrender.com/api/management-report/export.xlsx' -o /tmp/report.xlsx
           python - <<'PY'
