@@ -1,0 +1,146 @@
+/* SBRate management report bank focus/mobile sticky polish - 2026-08-26 */
+
+/* Intelligence table quick focus */
+.mi-bank-focus-actions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:7px 10px;
+  border-bottom:1px solid #edf2f7;
+  background:#fbfdff;
+}
+.mi-bank-focus-actions>span{
+  font-size:9px;
+  font-weight:800;
+  color:#8190a4;
+}
+.mi-bank-focus-btn{
+  height:27px;
+  padding:0 9px;
+  border:1px solid #bfd9fb;
+  border-radius:8px;
+  background:#eef6ff;
+  color:#1556c0;
+  font-size:9px;
+  font-weight:800;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.mi-bank-focus-btn:hover{background:#dfeeff;border-color:#9fc5f7}
+.mi-bank-focus-btn:disabled{opacity:.45;cursor:default}
+
+@keyframes miWooriFocusPulse{
+  0%,100%{filter:none}
+  35%{filter:brightness(.92)}
+  65%{filter:brightness(1.04)}
+}
+#mi-content .mi-table tr.mi-woori-focus-pulse td{
+  animation:miWooriFocusPulse .55s ease 2;
+}
+
+/* Bank labels are shorter now, so reclaim a little width on desktop too. */
+#mi-content .mi-table th:nth-child(2),
+#mi-content .mi-table td:nth-child(2){
+  width:136px!important;
+  min-width:136px!important;
+  max-width:136px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#mi-content .mi-table th:nth-child(3),
+#mi-content .mi-table td:nth-child(3){left:202px!important;}
+
+@media(max-width:900px){
+  /* Main management table: only the bank column stays fixed horizontally. */
+  #mr-table tbody .mr-col-rank,
+  #mr-table tbody .mr-col-rankchg,
+  #mr-table tbody .mr-col-region{
+    position:static!important;
+    left:auto!important;
+    z-index:auto!important;
+    box-shadow:none!important;
+  }
+
+  #mr-table thead .mr-col-rank,
+  #mr-table thead .mr-col-rankchg,
+  #mr-table thead .mr-col-region{
+    left:auto!important;
+    box-shadow:none!important;
+  }
+
+  #mr-table .mr-col-bank{
+    position:sticky!important;
+    left:0!important;
+    width:104px!important;
+    min-width:104px!important;
+    max-width:104px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    text-align:left!important;
+    z-index:12!important;
+    background:#fff!important;
+    box-shadow:5px 0 8px -8px rgba(15,23,42,.4)!important;
+  }
+  #mr-table thead .mr-col-bank{
+    z-index:27!important;
+    background:#f8fafc!important;
+    text-align:center!important;
+  }
+  #mr-table tbody tr.mr-woori-row .mr-col-bank{
+    background:#eef6ff!important;
+  }
+
+  /* Intelligence tables: rank and region move with the metrics; bank alone is frozen. */
+  #mi-content .mi-table td:nth-child(1),
+  #mi-content .mi-table td:nth-child(3){
+    position:static!important;
+    left:auto!important;
+    z-index:auto!important;
+    box-shadow:none!important;
+  }
+  #mi-content .mi-table th:nth-child(1),
+  #mi-content .mi-table th:nth-child(3){
+    left:auto!important;
+    z-index:2!important;
+    box-shadow:none!important;
+  }
+
+  #mi-content .mi-table th:nth-child(2),
+  #mi-content .mi-table td:nth-child(2){
+    position:sticky!important;
+    left:0!important;
+    width:104px!important;
+    min-width:104px!important;
+    max-width:104px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    text-align:left!important;
+    z-index:7!important;
+    background:#fff!important;
+    box-shadow:5px 0 8px -8px rgba(15,23,42,.4)!important;
+  }
+  #mi-content .mi-table thead th:nth-child(2){
+    z-index:10!important;
+    background:#f8fafc!important;
+    text-align:center!important;
+  }
+  #mi-content .mi-table tr.mi-woori td:nth-child(2){
+    background:#edf5ff!important;
+    color:#1556c0!important;
+    font-weight:800!important;
+  }
+
+  .mi-bank-focus-actions{padding:7px 8px}
+  .mi-bank-focus-btn{height:26px;padding:0 8px;font-size:8.5px}
+}
+
+@media(max-width:420px){
+  #mr-table .mr-col-bank,
+  #mi-content .mi-table th:nth-child(2),
+  #mi-content .mi-table td:nth-child(2){
+    width:98px!important;
+    min-width:98px!important;
+    max-width:98px!important;
+  }
+}
