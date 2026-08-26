@@ -6,6 +6,7 @@ on:
       - 'fisis_intelligence_store.py'
       - 'fisis_profitability_period_patch.py'
       - 'management_intelligence.py'
+      - 'management_export_v2.py'
       - 'management_report_v5_runtime.py'
       - 'static/js/management_intelligence.js'
       - 'static/js/management_intelligence_polish.js'
@@ -26,6 +27,7 @@ jobs:
             fisis_intelligence_store.py \
             fisis_profitability_period_patch.py \
             management_intelligence.py \
+            management_export_v2.py \
             management_report_v5_runtime.py \
             scheduler.py
           node --check static/js/management_intelligence.js
@@ -35,17 +37,14 @@ jobs:
         run: |
           set -e
           for i in $(seq 1 80); do
-            if curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/intelligence-status' >/tmp/status.json; then
+            if curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/intelligence-status' >/tmp/status.json; then
               if python - <<'PY'
           import json, sys
           try:
               d=json.load(open('/tmp/status.json',encoding='utf-8'))
           except Exception:
               sys.exit(1)
-          ok=(
-              d.get('ok') is True and
-              int(d.get('code_schema_version') or 0) >= 7
-          )
+          ok=(d.get('ok') is True and int(d.get('code_schema_version') or 0) >= 7)
           sys.exit(0 if ok else 1)
           PY
               then
@@ -65,7 +64,7 @@ jobs:
         run: |
           set -e
           for i in $(seq 1 40); do
-            curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/intelligence-status' >/tmp/status.json || true
+            curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/intelligence-status' >/tmp/status.json || true
             if python - <<'PY'
           import json, sys
           try:
@@ -103,7 +102,7 @@ jobs:
 
       - name: Verify stable base report is unchanged
         run: |
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json
+          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json
           python - <<'PY' >/tmp/qparams.env
           import json
           d=json.load(open('/tmp/quarters.json',encoding='utf-8'))
@@ -115,7 +114,7 @@ jobs:
           print('PREVIOUS='+qs[1]['key'])
           PY
           . /tmp/qparams.env
-          curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${PREVIOUS}" >/tmp/base-report.json
+          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${PREVIOUS}" >/tmp/base-report.json
           python - <<'PY'
           import json
           d=json.load(open('/tmp/base-report.json',encoding='utf-8'))
@@ -125,32 +124,23 @@ jobs:
           w=next((x for x in rows if '우리금융' in str(x.get('bank') or '')),None)
           assert w, 'Woori missing from base report'
           assert w.get('rank') is not None, w
-          print('stable_base', {
-              'base':d.get('base'), 'compare':d.get('compare'),
-              'rows':len(rows), 'woori_rank':w.get('rank'),
-              'woori_compare_rank':w.get('compare_rank'),
-          })
+          print('stable_base', {'rows':len(rows),'woori_rank':w.get('rank'),'woori_compare_rank':w.get('compare_rank')})
           PY
 
       - name: Verify live intelligence payloads
         run: |
+          set -e
           . /tmp/qparams.env
           for section in funding soundness profitability; do
-            curl -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=${section}&base=${LATEST}&compare=${PREVIOUS}" >"/tmp/${section}.json"
+            curl --retry 4 --retry-all-errors --retry-delay 2 -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=${section}&base=${LATEST}&compare=${PREVIOUS}" >"/tmp/${section}.json"
           done
           python - <<'PY'
           import json
-
-          def load(name):
-              return json.load(open(f'/tmp/{name}.json',encoding='utf-8'))
-
-          def val(d,key):
-              return (((d.get('woori') or {}).get('metrics') or {}).get(key) or {}).get('base')
-
+          def load(name): return json.load(open(f'/tmp/{name}.json',encoding='utf-8'))
+          def val(d,key): return (((d.get('woori') or {}).get('metrics') or {}).get(key) or {}).get('base')
           def reasonable_amount(value, name):
               assert value is not None, f'{name} missing'
               assert abs(float(value)) < 1_000_000, f'{name} looks like raw KRW, not 억원: {value}'
-
           f,s,p=load('funding'),load('soundness'),load('profitability')
           for name,d in [('funding',f),('soundness',s),('profitability',p)]:
               assert d.get('ok') is True, (name,d)
@@ -158,59 +148,27 @@ jobs:
               assert int(d.get('intelligence_schema_version') or 0) >= 7, (name,d)
               assert int(d.get('intelligence_quarter_count') or 0) >= 2, (name,d)
               assert len(d.get('rows') or []) >= 70, (name,len(d.get('rows') or []))
-
           reasonable_amount(val(f,'deposits'),'deposits')
           reasonable_amount(val(f,'time_deposits'),'time_deposits')
           assert val(s,'liquidity_ratio') is not None, s
           assert val(s,'delinquency_ratio') is not None, s
-
-          for key in (
-              'net_income','operating_profit','net_interest_income','interest_income',
-              'interest_expense','deposit_interest_expense','time_deposit_interest_expense'
-          ):
+          for key in ('net_income','operating_profit','net_interest_income','interest_income','interest_expense','deposit_interest_expense','time_deposit_interest_expense'):
               reasonable_amount(val(p,key),key)
-
-          # FISIS savings-bank profitability table SE010 rejects term=Q.
-          # Quarterly ROA/ROE must therefore remain unavailable, not estimated.
           assert val(p,'roa') is None, ('quarterly ROA must stay blank', val(p,'roa'))
           assert val(p,'roe') is None, ('quarterly ROE must stay blank', val(p,'roe'))
           periodicity=p.get('periodicity') or {}
           assert periodicity.get('quarterly_roa_roe') is False, periodicity
           note=(p.get('notes') or {}).get('roa_roe_basis') or ''
           assert '분기' in note and '추정하지 않고' in note, note
-
-          print('funding', {
-              'base':f.get('base'), 'banks':f.get('bank_count'),
-              'deposits':val(f,'deposits'), 'time_deposits':val(f,'time_deposits'),
-              'deposit_rank':(f.get('woori') or {}).get('section_rank'),
-              'current_market':f.get('current_market'),
-          })
-          print('soundness', {
-              'asset_rank':(s.get('woori') or {}).get('asset_rank'),
-              'bis':val(s,'bis_ratio'), 'delinquency':val(s,'delinquency_ratio'),
-              'npl':val(s,'npl_ratio_effective'), 'liquidity':val(s,'liquidity_ratio'),
-              'npl_coverage':val(s,'npl_coverage_ratio'),
-          })
-          print('profitability', {
-              'net_income':val(p,'net_income'), 'operating_profit':val(p,'operating_profit'),
-              'net_interest_income':val(p,'net_interest_income'),
-              'interest_income':val(p,'interest_income'), 'interest_expense':val(p,'interest_expense'),
-              'deposit_interest_expense':val(p,'deposit_interest_expense'),
-              'time_deposit_interest_expense':val(p,'time_deposit_interest_expense'),
-              'roa':val(p,'roa'), 'roe':val(p,'roe'), 'periodicity':periodicity,
-          })
-          print('rate_history', f.get('rate_history'))
+          print('INTELLIGENCE_PAYLOADS_OK')
           PY
 
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-intelligence/insight' >/tmp/insight.json
+          curl --retry 4 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/api/management-intelligence/insight' >/tmp/insight.json
           python - <<'PY'
           import json
           d=json.load(open('/tmp/insight.json',encoding='utf-8'))
           assert d.get('ok') is True, d
           assert d.get('ready') is True, d
           assert d.get('latest'), d
-          print('insight', {
-              'latest':d.get('latest'), 'latest_label':d.get('latest_label'),
-              'as_of':d.get('as_of'), 'ready':d.get('ready'),
-          })
+          print('INSIGHT_OK', {'latest':d.get('latest'),'latest_label':d.get('latest_label'),'as_of':d.get('as_of')})
           PY
