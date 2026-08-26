@@ -30,7 +30,6 @@
 
     // Desktop action order:
     // 상품탭 → 경영현황 → 오류제보 → 시장현황 배지 → 업데이트기준 → 현재시각.
-    // 경영현황/오류제보를 먼저 배치해 우측 끝으로 밀리는 느낌을 없앤다.
     if (management && error && error.parentElement) {
       const parent = error.parentElement;
       const anchor = marketLabel && marketLabel.parentElement === parent ? marketLabel : parent.firstChild;
@@ -56,7 +55,6 @@
       row.appendChild(actions);
     }
 
-    // 경영현황은 항상 시뮬레이션 왼쪽, 두 버튼은 한 줄에 하나씩만 존재한다.
     actions.appendChild(management);
     actions.appendChild(simulation);
   }
@@ -68,26 +66,31 @@
     normalizeMobileHeaderActions();
   }
 
-  function previousQuarter(key) {
-    const match = String(key || '').match(/^(\d{4})Q([1-4])$/);
-    if (!match) return '';
-    const year = Number(match[1]);
-    const quarter = Number(match[2]);
-    return quarter === 1 ? `${year - 1}Q4` : `${year}Q${quarter - 1}`;
+  function currentSection() {
+    return document.querySelector('#mi-section-tabs [data-mi-section].is-active')?.dataset.miSection || 'general';
   }
 
-  function quarterOptions(selectId) {
-    return [...document.querySelectorAll(`#${selectId} option`)].map(option => option.value).filter(Boolean);
+  function currentMode() {
+    return document.querySelector('#management-report-modal [data-mr-mode="compare"].is-active')
+      ? 'compare'
+      : 'single';
   }
 
-  function exportSingleQuarter() {
-    const base = document.getElementById('mr-single-quarter')?.value || '';
-    if (!base) return;
-    const keys = quarterOptions('mr-single-quarter');
-    let compare = previousQuarter(base);
-    if (!keys.includes(compare)) compare = keys.find(key => key !== base) || '';
-    if (!compare) return;
-    window.location.href = `/api/management-report/export.xlsx?base=${encodeURIComponent(base)}&compare=${encodeURIComponent(compare)}`;
+  function exportCurrentView() {
+    const section = currentSection();
+    const mode = currentMode();
+    const base = mode === 'compare'
+      ? document.getElementById('mr-base-quarter')?.value || ''
+      : document.getElementById('mr-single-quarter')?.value || '';
+    const compare = mode === 'compare'
+      ? document.getElementById('mr-compare-quarter')?.value || ''
+      : '';
+
+    if (!base || (mode === 'compare' && (!compare || compare === base))) return;
+
+    const params = new URLSearchParams({ section, mode, base });
+    if (mode === 'compare') params.set('compare', compare);
+    window.location.href = `/api/management-export.xlsx?${params.toString()}`;
   }
 
   function ensureSingleExport() {
@@ -96,16 +99,24 @@
 
     const existing = [...toolbar.querySelectorAll('#mr-export-single')];
     existing.slice(1).forEach(node => node.remove());
-    if (existing[0]) return;
+    if (existing[0]) {
+      existing[0].title = '현재 화면의 선택 분기 데이터를 Excel로 다운로드';
+      return;
+    }
 
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.id = 'mr-export-single';
     btn.className = 'mr-secondary-btn mr-single-export-btn';
     btn.textContent = '⬇ Excel 다운로드';
-    btn.title = '선택 분기와 직전 공시분기 비교 데이터를 Excel로 다운로드';
-    btn.addEventListener('click', exportSingleQuarter);
+    btn.title = '현재 화면의 선택 분기 데이터를 Excel로 다운로드';
     toolbar.appendChild(btn);
+  }
+
+  function normalizeCompareExport() {
+    const btn = document.getElementById('mr-export');
+    if (!btn) return;
+    btn.title = '현재 화면의 기준분기·비교분기 데이터를 Excel로 다운로드';
   }
 
   function ensureScrollableReport() {
@@ -119,6 +130,7 @@
   function stabilize() {
     dedupeHeaderActions();
     ensureSingleExport();
+    normalizeCompareExport();
     ensureScrollableReport();
   }
 
@@ -131,6 +143,16 @@
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
   document.addEventListener('click', event => {
+    const exportButton = event.target.closest?.('#mr-export-single,#mr-export');
+    if (exportButton) {
+      // Capture phase에서 기존 비교용 export handler보다 먼저 처리한다.
+      // 현재 탭/모드에 맞는 V2 export만 한 번 실행한다.
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      exportCurrentView();
+      return;
+    }
+
     if (event.target.closest?.('#management-report-open,#management-report-open-mobile,[data-mi-section],[data-mr-mode],#mr-single-run,#mr-run')) {
       setTimeout(stabilize, 40);
     }
