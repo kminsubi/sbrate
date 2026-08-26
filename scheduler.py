@@ -13,6 +13,7 @@ from data_quality_runtime import install_data_quality_endpoint
 from fisis_catalog_probe import install_fisis_catalog_probe
 from fisis_history_patch import install_fisis_history_patch
 import fisis_intelligence_store
+from fisis_profitability_period_patch import install_fisis_profitability_period_patch
 from fisis_quality_patch import install_fisis_quality_patch
 from fisis_region_patch import install_fisis_region_patch
 from management_intelligence import install_management_intelligence
@@ -119,19 +120,18 @@ install_management_report_v4_runtime()
 install_management_report()
 
 # 기본 FISIS provider에는 검증된 이력/권역/품질 규칙만 적용한다.
-# 기존 Upstash 경영현황 캐시는 요청 시 즉시 읽히며, 오래됐을 때는
-# 기존 management_report 경로에서 백그라운드 갱신된다. 배포 직후에는
-# 대용량 기본 캐시 재수집을 먼저 돌리지 않아 확장 지표와 API를 경쟁시키지 않는다.
 install_fisis_history_patch()
 install_fisis_region_patch()
 install_fisis_quality_patch()
 install_management_report_auto_update()
 install_fisis_catalog_probe()
 
-# 확장 지표는 기본 캐시를 절대 refresh시키지 않고 현재 저장된 기준분기만 읽는다.
-# 이 한 줄이 과거 2020Q1+ 전체 재수집과 최근분기 intelligence 수집의 충돌을 차단한다.
+# 확장 지표는 기존 경영현황 캐시와 분리한다. SE010 수익성 표는
+# FISIS가 term=Q를 지원하지 않으므로 분기 화면에서 ROA/ROE를 추정하지
+# 않고 실제 분기 손익지표만 사용하도록 주기 패치를 먼저 적용한다.
 import fisis_management as _fm
 fisis_intelligence_store._base_store = lambda: _fm.get_management_store(trigger_refresh=False) or {}
+install_fisis_profitability_period_patch()
 fisis_intelligence_store.install_fisis_intelligence_store()
 install_management_intelligence()
 
