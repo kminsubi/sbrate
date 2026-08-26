@@ -16,8 +16,97 @@ jobs:
           curl -fsS --retry 4 --retry-delay 5 --max-time 90 \
             https://sbrate.onrender.com/ >/dev/null
 
-      - name: Check FISIS latest quarter
+      - name: Check FISIS latest quarter to completion
+        shell: bash
         run: |
+          set -euo pipefail
+
           curl -fsS --retry 3 --retry-delay 8 --max-time 600 \
             https://sbrate.onrender.com/api/management-report/check-latest \
-            | python -m json.tool
+            > /tmp/fisis-latest.json
+
+          echo '--- initial state ---'
+          python -m json.tool /tmp/fisis-latest.json
+
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/fisis-latest.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          assert d.get('current_latest'), d
+          assert d.get('target_quarter'), d
+          assert float(d.get('coverage_ratio_required') or 0) >= 0.90, d
+          PY
+
+          status="$(python - <<'PY'
+          import json
+          print(json.load(open('/tmp/fisis-latest.json',encoding='utf-8')).get('status') or '')
+          PY
+          )"
+
+          if [ "$status" = 'probe_started' ] || [ "$status" = 'probe_running' ]; then
+            finished=0
+            for i in $(seq 1 90); do
+              sleep 10
+              curl -fsS --retry 2 --retry-delay 5 --max-time 90 \
+                https://sbrate.onrender.com/api/management-report/check-latest/status \
+                > /tmp/fisis-status.json
+
+              if python - <<'PY'
+          import json, sys
+          d=json.load(open('/tmp/fisis-status.json',encoding='utf-8'))
+          terminal={
+              'new_quarter_not_broadly_published',
+              'new_quarter_refresh_started',
+              'refresh_already_running',
+              'latest_quarter_no_new_banks',
+              'probe_failed',
+          }
+          ok=(
+              d.get('persistent') is True
+              and bool(d.get('finished_at'))
+              and str(d.get('status') or '') in terminal
+          )
+          sys.exit(0 if ok else 1)
+          PY
+              then
+                finished=1
+                cp /tmp/fisis-status.json /tmp/fisis-latest.json
+                break
+              fi
+
+              echo "waiting for persistent FISIS probe result... $i/90"
+            done
+            test "$finished" = 1
+          fi
+
+          echo '--- final state ---'
+          python -m json.tool /tmp/fisis-latest.json
+
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/fisis-latest.json',encoding='utf-8'))
+          assert d.get('ok') is True, d
+          assert float(d.get('coverage_ratio_required') or 0) >= 0.90, d
+          allowed={
+              'latest_already_loaded',
+              'waiting_for_disclosure_window',
+              'management_refresh_running',
+              'recent_probe_reused',
+              'new_quarter_not_broadly_published',
+              'new_quarter_refresh_started',
+              'refresh_already_running',
+              'latest_quarter_no_new_banks',
+          }
+          status=str(d.get('status') or '')
+          assert status in allowed, d
+          if status == 'probe_failed':
+              raise AssertionError(d)
+          print('FISIS_AUTO_CHECK_OK', {
+              'status': status,
+              'current_latest': d.get('current_latest'),
+              'target_quarter': d.get('target_quarter'),
+              'published_asset_count': d.get('published_asset_count'),
+              'coverage_threshold': d.get('coverage_threshold'),
+              'finished_at': d.get('finished_at'),
+          })
+          PY
