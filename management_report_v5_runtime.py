@@ -4,6 +4,7 @@ import sys
 ASSET_VERSION = "20260826mi7"
 STABILITY_VERSION = "20260826mi14"
 DASHBOARD_GUARD_VERSION = "20260826df1"
+MOBILE_BANK_PIN_VERSION = "20260826pin1"
 
 
 def install_management_report_v5_runtime():
@@ -49,6 +50,12 @@ def install_management_report_v5_runtime():
                         f'<link rel="stylesheet" href="/static/css/management_report_stability.css?v={STABILITY_VERSION}">\n</head>',
                         1,
                     )
+                if "management_report_mobile_bank_pin.css" not in html:
+                    html = html.replace(
+                        "</head>",
+                        f'<link rel="stylesheet" href="/static/css/management_report_mobile_bank_pin.css?v={MOBILE_BANK_PIN_VERSION}">\n</head>',
+                        1,
+                    )
                 if "management_report_v5_patch.js" not in html:
                     html = html.replace(
                         "</body>",
@@ -77,6 +84,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</body>",
                         f'<script src="/static/js/management_report_stability.js?v={STABILITY_VERSION}"></script>\n</body>',
+                        1,
+                    )
+                if "management_report_mobile_bank_pin.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/management_report_mobile_bank_pin.js?v={MOBILE_BANK_PIN_VERSION}"></script>\n</body>',
                         1,
                     )
                 if "dashboard_final_guard.js" not in html:
