@@ -46,8 +46,7 @@
 
   function deltaHtml(value, unit) {
     const n = num(value);
-    if (n === null) return '<span class="mp-delta mp-flat">-</span>';
-    if (Math.abs(n) < 0.0000001) return '<span class="mp-delta mp-flat">-</span>';
+    if (n === null || Math.abs(n) < 0.0000001) return '<span class="mp-delta mp-flat">-</span>';
     const digits = unit === '억원' ? (Math.abs(n) >= 100 ? 0 : 1) : 2;
     const body = Math.abs(n).toLocaleString('ko-KR', {minimumFractionDigits: digits, maximumFractionDigits: digits});
     const suffix = unit === '%' ? '%p' : unit;
@@ -112,6 +111,8 @@
   function activatePeer() {
     if (!ensureUI()) return;
     peerActive = true;
+    const modal = document.getElementById('management-report-modal');
+    modal?.classList.add('mp-peer-active');
     document.querySelectorAll('#mi-section-tabs [data-mi-section]').forEach(btn => {
       btn.classList.toggle('is-active', btn.dataset.miSection === PEER_KEY);
     });
@@ -123,8 +124,20 @@
 
   function deactivatePeer() {
     peerActive = false;
+    document.getElementById('management-report-modal')?.classList.remove('mp-peer-active');
     const content = document.getElementById('mp-content');
     if (content) content.hidden = true;
+  }
+
+  function exportPeer() {
+    if (!peerActive) return;
+    const mode = isCompareMode() ? 'compare' : 'single';
+    const base = currentBase();
+    const compare = currentCompare();
+    if (!base || (mode === 'compare' && (!compare || compare === base))) return;
+    const params = new URLSearchParams({mode, base});
+    if (mode === 'compare') params.set('compare', compare);
+    window.location.href = `/api/management-peer/export.xlsx?${params.toString()}`;
   }
 
   function summaryCard(label, rank, value, note = '') {
@@ -152,21 +165,17 @@
   }
 
   function insightHtml(data) {
-    const w = data.woori || {};
     const ranks = data.woori_peer_ranks || {};
     const bisGap = avgDiff(data, 'bis_ratio');
     const delinGap = avgDiff(data, 'delinquency_ratio');
     const roeGap = avgDiff(data, 'roe');
     const assetRank = ranks.total_assets ? `${ranks.total_assets}/4위` : '-';
     const depositRank = ranks.deposits ? `${ranks.deposits}/4위` : '-';
-    const bisText = signedText(bisGap, '%');
-    const delinText = signedText(delinGap, '%');
-    const roeText = signedText(roeGap, '%');
     return `<div class="mp-insight">
       <div class="mp-insight-title">우리금융 Peer 인사이트</div>
       <div class="mp-insight-text">
         우리금융은 4개사 중 <b>총자산 ${esc(assetRank)}</b>, <b>총예수금 ${esc(depositRank)}</b>입니다.
-        BIS는 Peer 평균 대비 <b>${esc(bisText)}</b>, 연체율은 <b>${esc(delinText)}</b>, ROE(산출)는 <b>${esc(roeText)}</b>입니다.
+        BIS는 Peer 평균 대비 <b>${esc(signedText(bisGap, '%'))}</b>, 연체율은 <b>${esc(signedText(delinGap, '%'))}</b>, ROE(산출)는 <b>${esc(signedText(roeGap, '%'))}</b>입니다.
         <span class="mp-insight-help">연체율은 낮을수록 건전성 측면에서 유리합니다.</span>
       </div>
     </div>`;
@@ -231,7 +240,10 @@
           <h3>4대 금융지주 저축은행 비교</h3>
           <p>${esc(data.base_label || data.base || '-')} · ${esc(data.as_of || '-')} 기준 · 우리금융 → 신한 → 하나 → KB</p>
         </div>
-        <div class="mp-mode-badge">${data.mode === 'compare' ? `${esc(data.base || '')} vs ${esc(data.compare || '')}` : '분기현황'}</div>
+        <div class="mp-heading-actions">
+          <div class="mp-mode-badge">${data.mode === 'compare' ? `${esc(data.base || '')} vs ${esc(data.compare || '')}` : '분기현황'}</div>
+          <button type="button" id="mp-export" class="mr-secondary-btn mp-export-btn">⬇ Excel 다운로드</button>
+        </div>
       </div>
       ${warning}
       ${summary}
@@ -257,7 +269,7 @@
     }
     const seq = ++loadSeq;
     content.innerHTML = '<div class="mi-warmup">4대 금융지주 저축은행 데이터를 비교하고 있습니다.</div>';
-    const params = new URLSearchParams({ mode, base });
+    const params = new URLSearchParams({mode, base});
     if (mode === 'compare') params.set('compare', compare);
     try {
       const response = await fetch(`/api/management-peer?${params.toString()}`, {cache: 'no-store'});
@@ -274,6 +286,11 @@
     if (document.documentElement.dataset.mpBound === '1') return;
     document.documentElement.dataset.mpBound = '1';
     document.addEventListener('click', event => {
+      if (event.target.closest?.('#mp-export')) {
+        event.preventDefault();
+        exportPeer();
+        return;
+      }
       const section = event.target.closest?.('#mi-section-tabs [data-mi-section]');
       if (section) {
         if (section.dataset.miSection === PEER_KEY) {
