@@ -1,7 +1,7 @@
 import sys
 
 
-ASSET_VERSION = "20260826mi5"
+ASSET_VERSION = "20260826mi6"
 
 
 def install_management_report_v5_runtime():
@@ -35,6 +35,12 @@ def install_management_report_v5_runtime():
                         f'<link rel="stylesheet" href="/static/css/management_intelligence.css?v={ASSET_VERSION}">\n</head>',
                         1,
                     )
+                if "management_report_bank_focus.css" not in html:
+                    html = html.replace(
+                        "</head>",
+                        f'<link rel="stylesheet" href="/static/css/management_report_bank_focus.css?v={ASSET_VERSION}">\n</head>',
+                        1,
+                    )
                 if "management_report_v5_patch.js" not in html:
                     html = html.replace(
                         "</body>",
@@ -51,6 +57,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</body>",
                         f'<script src="/static/js/management_intelligence_polish.js?v={ASSET_VERSION}"></script>\n</body>',
+                        1,
+                    )
+                if "management_report_bank_focus.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/management_report_bank_focus.js?v={ASSET_VERSION}"></script>\n</body>',
                         1,
                     )
                 response.set_data(html)
