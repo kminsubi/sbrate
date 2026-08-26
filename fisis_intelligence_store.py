@@ -1,10 +1,9 @@
-"""Lightweight persistent FISIS cache for expanded management intelligence.
+"""Recent-quarter FISIS cache for management intelligence.
 
-The proven base management cache is intentionally left untouched.  This store
-collects only the recent quarters needed by the funding, soundness and
-profitability views and persists them under a separate Upstash/local key.
-FISIS authentication is read only by fisis_management on the Render server and
-is never returned by these APIs.
+This cache is deliberately separate from the proven management-report cache.
+It collects only the additional metrics needed by funding, soundness and
+profitability views, so deploying these views never forces a full 2020Q1+
+rebuild of the base report. FISIS authentication remains server-side only.
 """
 
 import json
@@ -12,94 +11,55 @@ import re
 import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
-
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 CACHE_KEY = "sbrate:management:intelligence:v1"
 CACHE_MAX_AGE = timedelta(days=14)
 MAX_QUARTERS = 6
 BASE_DIR = Path(__file__).resolve().parent
 LOCAL_CACHE = BASE_DIR / "data" / "management" / "fisis_intelligence.json"
 
-# Only fields that are not already supplied by the stable base management store.
-# One FISIS call is made per table/bank for a short recent-quarter range.
 TABLES = {
-    "SE028": {
-        "deposits": "A1",
-        "time_deposits": "A14",
-    },
-    "SE031": {
-        "personal_deposits": "A",
-        "corporate_deposits": "B",
-        "sole_prop_deposits": "B1",
-    },
-    "SE006": {
-        "operating_profit": "C",
-    },
+    "SE028": {"deposits": "A1", "time_deposits": "A14"},
+    "SE031": {"personal_deposits": "A", "corporate_deposits": "B", "sole_prop_deposits": "B1"},
+    "SE006": {"operating_profit": "C"},
     "SE010": {
-        "roa": "C",
-        "roe": "D",
+        "avg_assets": "A", "avg_equity": "B", "roa": "C",
+        "profit_net_income": "C1", "roe": "D",
     },
     "SE014": {
-        "net_interest_income": "A",
-        "interest_income": "A1",
-        "loan_interest_income": "A13",
-        "interest_expense": "B1",
-        "deposit_interest_expense": "B11",
-        "time_deposit_interest_expense": "B115",
+        "net_interest_income": "A", "interest_income": "A1", "loan_interest_income": "A13",
+        "interest_expense": "A2", "deposit_interest_expense": "A21",
+        "time_deposit_interest_expense": "A215",
     },
     "SE008": {
-        "fixed_below_loans": "A3",
-        "npl_ratio_detail": "A4",
-        "allowance_balance": "A6",
-        "npl_coverage_ratio": "A9",
+        "fixed_below_loans": "A3", "npl_ratio_detail": "A4",
+        "allowance_balance": "A6", "npl_coverage_ratio": "A9",
     },
-    "SE011": {
-        "liquidity_ratio": "A",
-    },
-    "SE036": {
-        "industry_corporate_loans": "A",
-        "real_estate_industry_loans": "A6",
-    },
+    "SE011": {"liquidity_ratio": "A"},
+    "SE036": {"industry_corporate_loans": "A", "real_estate_industry_loans": "A6"},
 }
 
-METRIC_KIND = {
-    "deposits": "amount",
-    "time_deposits": "amount",
-    "personal_deposits": "amount",
-    "corporate_deposits": "amount",
-    "sole_prop_deposits": "amount",
-    "operating_profit": "amount",
-    "roa": "ratio",
-    "roe": "ratio",
-    "net_interest_income": "amount",
-    "interest_income": "amount",
-    "loan_interest_income": "amount",
-    "interest_expense": "amount",
-    "deposit_interest_expense": "amount",
-    "time_deposit_interest_expense": "amount",
-    "fixed_below_loans": "amount",
-    "npl_ratio_detail": "ratio",
-    "allowance_balance": "amount",
-    "npl_coverage_ratio": "ratio",
-    "liquidity_ratio": "ratio",
-    "industry_corporate_loans": "amount",
-    "real_estate_industry_loans": "amount",
+AMOUNT_METRICS = {
+    "deposits", "time_deposits", "personal_deposits", "corporate_deposits", "sole_prop_deposits",
+    "operating_profit", "avg_assets", "avg_equity", "profit_net_income", "net_interest_income",
+    "interest_income", "loan_interest_income", "interest_expense", "deposit_interest_expense",
+    "time_deposit_interest_expense", "fixed_below_loans", "allowance_balance",
+    "industry_corporate_loans", "real_estate_industry_loans",
 }
+RATIO_METRICS = {"roa", "roe", "npl_ratio_detail", "npl_coverage_ratio", "liquidity_ratio"}
+METRIC_KIND = {metric: "amount" for metric in AMOUNT_METRICS}
+METRIC_KIND.update({metric: "ratio" for metric in RATIO_METRICS})
 
 _MEMORY_LOCK = threading.Lock()
 _MEMORY_STORE = None
 _REFRESH_LOCK = threading.Lock()
 _REFRESH_THREAD = None
 _REFRESH_STATE = {
-    "running": False,
-    "started_at": None,
-    "finished_at": None,
-    "company_total": 0,
-    "company_done": 0,
-    "errors": [],
+    "running": False, "phase": "idle", "started_at": None, "finished_at": None,
+    "company_total": 0, "company_done": 0, "errors": [],
 }
 
 
@@ -110,21 +70,35 @@ def _quarter_rank(key):
 
 def _quarter_month(key):
     match = re.fullmatch(r"(\d{4})Q([1-4])", str(key or ""))
-    if not match:
-        return None
-    return f"{match.group(1)}{int(match.group(2)) * 3:02d}"
+    return f"{match.group(1)}{int(match.group(2)) * 3:02d}" if match else None
 
 
 def _base_store():
     import fisis_management as fm
-    return fm.get_management_store(trigger_refresh=True) or {}
+    return fm.get_management_store(trigger_refresh=False) or {}
 
 
-def _target_quarters():
-    base = _base_store()
+def _target_quarters(base=None):
+    base = base if isinstance(base, dict) else _base_store()
     quarters = base.get("quarters") if isinstance(base.get("quarters"), dict) else {}
-    ordered = sorted(quarters.keys(), key=_quarter_rank, reverse=True)
-    return ordered[:MAX_QUARTERS]
+    return sorted(quarters.keys(), key=_quarter_rank, reverse=True)[:MAX_QUARTERS]
+
+
+def _companies_from_base(base, targets):
+    quarters = base.get("quarters") if isinstance(base.get("quarters"), dict) else {}
+    latest = quarters.get(targets[0]) if targets else {}
+    rows = latest.get("banks") if isinstance(latest, dict) else []
+    result, seen = [], set()
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        code = str(row.get("finance_cd") or "").strip()
+        name = str(row.get("bank") or "").strip()
+        if not code or not name or code in seen:
+            continue
+        seen.add(code)
+        result.append({"finance_cd": code, "finance_nm": name, "region": row.get("region")})
+    return result
 
 
 def _cache_age(store):
@@ -134,7 +108,6 @@ def _cache_age(store):
         return None
     for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S%z"):
         try:
-            from datetime import datetime
             dt = datetime.strptime(value, fmt)
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=fm.KST)
@@ -168,8 +141,7 @@ def _load_upstash():
 
 def _save_upstash(store):
     import fisis_management as fm
-    raw = json.dumps(store, ensure_ascii=False, separators=(",", ":"))
-    fm._upstash_command(["SET", CACHE_KEY, raw], timeout=20)
+    fm._upstash_command(["SET", CACHE_KEY, json.dumps(store, ensure_ascii=False, separators=(",", ":"))], timeout=20)
 
 
 def _load_local():
@@ -216,28 +188,35 @@ def get_intelligence_refresh_state():
         return dict(_REFRESH_STATE)
 
 
+def _legend_with_unit_fallback(result):
+    import fisis_management as fm
+    legend = fm._legend(result)
+    if not legend or any(str(unit or "").strip() for _, _, unit in legend):
+        return legend
+    tokens = [token.strip() for token in str(result.get("unit") or "").split(",") if token.strip()]
+    unique = []
+    for token in tokens:
+        if token not in unique:
+            unique.append(token)
+    if len(unique) == 1:
+        return [(cid, name, unique[0]) for cid, name, _ in legend]
+    return legend
+
+
 def _fetch_table(finance_cd, list_no, metric_accounts, start_month, end_month):
     import fisis_management as fm
-
     params = {
-        "financeCd": finance_cd,
-        "listNo": list_no,
-        "term": "Q",
-        "startBaseMm": start_month,
-        "endBaseMm": end_month,
+        "financeCd": finance_cd, "listNo": list_no, "term": "Q",
+        "startBaseMm": start_month, "endBaseMm": end_month,
     }
-    # SE006 is very large. Only operating profit is needed, so request that
-    # account directly. Other selected tables are compact enough for one call.
     if list_no == "SE006" and len(metric_accounts) == 1:
         params["accountCd"] = next(iter(metric_accounts.values()))
-
     result = fm._api_get("statisticsInfoSearch", **params)
-    legend = fm._legend(result)
+    legend = _legend_with_unit_fallback(result)
     by_account = {account_cd: metric for metric, account_cd in metric_accounts.items()}
     values = {}
     for row in fm._as_rows(result.get("list")):
-        account_cd = str(row.get("account_cd") or "").strip()
-        metric = by_account.get(account_cd)
+        metric = by_account.get(str(row.get("account_cd") or "").strip())
         if not metric:
             continue
         quarter = fm._quarter_key(row.get("base_month"))
@@ -250,13 +229,8 @@ def _fetch_table(finance_cd, list_no, metric_accounts, start_month, end_month):
 
 
 def _fetch_company(company, start_month, end_month, targets):
-    code = company["finance_cd"]
-    name = company["finance_nm"]
-    region = company.get("region")
-    quarters = {}
-    errors = []
-    target_set = set(targets)
-
+    code, name = company["finance_cd"], company["finance_nm"]
+    quarters, errors, target_set = {}, [], set(targets)
     for list_no, metric_accounts in TABLES.items():
         try:
             table_values = _fetch_table(code, list_no, metric_accounts, start_month, end_month)
@@ -264,9 +238,7 @@ def _fetch_company(company, start_month, end_month, targets):
                 if quarter not in target_set:
                     continue
                 row = quarters.setdefault(quarter, {
-                    "bank": name,
-                    "finance_cd": code,
-                    "region": region,
+                    "bank": name, "finance_cd": code, "region": company.get("region"),
                 })
                 row.update(metrics)
         except Exception as exc:
@@ -276,29 +248,27 @@ def _fetch_company(company, start_month, end_month, targets):
 
 def _build_store():
     import fisis_management as fm
-
-    targets = _target_quarters()
+    with _REFRESH_LOCK:
+        _REFRESH_STATE["phase"] = "loading_base"
+    base = _base_store()
+    targets = _target_quarters(base)
     if len(targets) < 2:
         raise RuntimeError("확장 지표 기준이 될 FISIS 분기가 부족합니다.")
-    oldest = targets[-1]
-    latest = targets[0]
-    start_month = _quarter_month(oldest)
-    end_month = _quarter_month(latest)
-    companies = fm._companies()
-    if not companies:
-        raise RuntimeError("FISIS 저축은행 회사목록이 비어 있습니다.")
+    companies = _companies_from_base(base, targets)
+    if len(companies) < 50:
+        raise RuntimeError(f"기본 경영현황의 활성 저축은행이 부족합니다: {len(companies)}")
 
+    latest = targets[0]
+    start_month, end_month = _quarter_month(targets[-1]), _quarter_month(latest)
     with _REFRESH_LOCK:
         _REFRESH_STATE.update({
-            "company_total": len(companies),
-            "company_done": 0,
-            "errors": [],
+            "phase": "fetching_metrics", "company_total": len(companies),
+            "company_done": 0, "errors": [],
         })
 
     gathered = {quarter: [] for quarter in targets}
     errors = []
-    workers = min(6, max(2, len(companies)))
-    with ThreadPoolExecutor(max_workers=workers) as executor:
+    with ThreadPoolExecutor(max_workers=min(6, max(2, len(companies)))) as executor:
         future_map = {
             executor.submit(_fetch_company, company, start_month, end_month, targets): company
             for company in companies
@@ -316,27 +286,21 @@ def _build_store():
                 _REFRESH_STATE["company_done"] += 1
                 _REFRESH_STATE["errors"] = errors[-20:]
 
-    quarters = {}
+    with _REFRESH_LOCK:
+        _REFRESH_STATE["phase"] = "saving"
     metric_names = sorted(METRIC_KIND.keys())
+    quarters = {}
     for quarter in targets:
         rows = gathered.get(quarter) or []
         rows.sort(key=lambda row: str(row.get("bank") or ""))
-        coverage = {
-            metric: sum(1 for row in rows if row.get(metric) is not None)
-            for metric in metric_names
-        }
         quarters[quarter] = {
             "bank_count": len(rows),
-            "coverage": coverage,
+            "coverage": {metric: sum(1 for row in rows if row.get(metric) is not None) for metric in metric_names},
             "banks": rows,
         }
-
     latest_rows = quarters.get(latest, {}).get("banks") or []
     if len(latest_rows) < 50:
-        raise RuntimeError(
-            f"확장 FISIS 최신분기 수집 은행 수 부족: latest={latest} banks={len(latest_rows)} errors={len(errors)}"
-        )
-
+        raise RuntimeError(f"확장 FISIS 최신분기 수집 은행 수 부족: latest={latest} banks={len(latest_rows)} errors={len(errors)}")
     return {
         "schema_version": SCHEMA_VERSION,
         "source_name": fm.FISIS_SOURCE_NAME,
@@ -346,7 +310,7 @@ def _build_store():
         "target_quarters": targets,
         "quarter_count": len(quarters),
         "active_company_count": len(companies),
-        "fetch_mode": "separate-recent-quarter-cache",
+        "fetch_mode": "separate-recent-quarter-cache-v5",
         "quarters": quarters,
         "last_errors": errors[-50:],
     }
@@ -374,42 +338,33 @@ def _refresh_worker(force):
     except Exception as exc:
         print("FISIS INTELLIGENCE REFRESH ERROR:", exc)
         with _REFRESH_LOCK:
-            _REFRESH_STATE["errors"] = (_REFRESH_STATE.get("errors") or [])[-19:] + [
-                f"refresh: {type(exc).__name__}: {exc}"
-            ]
+            _REFRESH_STATE["errors"] = (_REFRESH_STATE.get("errors") or [])[-19:] + [f"refresh: {type(exc).__name__}: {exc}"]
     finally:
         import fisis_management as fm
         with _REFRESH_LOCK:
-            _REFRESH_STATE["running"] = False
-            _REFRESH_STATE["finished_at"] = fm._now().strftime("%Y-%m-%d %H:%M:%S")
+            _REFRESH_STATE.update({
+                "running": False, "phase": "idle",
+                "finished_at": fm._now().strftime("%Y-%m-%d %H:%M:%S"),
+            })
 
 
 def trigger_intelligence_refresh(force=False):
     global _REFRESH_THREAD
     import fisis_management as fm
-
     if not fm._api_key():
         return False
     with _REFRESH_LOCK:
         if _REFRESH_STATE["running"]:
             return False
-        if not force:
-            current = get_intelligence_store(trigger_refresh=False)
-            if _cache_is_fresh(current):
-                return False
+        if not force and _cache_is_fresh(get_intelligence_store(trigger_refresh=False)):
+            return False
         _REFRESH_STATE.update({
-            "running": True,
+            "running": True, "phase": "starting",
             "started_at": fm._now().strftime("%Y-%m-%d %H:%M:%S"),
-            "finished_at": None,
-            "company_total": 0,
-            "company_done": 0,
-            "errors": [],
+            "finished_at": None, "company_total": 0, "company_done": 0, "errors": [],
         })
         _REFRESH_THREAD = threading.Thread(
-            target=_refresh_worker,
-            args=(force,),
-            name="sbrate-fisis-intelligence-refresh",
-            daemon=True,
+            target=_refresh_worker, args=(force,), name="sbrate-fisis-intelligence-refresh", daemon=True,
         )
         _REFRESH_THREAD.start()
     return True
@@ -421,18 +376,12 @@ def intelligence_status():
     latest = targets[0] if targets else None
     meta = (store.get("quarters") or {}).get(latest) if latest else {}
     rows = meta.get("banks") if isinstance(meta, dict) else []
-    woori = next(
-        (row for row in (rows or []) if "우리금융" in str(row.get("bank") or "")),
-        None,
-    )
+    woori = next((row for row in (rows or []) if "우리금융" in str(row.get("bank") or "")), None)
     return {
-        "ok": True,
-        "ready": _cache_is_fresh(store),
-        "schema_version": store.get("schema_version"),
-        "updated_at": store.get("updated_at"),
-        "target_latest": latest,
-        "quarter_count": len(store.get("quarters") or {}),
-        "bank_count": len(rows or []),
+        "ok": True, "ready": _cache_is_fresh(store),
+        "schema_version": store.get("schema_version"), "code_schema_version": SCHEMA_VERSION,
+        "updated_at": store.get("updated_at"), "target_latest": latest,
+        "quarter_count": len(store.get("quarters") or {}), "bank_count": len(rows or []),
         "woori_available": bool(woori),
         "coverage": meta.get("coverage") if isinstance(meta, dict) else {},
         "refresh": get_intelligence_refresh_state(),
@@ -440,26 +389,21 @@ def intelligence_status():
 
 
 def install_fisis_intelligence_store():
-    # Warm the separate cache without changing fisis_management.TABLES or its
-    # cache freshness rules.
     try:
         trigger_intelligence_refresh(force=False)
     except Exception as exc:
         print("FISIS INTELLIGENCE STORE INSTALL ERROR:", exc)
-
     app_module = sys.modules.get("app") or sys.modules.get("__main__")
     if app_module is not None and hasattr(app_module, "app"):
         flask_app = app_module.app
         existing = {rule.rule for rule in flask_app.url_map.iter_rules()}
         if "/api/management-report/intelligence-status" not in existing:
             from flask import jsonify
-
             @flask_app.get("/api/management-report/intelligence-status")
             def management_intelligence_status_api():
                 try:
                     return jsonify(intelligence_status())
                 except Exception as exc:
                     return jsonify({"ok": False, "error": f"{type(exc).__name__}: {exc}"}), 500
-
     print("FISIS separate intelligence store installed: schema", SCHEMA_VERSION)
     return True
