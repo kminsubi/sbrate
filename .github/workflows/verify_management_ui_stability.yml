@@ -6,7 +6,9 @@ on:
     paths:
       - 'static/js/management_report_stability.js'
       - 'static/css/management_report_stability.css'
+      - 'management_export_v2.py'
       - 'management_report_v5_runtime.py'
+      - 'scheduler.py'
       - '.github/workflows/verify_management_ui_stability.yml'
   workflow_dispatch:
 
@@ -20,16 +22,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Static UI guards
+      - name: Static UI and export guards
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile management_report_v5_runtime.py
+          python -m py_compile management_export_v2.py management_report_v5_runtime.py scheduler.py
           node --check static/js/management_report_stability.js
-          grep -q 'STABILITY_VERSION = "20260826mi10"' management_report_v5_runtime.py
+          grep -q 'STABILITY_VERSION = "20260826mi11"' management_report_v5_runtime.py
+          grep -q 'install_management_export_v2' scheduler.py
+          grep -q '/api/management-export.xlsx' static/js/management_report_stability.js
+          grep -q "currentSection" static/js/management_report_stability.js
+          grep -q "currentMode" static/js/management_report_stability.js
+          grep -q "#mr-export-single,#mr-export" static/js/management_report_stability.js
           grep -q "parent.insertBefore(management, anchor)" static/js/management_report_stability.js
           grep -q "parent.insertBefore(error, management.nextSibling)" static/js/management_report_stability.js
-          grep -q "mr-export-single" static/js/management_report_stability.js
           grep -q "mr-scroll-stable" static/js/management_report_stability.js
           grep -q "body > header" static/css/management_report_stability.css
           grep -q "position:sticky!important" static/css/management_report_stability.css
@@ -37,9 +43,8 @@ jobs:
           grep -q "font-size:12px!important" static/css/management_report_stability.css
           grep -q "justify-content:flex-start!important" static/css/management_report_stability.css
           grep -q "overflow-y:visible!important" static/css/management_report_stability.css
-          grep -q "mr-single-export-btn" static/css/management_report_stability.css
 
-      - name: Wait for live stability assets
+      - name: Wait for live export-aware assets
         shell: bash
         run: |
           set -euo pipefail
@@ -47,26 +52,40 @@ jobs:
           for i in $(seq 1 90); do
             curl -fsS --max-time 90 'https://sbrate.onrender.com/' >/tmp/root.html || true
             curl -fsS --max-time 90 'https://sbrate.onrender.com/mobile' >/tmp/mobile.html || true
+            status=$(curl -sS -o /tmp/export-probe.xlsx -w '%{http_code}' --max-time 120 'https://sbrate.onrender.com/api/management-export.xlsx?section=general&mode=single' || true)
             if python - <<'PY'
           from pathlib import Path
+          import zipfile
           root=Path('/tmp/root.html').read_text(encoding='utf-8',errors='ignore')
           mobile=Path('/tmp/mobile.html').read_text(encoding='utf-8',errors='ignore')
-          version='20260826mi10'
-          required=[
-              f'management_report_stability.css?v={version}',
-              f'management_report_stability.js?v={version}',
-          ]
-          ok=all(item in root and item in mobile for item in required)
+          version='20260826mi11'
+          required=[f'management_report_stability.css?v={version}',f'management_report_stability.js?v={version}']
+          ok=all(item in root and item in mobile for item in required) and zipfile.is_zipfile('/tmp/export-probe.xlsx')
           raise SystemExit(0 if ok else 1)
           PY
             then
               ready=1
               break
             fi
-            echo "waiting for Render UI stability deploy... $i/90"
+            echo "waiting for Render export-aware deploy... $i/90 (export http ${status})"
             sleep 10
           done
           test "$ready" = 1
+
+      - name: Resolve live quarters
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json
+          python - <<'PY' >/tmp/quarters.env
+          import json
+          d=json.load(open('/tmp/quarters.json',encoding='utf-8'))
+          qs=d.get('quarters') or []
+          assert len(qs)>=2, qs
+          print('LATEST='+qs[0]['key'])
+          print('PREVIOUS='+qs[1]['key'])
+          PY
+          cat /tmp/quarters.env
 
       - name: Verify singleton assets and source buttons
         shell: bash
@@ -76,38 +95,79 @@ jobs:
           from pathlib import Path
           root=Path('/tmp/root.html').read_text(encoding='utf-8',errors='ignore')
           mobile=Path('/tmp/mobile.html').read_text(encoding='utf-8',errors='ignore')
-          version='20260826mi10'
+          version='20260826mi11'
           for html,name in [(root,'root'),(mobile,'mobile')]:
               assert html.count(f'management_report_stability.css?v={version}') == 1, name
               assert html.count(f'management_report_stability.js?v={version}') == 1, name
               assert html.count('data-sbrate-management-report="1"') == 2, name
-          assert root.count('id="error-report-open"') == 1, root.count('id="error-report-open"')
-          assert mobile.count('id="mobile-error-report"') == 1, mobile.count('id="mobile-error-report"')
+          assert root.count('id="error-report-open"') == 1
+          assert mobile.count('id="mobile-error-report"') == 1
           print('HTML_SINGLETONS_OK')
           PY
 
-      - name: Verify live header stability JS CSS and Excel endpoint
+      - name: Verify all eight Excel views match section and mode
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/management_report_stability.js?v=20260826mi10' >/tmp/stability.js
-          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/css/management_report_stability.css?v=20260826mi10' >/tmp/stability.css
+          . /tmp/quarters.env
+          for section in general funding soundness profitability; do
+            curl -fsS --max-time 180 "https://sbrate.onrender.com/api/management-export.xlsx?section=${section}&mode=single&base=${LATEST}" -o "/tmp/${section}-single.xlsx"
+            curl -fsS --max-time 180 "https://sbrate.onrender.com/api/management-export.xlsx?section=${section}&mode=compare&base=${LATEST}&compare=${PREVIOUS}" -o "/tmp/${section}-compare.xlsx"
+          done
+          python - <<'PY'
+          import zipfile, html
+          labels={'general':'종합현황','funding':'수신·조달','soundness':'건전성','profitability':'수익성'}
+          for section,label in labels.items():
+              for mode in ('single','compare'):
+                  path=f'/tmp/{section}-{mode}.xlsx'
+                  assert zipfile.is_zipfile(path), path
+                  with zipfile.ZipFile(path) as z:
+                      names=set(z.namelist())
+                      assert 'xl/workbook.xml' in names, path
+                      assert 'xl/worksheets/sheet1.xml' in names, path
+                      xml=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
+                  expected=f'{label} 분기현황' if mode=='single' else f'{label} 분기비교'
+                  assert expected in xml, (path,expected)
+                  if mode=='single':
+                      assert ' vs ' not in xml.split('</row>',1)[0], path
+                  else:
+                      assert ' vs ' in xml.split('</row>',1)[0], path
+          print('ALL_8_EXPORTS_OK')
+          PY
+
+      - name: Verify single general is not legacy comparison export
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /tmp/quarters.env
+          python - <<'PY'
+          import zipfile, html
+          single='/tmp/general-single.xlsx'
+          compare='/tmp/general-compare.xlsx'
+          with zipfile.ZipFile(single) as z:
+              sx=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
+          with zipfile.ZipFile(compare) as z:
+              cx=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
+          assert '전년말比' in sx and '전년동기比' in sx and '전분기比' in sx, 'single-quarter benchmark columns missing'
+          assert '기준분기·비교분기·증감' not in sx, 'single export still comparison-shaped'
+          assert '기준분기·비교분기·증감' in cx, 'compare export missing comparison basis'
+          assert sx != cx, 'single and compare exports unexpectedly identical'
+          print('GENERAL_SINGLE_EXPORT_SHAPE_OK')
+          PY
+
+      - name: Verify live header and report stability assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/management_report_stability.js?v=20260826mi11' >/tmp/stability.js
+          curl -fsS --max-time 90 'https://sbrate.onrender.com/static/css/management_report_stability.css?v=20260826mi11' >/tmp/stability.css
           node --check /tmp/stability.js
+          grep -q '/api/management-export.xlsx' /tmp/stability.js
+          grep -q "#mr-export-single,#mr-export" /tmp/stability.js
           grep -q "parent.insertBefore(management, anchor)" /tmp/stability.js
-          grep -q "parent.insertBefore(error, management.nextSibling)" /tmp/stability.js
-          grep -q "mr-export-single" /tmp/stability.js
           grep -q "mr-scroll-stable" /tmp/stability.js
           grep -q "body > header" /tmp/stability.css
           grep -q "position:sticky!important" /tmp/stability.css
-          grep -q "#header-current-datetime" /tmp/stability.css
           grep -q "font-size:12px!important" /tmp/stability.css
-          grep -q "justify-content:flex-start!important" /tmp/stability.css
           grep -q "overflow-y:visible!important" /tmp/stability.css
-          curl -fsS --max-time 120 'https://sbrate.onrender.com/api/management-report/export.xlsx' -o /tmp/report.xlsx
-          python - <<'PY'
-          import zipfile
-          assert zipfile.is_zipfile('/tmp/report.xlsx')
-          with zipfile.ZipFile('/tmp/report.xlsx') as z:
-              assert 'xl/workbook.xml' in z.namelist()
-          print('UI_STABILITY_LIVE_OK')
-          PY
+          echo 'UI_STABILITY_AND_EXPORTS_LIVE_OK'
