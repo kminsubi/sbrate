@@ -1,10 +1,10 @@
 /* SBRate management report stability patch - 2026-08-26 */
 
-/* Dashboard itself must never create a page-level horizontal scroller. */
+/* Clip horizontal overflow without creating a scroll container that breaks sticky. */
 html,
 body{
   max-width:100%!important;
-  overflow-x:hidden!important;
+  overflow-x:clip!important;
 }
 
 /* =========================================================
@@ -12,10 +12,11 @@ body{
    - keep CI/title visible while scrolling
    - keep management/error actions clickable
    - prevent page-level horizontal overflow
-   - keep the live clock fully visible
+   - keep update basis and live clock visible
 ========================================================= */
 @media(min-width:901px){
   body > header{
+    position:-webkit-sticky!important;
     position:sticky!important;
     top:0!important;
     z-index:220!important;
@@ -81,15 +82,18 @@ body{
   }
 
   .mr-header-update{
+    display:flex!important;
     flex:0 0 auto!important;
     min-width:0!important;
     white-space:nowrap!important;
   }
+
+  .mr-header-update > span:first-child{
+    display:inline!important;
+  }
 }
 
-/* The market/source pill is useful but lower priority than actions/update/clock.
-   Hide it on ordinary desktop and laptop widths so the header can never push
-   the viewport sideways. */
+/* The market/source pill is lower priority than actions/update/clock. */
 @media(min-width:901px) and (max-width:2100px){
   #dashboard-market-label{display:none!important;}
 }
@@ -104,8 +108,11 @@ body{
 @media(min-width:901px) and (max-width:1550px){
   body > header > div:first-child > h1{display:none!important;}
   body > header > div:last-child{max-width:calc(100vw - 430px)!important;}
-  .mr-header-update > span:first-child{display:none!important;}
   #header-current-datetime{min-width:158px!important;max-width:158px!important;font-size:11.5px!important;}
+}
+
+@media(min-width:901px) and (max-width:1350px){
+  #error-report-open{display:none!important;}
 }
 
 @media(min-width:901px) and (max-width:1250px){
@@ -113,7 +120,6 @@ body{
   #market-product-tabs{margin-left:0!important;}
   #market-product-tabs .market-product-tab{padding-left:10px!important;padding-right:10px!important;}
   body > header > div:last-child{max-width:calc(100vw - 360px)!important;}
-  #error-report-open{display:none!important;}
 }
 
 /* Desktop/tablet: report shell may scroll vertically if content exceeds viewport. */
