@@ -1,11 +1,18 @@
+import json
 import math
 import threading
+import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 import sys
 
 
 MIN_QUARTER_COVERAGE = 0.90
+PROBE_REUSE_AGE = timedelta(hours=6)
+PROBE_RESULT_KEY = "sbrate:management:fisis:latest-quarter-probe:v1"
+PROBE_LOCK_KEY = "sbrate:management:fisis:latest-quarter-probe:lock:v1"
+PROBE_RESULT_TTL_SECONDS = 24 * 60 * 60
+PROBE_LOCK_TTL_SECONDS = 30 * 60
 
 _LOCK = threading.Lock()
 _STATE = {
@@ -14,6 +21,7 @@ _STATE = {
     "finished_at": None,
     "last_probe_at": None,
     "result": None,
+    "lock_token": None,
 }
 
 
@@ -49,6 +57,21 @@ def fm_now_date():
     return fm._now().date()
 
 
+def _parse_dt(value, fm):
+    text = str(value or "").strip()
+    if not text:
+        return None
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S%z"):
+        try:
+            dt = datetime.strptime(text, fmt)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=fm.KST)
+            return dt.astimezone(fm.KST)
+        except Exception:
+            pass
+    return None
+
+
 def _stored_asset_count(store, quarter):
     quarters = store.get("quarters") if isinstance(store.get("quarters"), dict) else {}
     meta = quarters.get(quarter) if isinstance(quarters.get(quarter), dict) else {}
@@ -62,7 +85,70 @@ def _stored_asset_count(store, quarter):
     )
 
 
-def _probe_worker(base_result, target, target_month):
+def _load_persisted_probe(fm):
+    try:
+        raw = fm._upstash_command(["GET", PROBE_RESULT_KEY], timeout=10)
+        if not raw:
+            return None
+        data = json.loads(raw)
+        return data if isinstance(data, dict) else None
+    except Exception as exc:
+        print("FISIS latest-quarter persisted probe load error:", exc)
+        return None
+
+
+def _save_persisted_probe(fm, result):
+    try:
+        raw = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
+        fm._upstash_command(
+            ["SET", PROBE_RESULT_KEY, raw, "EX", str(PROBE_RESULT_TTL_SECONDS)],
+            timeout=15,
+        )
+        return True
+    except Exception as exc:
+        print("FISIS latest-quarter persisted probe save error:", exc)
+        return False
+
+
+def _acquire_probe_lock(fm):
+    token = uuid.uuid4().hex
+    try:
+        result = fm._upstash_command(
+            ["SET", PROBE_LOCK_KEY, token, "NX", "EX", str(PROBE_LOCK_TTL_SECONDS)],
+            timeout=10,
+        )
+        return token if str(result or "").upper() == "OK" else None
+    except Exception as exc:
+        print("FISIS latest-quarter distributed lock error:", exc)
+        return token
+
+
+def _release_probe_lock(fm, token):
+    if not token:
+        return
+    try:
+        current = fm._upstash_command(["GET", PROBE_LOCK_KEY], timeout=10)
+        if str(current or "") == str(token):
+            fm._upstash_command(["DEL", PROBE_LOCK_KEY], timeout=10)
+    except Exception as exc:
+        print("FISIS latest-quarter distributed unlock error:", exc)
+
+
+def _recent_persisted_result(fm, target):
+    persisted = _load_persisted_probe(fm)
+    if not isinstance(persisted, dict):
+        return None
+    if target and str(persisted.get("target_quarter") or "") != str(target):
+        return None
+    finished = _parse_dt(persisted.get("finished_at"), fm)
+    if not finished:
+        return None
+    if fm._now() - finished >= PROBE_REUSE_AGE:
+        return None
+    return persisted
+
+
+def _probe_worker(base_result, target, target_month, lock_token=None):
     import fisis_management as fm
 
     result = dict(base_result)
@@ -104,9 +190,6 @@ def _probe_worker(base_result, target, target_month):
         result["published_asset_count"] = published
         result["probe_error_count"] = errors
 
-        # 새 분기 최초 승격: 90% 이상 공시됐을 때만 전체 데이터를 받는다.
-        # 이미 최신분기로 승격된 뒤에는 추가 은행이 공시될 때마다 다시 받아
-        # 72/79 같은 중간 상태에 멈추지 않도록 한다.
         should_refresh = published >= threshold and published > stored_count
         if should_refresh:
             result["triggered_refresh"] = bool(fm.trigger_management_refresh(force=True))
@@ -129,14 +212,18 @@ def _probe_worker(base_result, target, target_month):
     finally:
         now = fm._now()
         result["finished_at"] = now.strftime("%Y-%m-%d %H:%M:%S")
+        _save_persisted_probe(fm, result)
+        _release_probe_lock(fm, lock_token)
         with _LOCK:
             _STATE["running"] = False
             _STATE["finished_at"] = now
             _STATE["last_probe_at"] = now
             _STATE["result"] = dict(result)
+            _STATE["lock_token"] = None
+    return result
 
 
-def check_latest_quarter(force_probe=False):
+def check_latest_quarter(force_probe=False, wait=False):
     import fisis_management as fm
 
     store = fm.get_management_store(trigger_refresh=False) or {}
@@ -163,8 +250,6 @@ def check_latest_quarter(force_probe=False):
         result["status"] = "latest_already_loaded"
         return result
 
-    # 목표 분기가 이미 최신이어도 전 은행 데이터가 다 들어오기 전까지는
-    # 하루 두 번 가볍게 총자산 공시 수를 확인해 후속 공시를 자동 반영한다.
     target_is_latest = _quarter_rank(current_latest) >= _quarter_rank(target)
     target_is_complete = active_count > 0 and stored_target_count >= active_count
     if target_is_latest and target_is_complete and not force_probe:
@@ -177,35 +262,45 @@ def check_latest_quarter(force_probe=False):
         result["status"] = "waiting_for_disclosure_window"
         return result
 
-    # 이미 전체 FISIS 캐시를 갱신 중이면 같은 API를 중복 호출하지 않는다.
     refresh_state = fm.get_refresh_state()
     if bool(refresh_state.get("running")) and not force_probe:
         result["status"] = "management_refresh_running"
         return result
+
+    if not force_probe:
+        persisted = _recent_persisted_result(fm, target)
+        if persisted:
+            cached = dict(persisted)
+            cached["checked_at"] = result["checked_at"]
+            cached["current_latest"] = current_latest or None
+            cached["stored_asset_count"] = stored_target_count
+            cached["active_company_count"] = active_count
+            cached["status_detail"] = str(cached.get("status") or "")
+            cached["status"] = "recent_probe_reused"
+            return cached
 
     with _LOCK:
         if _STATE.get("running"):
             result["status"] = "probe_running"
             return result
 
-        previous_at = _STATE.get("last_probe_at")
-        previous_result = _STATE.get("result")
-        if (
-            previous_at
-            and not force_probe
-            and fm._now() - previous_at < timedelta(hours=6)
-            and isinstance(previous_result, dict)
-        ):
-            cached = dict(previous_result)
-            cached["status"] = "recent_probe_reused"
-            return cached
+    lock_token = _acquire_probe_lock(fm)
+    if not lock_token:
+        result["status"] = "probe_running"
+        result["distributed_lock"] = True
+        return result
 
+    with _LOCK:
         _STATE["running"] = True
         _STATE["started_at"] = fm._now()
+        _STATE["lock_token"] = lock_token
+
+    if wait:
+        return _probe_worker(result, target, target_month, lock_token=lock_token)
 
     thread = threading.Thread(
         target=_probe_worker,
-        args=(result, target, target_month),
+        args=(result, target, target_month, lock_token),
         name="sbrate-fisis-latest-quarter-probe",
         daemon=True,
     )
@@ -217,14 +312,25 @@ def check_latest_quarter(force_probe=False):
 
 
 def get_auto_update_state():
+    import fisis_management as fm
+
+    persisted = _load_persisted_probe(fm) or {}
     with _LOCK:
         result = dict(_STATE.get("result") or {})
-        result["running"] = bool(_STATE.get("running"))
+        running = bool(_STATE.get("running"))
         started = _STATE.get("started_at")
         finished = _STATE.get("finished_at")
-        result["started_at"] = started.strftime("%Y-%m-%d %H:%M:%S") if started else None
-        result["finished_at"] = finished.strftime("%Y-%m-%d %H:%M:%S") if finished else result.get("finished_at")
-        return result
+
+    local_finished = _parse_dt(result.get("finished_at"), fm) or finished
+    persisted_finished = _parse_dt(persisted.get("finished_at"), fm)
+    if persisted and (not result or (persisted_finished and (not local_finished or persisted_finished >= local_finished))):
+        result = dict(persisted)
+
+    result["running"] = running
+    result["started_at"] = started.strftime("%Y-%m-%d %H:%M:%S") if started else result.get("started_at")
+    result["finished_at"] = finished.strftime("%Y-%m-%d %H:%M:%S") if finished else result.get("finished_at")
+    result["persistent"] = bool(persisted)
+    return result
 
 
 def install_management_report_auto_update():
@@ -241,7 +347,7 @@ def install_management_report_auto_update():
     def management_report_check_latest():
         force_probe = str(request.args.get("force") or "").strip() == "1"
         try:
-            return jsonify(check_latest_quarter(force_probe=force_probe))
+            return jsonify(check_latest_quarter(force_probe=force_probe, wait=False))
         except Exception as exc:
             return jsonify({"ok": False, "error": str(exc)}), 500
 
