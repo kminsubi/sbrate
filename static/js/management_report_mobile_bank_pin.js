@@ -4,6 +4,16 @@
   let timer = null;
 
   const mobile = () => window.matchMedia('(max-width: 900px)').matches;
+  const shortBankName = value => String(value || '').replace(/\s*저축은행\s*$/g, '').trim();
+
+  function shortenBankCell(cell) {
+    if (!cell || cell.tagName === 'TH') return;
+    const original = String(cell.textContent || '').trim();
+    const shortened = shortBankName(original);
+    if (!shortened || shortened === original) return;
+    if (!cell.title) cell.title = original;
+    cell.textContent = shortened;
+  }
 
   function tagIntelligenceSourceColumns() {
     document.querySelectorAll('#mi-content .mi-table').forEach(table => {
@@ -47,6 +57,7 @@
     table.querySelectorAll('tr').forEach(row => {
       const bank = row.querySelector(':scope > .mr-col-bank');
       if (!bank) return;
+      shortenBankCell(bank);
       if (mobile()) moveBankFirst(row, bank);
       else restoreBankBeforeRegion(row, bank, row.querySelector(':scope > .mr-col-region'));
     });
@@ -57,6 +68,7 @@
     document.querySelectorAll('#mi-content .mi-table tr').forEach(row => {
       const bank = row.querySelector(':scope > .mi-col-bank');
       if (!bank) return;
+      shortenBankCell(bank);
       if (mobile()) moveBankFirst(row, bank);
       else restoreBankBeforeRegion(row, bank, row.querySelector(':scope > .mi-col-region'));
     });
