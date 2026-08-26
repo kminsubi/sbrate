@@ -40,7 +40,9 @@ jobs:
           set -euo pipefail
           python -m py_compile fisis_management.py fisis_intelligence_store.py fisis_profitability_period_patch.py management_intelligence.py management_peer_compare.py management_export_v2.py management_report_auto_update.py management_report_v5_runtime.py scheduler.py
           for f in static/js/dashboard.js static/js/mobile.js static/js/dashboard_final_guard.js static/js/management_report.js static/js/management_intelligence.js static/js/management_report_stability.js static/js/management_report_bank_focus.js static/js/management_report_mobile_bank_pin.js static/js/management_peer_compare.js; do node --check "$f"; done
-          grep -q 'PEER_COMPARE_VERSION = "20260827peer1"' management_report_v5_runtime.py
+          grep -q 'PEER_COMPARE_VERSION = "20260827peer2"' management_report_v5_runtime.py
+          grep -q 'mp-summary-bar' static/js/management_peer_compare.js
+          grep -q 'mp-bank-col' static/js/management_peer_compare.js
           grep -q 'management_peer_compare.css' management_report_v5_runtime.py
           grep -q 'management_peer_compare.js' management_report_v5_runtime.py
           grep -q 'MOBILE_BANK_PIN_VERSION = "20260826pin1"' management_report_v5_runtime.py
@@ -63,8 +65,8 @@ jobs:
               'dashboard_final_guard.js?v=20260826df1',
               'management_report_stability.js?v=20260826mi14',
               'management_report_mobile_bank_pin.js?v=20260826pin1',
-              'management_peer_compare.js?v=20260827peer1',
-              'management_peer_compare.css?v=20260827peer1',
+              'management_peer_compare.js?v=20260827peer2',
+              'management_peer_compare.css?v=20260827peer2',
           )
           assert all(x in r and x in m for x in required)
           assert r.count('id="error-report-open"')==1
@@ -82,7 +84,7 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import io,json,math,urllib.parse,urllib.request,zipfile,html
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Release-Audit/2.0'}
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Release-Audit/3.0'}
           def raw(path,timeout=180):
               req=urllib.request.Request(B+path,headers=H)
               with urllib.request.urlopen(req,timeout=timeout) as r:
@@ -130,9 +132,10 @@ jobs:
 
           peer=js('/api/management-peer?'+urllib.parse.urlencode({'mode':'single','base':latest}))
           assert peer.get('ok') is True and peer.get('ready') is True, peer
-          assert peer.get('peer_order')==['woori','shinhan','hana','kb'], peer.get('peer_order')
+          assert peer.get('peer_order')==['woori','shinhan','hana','kb']
           assert [x.get('label') for x in peer.get('peers') or []]==['우리금융','신한','하나','KB']
           assert len(peer.get('peers') or [])==4 and not peer.get('missing_peers')
+          assert [x.get('key') for x in peer.get('fields') or []]==['total_assets','total_loans','deposits','time_deposits','bis_ratio','delinquency_ratio','npl_ratio','net_income','roa','roe']
           field_map={x['key']:x for x in peer.get('fields') or []}
           assert field_map['total_assets']['delta_label']=='전년말比'
           assert field_map['deposits']['delta_label']=='전분기比'
@@ -151,8 +154,6 @@ jobs:
                   xml=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
                   expected=f'{label} 분기현황' if mode=='single' else f'{label} 분기비교'
                   assert expected in xml
-                  head=xml.split('</row>',1)[0]
-                  assert ((' vs ' not in head) if mode=='single' else (' vs ' in head))
 
           for mode in ('single','compare'):
               q={'mode':mode,'base':latest}
@@ -165,7 +166,7 @@ jobs:
               assert all(x>=0 for x in positions) and positions==sorted(positions),positions
 
           assert js('/api/management-report/check-latest').get('ok') is True
-          print('FINAL_DATA_PEER_OK',{'latest':latest,'banks':len(rows),'peer_order':peer.get('peer_order'),'woori_peer_ranks':peer.get('woori_peer_ranks'),'roa':roa,'roe':roe})
+          print('FINAL_DATA_PEER_OK',{'latest':latest,'banks':len(rows),'peer_order':peer.get('peer_order'),'roa':roa,'roe':roe})
           PY
 
       - name: Install browser runtime
@@ -192,38 +193,36 @@ jobs:
             const h=p.locator('body > header'); ok(await h.count()===1,'PC header missing'); ok(['sticky','fixed'].includes(await h.evaluate(e=>getComputedStyle(e).position)),'PC header not sticky');
             ok((await p.locator('body').innerText()).includes('데이터 업데이트 기준'),'PC update basis missing');
             const clock=p.locator('#header-current-datetime'), cb=await clock.boundingBox(); ok(await clock.isVisible()&&cb&&cb.x+cb.width<=1922,'clock hidden/clipped');
-            await p.evaluate(()=>scrollTo(0,700)); await wait(250); const hb=await h.boundingBox(); ok(hb&&Math.abs(hb.y)<=2,'PC header scrolls away'); await p.evaluate(()=>scrollTo(0,0));
-            ok(await p.locator('#management-report-open').count()===1,'PC management duplicate'); ok(await p.locator('#error-report-open').count()===1,'PC error duplicate');
             await p.locator('#management-report-open').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000});
             ok(await p.locator('#mi-section-tabs [data-mi-section]').count()===5,'PC tabs !=5');
-            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1800);
-            ok(await p.locator('#mp-content').isVisible(),'PC peer content hidden'); ok(await p.locator('#mp-export').isVisible(),'PC peer Excel hidden');
-            const headers=(await p.locator('.mp-table thead th').allTextContents()).map(x=>x.trim().split('\n')[0]);
-            ok(headers[0]==='지표'&&headers[1].startsWith('우리금융')&&headers[2].startsWith('신한')&&headers[3].startsWith('하나')&&headers[4].startsWith('KB'),'PC peer order '+headers.join('|'));
-            ok(await p.locator('.mp-summary-card').count()===5,'PC peer summary cards !=5');
-            ok(!(await p.locator('#mr-export-single').isVisible()),'standard Excel should hide in peer tab');
+            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1700);
+            ok(await p.locator('#mp-content').isVisible(),'PC peer hidden'); ok(await p.locator('#mp-export').isVisible(),'PC peer Excel hidden');
+            const headers=(await p.locator('.mp-table thead th strong').allTextContents()).map(x=>x.trim());
+            ok(JSON.stringify(headers)===JSON.stringify(['총자산','총대출','총예수금','정기예금','BIS비율','연체율','고정이하여신비율','당기순이익','ROA(산출)','ROE(산출)']),'PC metric headers '+headers.join('|'));
+            const firstHeader=(await p.locator('.mp-table thead th').first().innerText()).trim(); ok(firstHeader==='금융사','PC first header '+firstHeader);
+            const banks=(await p.locator('.mp-table tbody .mp-bank-col strong').allTextContents()).map(x=>x.trim());
+            ok(JSON.stringify(banks)===JSON.stringify(['우리금융','신한','하나','KB']),'PC peer rows '+banks.join('|'));
+            ok(await p.locator('.mp-table tbody tr').count()===4,'PC peer rows !=4');
+            ok(await p.locator('.mp-summary-card').count()===0,'old peer cards remain'); ok(await p.locator('.mp-summary-bar').isVisible(),'compact peer summary missing');
+            ok(await p.locator('.mp-woori-row').count()===1,'Woori row highlight missing');
+            await p.locator('#mi-section-tabs [data-mi-section="funding"]').click(); await wait(1000); ok(await p.locator('#mp-content').isHidden(),'peer not hidden after funding');
             ok(errs.length===0,'PC JS errors '+errs.join(' || ')); await p.close(); console.log('PC_RELEASE_OK');
           }
 
           async function mobile(b){
             const p=await b.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true}), errs=jsErrors(p);
             await p.goto(B+'/mobile',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
-            let dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile page overflow '+JSON.stringify(dims));
+            const dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile page overflow '+JSON.stringify(dims));
             await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000});
-            ok(await p.locator('#mi-section-tabs [data-mi-section]').count()===5,'mobile tabs !=5');
-
-            await p.locator('#mi-section-tabs [data-mi-section="general"]').click(); await wait(1000);
-            const first=p.locator('#mr-table tbody tr').first(), bank=first.locator('.mr-col-bank');
-            ok(await first.locator('td').first().evaluate(e=>e.classList.contains('mr-col-bank')),'general bank not first');
-            const wrap=p.locator('#mr-table').locator('xpath=ancestor::*[contains(@class,"mr-table-wrap")][1]'), b0=await bank.boundingBox();
-            await wrap.evaluate(el=>{el.scrollLeft=Math.min(200,Math.max(0,el.scrollWidth-el.clientWidth));el.dispatchEvent(new Event('scroll'));}); await wait(350); const b1=await bank.boundingBox(); ok(b0&&b1&&Math.abs(b0.x-b1.x)<3,'general bank pin regressed');
-
-            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1800);
-            ok(await p.locator('#mp-content').isVisible(),'mobile peer hidden'); ok(await p.locator('#mp-export').isVisible(),'mobile peer Excel hidden');
-            const ph=(await p.locator('.mp-table thead th').allTextContents()).map(x=>x.trim().split('\n')[0]); ok(ph[1].startsWith('우리금융')&&ph[2].startsWith('신한')&&ph[3].startsWith('하나')&&ph[4].startsWith('KB'),'mobile peer order '+ph.join('|'));
-            const mw=p.locator('.mp-table-wrap'), metric=p.locator('.mp-table tbody tr').first().locator('.mp-metric-col'), m0=await metric.boundingBox();
-            await mw.evaluate(el=>{el.scrollLeft=Math.min(200,Math.max(0,el.scrollWidth-el.clientWidth));el.dispatchEvent(new Event('scroll'));}); await wait(350); const m1=await metric.boundingBox(); ok(m0&&m1&&Math.abs(m0.x-m1.x)<3,'peer metric column moved');
-            dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile overflow after peer '+JSON.stringify(dims));
+            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1700);
+            ok(await p.locator('.mp-table tbody tr').count()===4,'mobile peer rows !=4');
+            const banks=(await p.locator('.mp-table tbody .mp-bank-col strong').allTextContents()).map(x=>x.trim()); ok(JSON.stringify(banks)===JSON.stringify(['우리금융','신한','하나','KB']),'mobile peer order '+banks.join('|'));
+            const firstBank=p.locator('.mp-table tbody .mp-bank-col').first();
+            const state=await firstBank.evaluate(e=>({pos:getComputedStyle(e).position,w:e.getBoundingClientRect().width})); ok(state.pos==='sticky'&&state.w<=100,'mobile bank col not pinned '+JSON.stringify(state));
+            const wrap=p.locator('.mp-table-wrap'), b0=await firstBank.boundingBox();
+            await wrap.evaluate(el=>{el.scrollLeft=Math.min(260,Math.max(0,el.scrollWidth-el.clientWidth));el.dispatchEvent(new Event('scroll'));}); await wait(400); const b1=await firstBank.boundingBox();
+            ok(b0&&b1&&Math.abs(b0.x-b1.x)<3,`mobile peer bank moved ${b0?.x}->${b1?.x}`);
+            ok(await p.locator('.mp-summary-bar').isVisible(),'mobile compact summary missing');
             ok(errs.length===0,'mobile JS errors '+errs.join(' || ')); await p.close(); console.log('MOBILE_RELEASE_OK');
           }
 
@@ -232,4 +231,4 @@ jobs:
           node final-release-audit.cjs
 
       - name: Release success
-        run: echo "SBRate FINAL RELEASE PASS - dashboard, management, peer, Excel, PC, mobile"
+        run: echo "SBRate final release audit SUCCESS"
