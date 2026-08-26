@@ -1,6 +1,6 @@
 /* SBRate management report stability patch - 2026-08-26 */
 
-/* The report shell itself must be vertically scrollable on every viewport. */
+/* Desktop/tablet: report shell may scroll vertically if content exceeds viewport. */
 #management-report-modal .mr-shell{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -8,30 +8,19 @@
   -webkit-overflow-scrolling:touch!important;
 }
 
-/* Long intelligence sections should extend the document, not be clipped by flex sizing. */
 #management-report-modal #mi-content{
   flex:0 0 auto!important;
   min-height:0!important;
   overflow:visible!important;
 }
-#management-report-modal .mr-table-card{
-  flex:0 0 auto!important;
-  min-height:520px!important;
-}
-#management-report-modal .mr-table-wrap{
-  min-height:420px!important;
-  max-height:62vh!important;
-  overflow:auto!important;
-}
 
-/* Keep the title/actions reachable while the body scrolls. */
 #management-report-modal .mr-topbar{
   position:sticky!important;
   top:0!important;
   z-index:100!important;
 }
 
-/* Single-quarter view now exposes Excel too. */
+/* Single-quarter view exposes Excel too. */
 #management-report-modal .mr-toolbar-single{
   grid-template-columns:minmax(220px,360px) auto auto 1fr!important;
 }
@@ -40,26 +29,64 @@
 }
 
 @media(max-width:900px){
-  #management-report-modal .mr-shell{
-    height:100dvh!important;
-    max-height:100dvh!important;
-    touch-action:pan-y!important;
+  /* One vertical scroller only: the modal itself. Inner tables are horizontal pan areas. */
+  #management-report-modal.mr-scroll-stable.is-open{
+    display:block!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding:0!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior-y:contain!important;
   }
+
+  #management-report-modal.mr-scroll-stable .mr-shell{
+    width:100vw!important;
+    height:auto!important;
+    min-height:100dvh!important;
+    max-height:none!important;
+    overflow:visible!important;
+    border-radius:0!important;
+  }
+
+  #management-report-modal.mr-scroll-stable .mr-table-card{
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:0!important;
+    overflow:visible!important;
+    margin-bottom:calc(28px + env(safe-area-inset-bottom))!important;
+  }
+
+  #management-report-modal.mr-scroll-stable .mr-table-wrap,
+  #management-report-modal.mr-scroll-stable #mi-content .mi-table-wrap{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-x pan-y!important;
+  }
+
+  #management-report-modal.mr-scroll-stable #mi-content{
+    overflow:visible!important;
+    min-height:0!important;
+  }
+
   #management-report-modal .mr-toolbar-single{
     grid-template-columns:minmax(0,1fr) 84px!important;
   }
+
   #management-report-modal .mr-toolbar-single .mr-single-export-btn{
     grid-column:1 / -1!important;
     width:100%!important;
-    height:34px!important;
+    height:35px!important;
+    margin-top:1px!important;
   }
-  #management-report-modal .mr-table-card{
-    min-height:540px!important;
-    margin-bottom:calc(28px + env(safe-area-inset-bottom))!important;
-  }
-  #management-report-modal .mr-table-wrap{
-    min-height:450px!important;
-    max-height:68vh!important;
-    touch-action:pan-x pan-y!important;
+
+  /* Comparison Excel must remain visible when that mode is selected. */
+  #management-report-modal .mr-toolbar-compare #mr-export{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
   }
 }
