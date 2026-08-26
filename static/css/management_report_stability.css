@@ -211,4 +211,57 @@ body{
     align-items:center!important;
     justify-content:center!important;
   }
+
+  /*
+   * Mobile column guide:
+   * keep one vertical report scroll (no nested vertical table scroll), but float
+   * the active table header below the report topbar once rows pass underneath.
+   * JS synchronizes horizontal position and keeps the bank header frozen.
+   */
+  #management-report-modal .mr-mobile-column-header{
+    position:fixed!important;
+    display:none;
+    z-index:96!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+    background:#f8fafc!important;
+    border-top:1px solid #e6edf5!important;
+    border-bottom:1px solid #dce5f0!important;
+    box-shadow:0 5px 12px -9px rgba(15,23,42,.55)!important;
+    contain:layout paint!important;
+  }
+
+  #management-report-modal .mr-mobile-column-header-viewport{
+    position:relative!important;
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+    background:#f8fafc!important;
+  }
+
+  #management-report-modal .mr-mobile-floating-table{
+    position:relative!important;
+    margin:0!important;
+    transform-origin:left top!important;
+    will-change:transform!important;
+    background:#f8fafc!important;
+  }
+
+  #management-report-modal .mr-mobile-floating-table thead,
+  #management-report-modal .mr-mobile-floating-table thead tr,
+  #management-report-modal .mr-mobile-floating-table thead th{
+    background:#f8fafc!important;
+  }
+
+  #management-report-modal .mr-mobile-floating-table thead th{
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+
+  #management-report-modal .mr-mobile-floating-table thead .mr-col-bank,
+  #management-report-modal .mr-mobile-floating-table.mi-table thead tr > th:nth-child(2){
+    background:#f8fafc!important;
+    box-shadow:5px 0 8px -8px rgba(15,23,42,.45)!important;
+    will-change:transform!important;
+  }
 }
