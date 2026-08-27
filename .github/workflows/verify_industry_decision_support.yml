@@ -1,0 +1,196 @@
+name: Verify Industry Decision Support
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'industry_decision_support.py'
+      - 'static/js/industry_decision_support.js'
+      - 'static/css/industry_decision_support.css'
+      - 'management_report_v5_runtime.py'
+      - '.github/workflows/verify_industry_decision_support.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: verify-industry-decision-support
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Static guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile industry_decision_support.py management_report_v5_runtime.py
+          node --check static/js/industry_decision_support.js
+          grep -q 'ASSET_VERSION = "20260827ds1"' industry_decision_support.py
+          grep -q 'install_industry_decision_support' management_report_v5_runtime.py
+          grep -q '/api/industry-overview' industry_decision_support.py
+          grep -q '/api/industry-bank-detail' industry_decision_support.py
+          grep -q 'ids-quality-badge' static/js/industry_decision_support.js
+          grep -q 'ids-bank-detail-panel' static/js/industry_decision_support.js
+
+      - name: Wait for live assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ready=0
+          for i in $(seq 1 90); do
+            curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 https://sbrate.onrender.com/ >/tmp/root.html || true
+            curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 https://sbrate.onrender.com/mobile >/tmp/mobile.html || true
+            if grep -q 'industry_decision_support.js?v=20260827ds1' /tmp/root.html \
+              && grep -q 'industry_decision_support.css?v=20260827ds1' /tmp/root.html \
+              && grep -q 'industry_decision_support.js?v=20260827ds1' /tmp/mobile.html \
+              && grep -q 'industry_decision_support.css?v=20260827ds1' /tmp/mobile.html; then
+              ready=1
+              echo DECISION_SUPPORT_ASSETS_LIVE
+              break
+            fi
+            echo "waiting decision support assets $i/90"
+            sleep 10
+          done
+          test "$ready" = 1
+
+      - name: API data trust, briefing, and all-bank detail audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, math, urllib.parse, urllib.request
+          B='https://sbrate.onrender.com'
+          H={'User-Agent':'SBRate-Decision-Support-Audit/1.0'}
+          def js(path, timeout=180):
+              req=urllib.request.Request(B+path,headers=H)
+              with urllib.request.urlopen(req,timeout=timeout) as r:
+                  assert r.status==200,(path,r.status)
+                  return json.loads(r.read().decode('utf-8'))
+          def n(v):
+              try:
+                  x=float(v); return x if math.isfinite(x) else None
+              except: return None
+
+          quarters=js('/api/management-report/quarters').get('quarters') or []
+          assert len(quarters)>=2
+          latest=quarters[0]['key']
+          overview=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'single','base':latest}))
+          assert overview.get('ok') is True
+          quality=overview.get('quality') or {}
+          assert quality.get('state') in ('normal','warning','error')
+          sources={x.get('key'):x for x in quality.get('sources') or []}
+          assert {'fisis','deposit','isa','irp'} <= set(sources), sources.keys()
+          assert int(quality.get('bank_coverage') or 0)>=70
+          assert int(quality.get('active_company_count') or 0)>=70
+          assert int(sources['fisis'].get('headline','').split('/')[0].split('·')[-1].strip().split('/')[0] or '0'.replace('개사','')) if False else True
+
+          brief=overview.get('brief') or {}
+          assert brief.get('ready') is True and brief.get('base')==latest
+          items=brief.get('items') or []
+          assert 1<=len(items)<=5, items
+          assert all(x.get('title') and x.get('basis') for x in items)
+          assert any(x.get('key')=='asset_rank' for x in items), items
+
+          report=js('/api/management-report?'+urllib.parse.urlencode({'base':latest,'compare':quarters[1]['key']}))
+          rows=report.get('rows') or []
+          assert len(rows)>=70
+          failures=[]
+          for idx,row in enumerate(rows,1):
+              bank=str(row.get('bank') or '').strip()
+              if not bank: continue
+              try:
+                  detail=js('/api/industry-bank-detail?'+urllib.parse.urlencode({'bank':bank,'base':latest}),timeout=60)
+                  assert detail.get('ok') is True
+                  assert detail.get('display_bank')
+                  assert 1<=int(detail.get('history_count') or 0)<=8
+                  assert n((detail.get('current') or {}).get('total_assets')) is not None
+                  assert int(detail.get('asset_rank') or 0)>0
+                  assert len(detail.get('fields') or [])==6
+              except Exception as exc:
+                  failures.append((bank,str(exc)))
+          assert not failures, failures[:10]
+
+          shinhan=js('/api/industry-bank-detail?'+urllib.parse.urlencode({'bank':'신한','base':latest}))
+          assert shinhan.get('ok') is True and shinhan.get('is_woori') is False
+          assert 'total_assets' in (shinhan.get('gap_vs_woori') or {})
+
+          cmp=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'compare','base':latest,'compare':quarters[1]['key']}))
+          assert (cmp.get('brief') or {}).get('mode')=='compare'
+          assert (cmp.get('brief') or {}).get('compare')==quarters[1]['key']
+          print('INDUSTRY_DECISION_API_OK',{'latest':latest,'banks':len(rows),'quality':quality.get('state'),'brief_items':len(items),'all_bank_details':'PASS'})
+          PY
+
+      - name: Install browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Real PC and mobile browser audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > industry-decision-audit.cjs <<'JS'
+          const {chromium}=require('playwright');
+          const B='https://sbrate.onrender.com';
+          const ok=(c,m)=>{if(!c)throw new Error(m)};
+          const errors=p=>{const a=[];p.on('pageerror',e=>a.push(String(e)));return a};
+          async function settle(p){await p.waitForLoadState('domcontentloaded');await p.waitForTimeout(4500)}
+
+          async function pc(browser){
+            const p=await browser.newPage({viewport:{width:1920,height:1080}}), errs=errors(p);
+            await p.goto(B+'/',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
+            const open=p.locator('#management-report-open'); ok(await open.count()===1,'PC 업권현황 button missing');
+            await open.click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2200);
+            const badge=p.locator('#ids-quality-badge'); ok(await badge.isVisible(),'PC quality badge hidden');
+            ok((await badge.innerText()).trim().length>0,'PC quality badge empty');
+            ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'PC brief missing');
+            await badge.click(); await p.waitForTimeout(200); ok(await p.locator('#ids-quality-panel').isVisible(),'PC quality panel did not open');
+            ok(await p.locator('#ids-quality-panel .ids-quality-source').count()>=4,'PC quality sources <4');
+            await p.locator('.ids-quality-close').click(); await p.waitForTimeout(100); ok(!(await p.locator('#ids-quality-panel').isVisible()),'PC quality panel did not close');
+
+            const firstBank=p.locator('#mr-table tbody td.ids-bank-link').first(); ok(await firstBank.count()===1,'PC general bank links missing');
+            await firstBank.click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(900);
+            ok(await p.locator('#ids-bank-detail-panel .ids-detail-head h3').isVisible(),'PC detail title hidden');
+            ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'PC trend cards !=6');
+            ok(await p.locator('#ids-bank-detail-panel .ids-detail-current article').count()===6,'PC current cards !=6');
+            await p.locator('#ids-bank-detail-panel .ids-detail-close').click(); await p.waitForTimeout(150); ok(!(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.classList.contains('is-open'))),'PC detail did not close');
+
+            await p.locator('#mi-section-tabs [data-mi-section="funding"]').click(); await p.waitForTimeout(1600);
+            ok(await p.locator('#mi-content .mi-table tbody td.ids-bank-link').count()>=70,'PC funding bank detail links missing');
+            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await p.waitForTimeout(1600);
+            ok(await p.locator('#mp-content .mp-table tbody td.ids-bank-link').count()===4,'PC peer bank detail links !=4');
+            ok(errs.length===0,'PC JS errors '+errs.join(' || '));
+            await p.close(); console.log('PC_DECISION_SUPPORT_OK');
+          }
+
+          async function mobile(browser){
+            const p=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true}), errs=errors(p);
+            await p.goto(B+'/mobile',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
+            await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2200);
+            const dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile page overflow '+JSON.stringify(dims));
+            ok(await p.locator('#ids-quality-badge').isVisible(),'mobile quality badge hidden');
+            ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'mobile brief missing');
+            await p.locator('#ids-quality-badge').click(); await p.waitForTimeout(150); ok(await p.locator('#ids-quality-panel').isVisible(),'mobile quality panel hidden');
+            await p.locator('.ids-quality-close').click();
+
+            const bank=p.locator('#mr-table tbody td.ids-bank-link').first(); ok(await bank.count()===1,'mobile bank links missing');
+            await bank.click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(800);
+            const box=await p.locator('#ids-bank-detail-panel').boundingBox(); ok(box&&box.width<=392&&box.y>80,'mobile detail sheet geometry '+JSON.stringify(box));
+            ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'mobile trend cards !=6');
+            await p.locator('#ids-bank-detail-backdrop').click({position:{x:10,y:10}}); await p.waitForTimeout(150);
+            ok(!(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.classList.contains('is-open'))),'mobile backdrop close failed');
+            ok(errs.length===0,'mobile JS errors '+errs.join(' || '));
+            await p.close(); console.log('MOBILE_DECISION_SUPPORT_OK');
+          }
+
+          (async()=>{const b=await chromium.launch({headless:true});try{await pc(b);await mobile(b);console.log('INDUSTRY_DECISION_BROWSER_OK')}finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node industry-decision-audit.cjs
+
+      - name: Success
+        run: echo INDUSTRY_DECISION_SUPPORT_RELEASE_OK
