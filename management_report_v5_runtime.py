@@ -1,5 +1,6 @@
 import sys
 
+import industry_decision_support as _industry_decision_support
 from industry_decision_support import install_industry_decision_support
 from management_terminology_patch import install_management_terminology_patch
 
@@ -10,6 +11,7 @@ DASHBOARD_GUARD_VERSION = "20260826df1"
 MOBILE_BANK_PIN_VERSION = "20260826pin1"
 PEER_COMPARE_VERSION = "20260827peer2"
 TERMINOLOGY_VERSION = "20260827term1"
+DECISION_SUPPORT_VERSION = "20260827ds2"
 
 
 def install_management_report_v5_runtime():
@@ -20,6 +22,7 @@ def install_management_report_v5_runtime():
         return True
 
     install_management_terminology_patch()
+    _industry_decision_support.ASSET_VERSION = DECISION_SUPPORT_VERSION
     install_industry_decision_support()
 
     flask_app = app_module.app
