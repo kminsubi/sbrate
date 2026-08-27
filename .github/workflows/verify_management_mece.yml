@@ -177,7 +177,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          set -a
           . /tmp/mece.env
+          set +a
           python - <<'PY'
           import json, math, os, urllib.parse, urllib.request
           B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
@@ -252,7 +254,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          set -a
           . /tmp/mece.env
+          set +a
           python - <<'PY'
           import html, io, json, os, urllib.parse, urllib.request, zipfile
           B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
