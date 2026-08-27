@@ -39,7 +39,7 @@
     const n = num(value);
     if (n === null) return '-';
     if (rankMetric || unit === '위') return `${Math.round(n)}위`;
-    if (unit === '%p' || unit === '%') return `${n.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}${unit === '%p' ? '%' : '%'}`;
+    if (unit === '%p' || unit === '%') return `${n.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}%`;
     if (unit === '억원') return `${n.toLocaleString('ko-KR', {maximumFractionDigits: Math.abs(n) < 10 ? 1 : 0})}억원`;
     return n.toLocaleString('ko-KR');
   }
@@ -187,9 +187,9 @@
 
   function decorateBankCells(root = document) {
     const cells = [
-      ...root.querySelectorAll?.('#mr-table tbody td.mr-col-bank') || [],
-      ...root.querySelectorAll?.('#mi-content .mi-table tbody tr td:nth-child(2)') || [],
-      ...root.querySelectorAll?.('#mp-content .mp-table tbody td.mp-bank-col') || [],
+      ...(root.querySelectorAll?.('#mr-table tbody td.mr-col-bank') || []),
+      ...(root.querySelectorAll?.('#mi-content .mi-table tbody tr td:nth-child(2)') || []),
+      ...(root.querySelectorAll?.('#mp-content .mp-table tbody td.mp-bank-col') || []),
     ];
     cells.forEach(cell => {
       const bank = bankNameFromCell(cell);
@@ -330,9 +330,9 @@
   function toggleQuality(show = null) {
     const panel = document.getElementById('ids-quality-panel');
     if (!panel) return;
-    const next = show === null ? panel.hidden : !show;
-    panel.hidden = !next;
-    document.getElementById('ids-quality-badge')?.classList.toggle('is-expanded', next);
+    const shouldShow = show === null ? panel.hidden : Boolean(show);
+    panel.hidden = !shouldShow;
+    document.getElementById('ids-quality-badge')?.classList.toggle('is-expanded', shouldShow);
   }
 
   function bindEvents() {
