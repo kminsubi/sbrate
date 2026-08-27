@@ -167,6 +167,7 @@
       if (!response.ok || !data?.ok) throw new Error(data?.error || `HTTP ${response.status}`);
       renderQuality(data.quality || {});
       renderBrief(data.brief || {});
+      decorateBankCells();
     } catch (error) {
       if (seq !== overviewSeq) return;
       const badge = document.getElementById('ids-quality-badge');
@@ -335,6 +336,11 @@
     document.getElementById('ids-quality-badge')?.classList.toggle('is-expanded', shouldShow);
   }
 
+  function scheduleDecorate(delay = 120) {
+    setTimeout(() => decorateBankCells(), delay);
+    setTimeout(() => decorateBankCells(), Math.max(350, delay + 250));
+  }
+
   function bindEvents() {
     if (document.documentElement.dataset.idsEventsBound === '1') return;
     document.documentElement.dataset.idsEventsBound = '1';
@@ -361,7 +367,12 @@
         openBankDetail(bankCell.dataset.idsBank || bankNameFromCell(bankCell));
         return;
       }
+      if (event.target.closest?.('#mi-section-tabs [data-mi-section]')) {
+        scheduleDecorate(180);
+        return;
+      }
       if (event.target.closest?.('#mr-single-run,#mr-run,[data-mr-mode]')) {
+        scheduleDecorate(180);
         setTimeout(loadOverview, 220);
         return;
       }
@@ -371,6 +382,7 @@
           decorateBankCells();
           loadOverview();
         }, 260);
+        scheduleDecorate(500);
         return;
       }
       if (event.target.closest?.('#mr-close')) closeBankDetail();
@@ -395,11 +407,12 @@
   }
 
   const observer = new MutationObserver(() => {
-    clearTimeout(observerTimer);
+    if (observerTimer) return;
     observerTimer = setTimeout(() => {
+      observerTimer = null;
       ensureUI();
       decorateBankCells();
-    }, 60);
+    }, 50);
   });
   observer.observe(document.documentElement, {childList: true, subtree: true});
 
