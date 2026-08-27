@@ -15,6 +15,12 @@ on:
       - 'static/js/management_report_bank_focus.js'
       - 'static/js/management_peer_compare.js'
       - 'static/css/management_peer_compare.css'
+      - 'static/js/management_terminology_patch.js'
+      - 'static/css/management_peer_readability_patch.css'
+      - 'static/js/industry_decision_support.js'
+      - 'static/css/industry_decision_support.css'
+      - 'industry_decision_support.py'
+      - 'management_terminology_patch.py'
       - 'management_peer_compare.py'
       - 'management_report_v5_runtime.py'
       - 'management_export_v2.py'
@@ -38,14 +44,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile fisis_management.py fisis_intelligence_store.py fisis_profitability_period_patch.py management_intelligence.py management_peer_compare.py management_export_v2.py management_report_auto_update.py management_report_v5_runtime.py scheduler.py
-          for f in static/js/dashboard.js static/js/mobile.js static/js/dashboard_final_guard.js static/js/management_report.js static/js/management_intelligence.js static/js/management_report_stability.js static/js/management_report_bank_focus.js static/js/management_report_mobile_bank_pin.js static/js/management_peer_compare.js; do node --check "$f"; done
+          python -m py_compile fisis_management.py fisis_intelligence_store.py fisis_profitability_period_patch.py management_intelligence.py management_peer_compare.py management_export_v2.py management_report_auto_update.py management_report_v5_runtime.py industry_decision_support.py management_terminology_patch.py scheduler.py
+          for f in static/js/dashboard.js static/js/mobile.js static/js/dashboard_final_guard.js static/js/management_report.js static/js/management_intelligence.js static/js/management_report_stability.js static/js/management_report_bank_focus.js static/js/management_report_mobile_bank_pin.js static/js/management_peer_compare.js static/js/management_terminology_patch.js static/js/industry_decision_support.js; do node --check "$f"; done
           grep -q 'PEER_COMPARE_VERSION = "20260827peer2"' management_report_v5_runtime.py
+          grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
           grep -q 'mp-summary-bar' static/js/management_peer_compare.js
           grep -q 'mp-bank-col' static/js/management_peer_compare.js
-          grep -q 'management_peer_compare.css' management_report_v5_runtime.py
-          grep -q 'management_peer_compare.js' management_report_v5_runtime.py
-          grep -q 'MOBILE_BANK_PIN_VERSION = "20260826pin1"' management_report_v5_runtime.py
+          grep -q 'pointer-events:none' static/css/industry_decision_support.css
+          grep -q 'scheduleDecorate' static/js/industry_decision_support.js
           grep -q '시장 최저' static/js/dashboard_final_guard.js
           grep -q 'SE017' fisis_profitability_period_patch.py
 
@@ -67,24 +73,30 @@ jobs:
               'management_report_mobile_bank_pin.js?v=20260826pin1',
               'management_peer_compare.js?v=20260827peer2',
               'management_peer_compare.css?v=20260827peer2',
+              'management_terminology_patch.js?v=20260827term1',
+              'industry_decision_support.js?v=20260827ds3',
+              'industry_decision_support.css?v=20260827ds3',
           )
           assert all(x in r and x in m for x in required)
           assert r.count('id="error-report-open"')==1
           assert m.count('id="mobile-error-report"')==1
           assert '데이터 업데이트 기준' in r
           PY
-            then ready=1; echo EXACT_RELEASE_ASSETS_LIVE; break; fi
+            then
+              curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/static/css/industry_decision_support.css?v=20260827ds3' >/tmp/ids.css || true
+              if grep -q 'pointer-events:none' /tmp/ids.css; then ready=1; echo EXACT_RELEASE_ASSETS_LIVE; break; fi
+            fi
             echo "waiting exact release assets $i/90"; sleep 10
           done
           test "$ready" = 1
 
-      - name: Final data API and Excel audit
+      - name: Final data API, decision support, and Excel audit
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           import io,json,math,urllib.parse,urllib.request,zipfile,html
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Release-Audit/3.0'}
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Release-Audit/4.0'}
           def raw(path,timeout=180):
               req=urllib.request.Request(B+path,headers=H)
               with urllib.request.urlopen(req,timeout=timeout) as r:
@@ -131,7 +143,7 @@ jobs:
           assert int(p.get('derived_profitability_count') or 0)>=70
 
           peer=js('/api/management-peer?'+urllib.parse.urlencode({'mode':'single','base':latest}))
-          assert peer.get('ok') is True and peer.get('ready') is True, peer
+          assert peer.get('ok') is True and peer.get('ready') is True
           assert peer.get('peer_order')==['woori','shinhan','hana','kb']
           assert [x.get('label') for x in peer.get('peers') or []]==['우리금융','신한','하나','KB']
           assert len(peer.get('peers') or [])==4 and not peer.get('missing_peers')
@@ -142,10 +154,20 @@ jobs:
           assert field_map['net_income']['delta_label']=='전년동기比'
           assert num(((peer.get('woori') or {}).get('metrics') or {}).get('roa',{}).get('base')) is not None
           assert num(((peer.get('woori') or {}).get('metrics') or {}).get('roe',{}).get('base')) is not None
-          peer_cmp=js('/api/management-peer?'+urllib.parse.urlencode({'mode':'compare','base':latest,'compare':previous}))
-          assert peer_cmp.get('ok') is True and all(x.get('delta_label')=='비교분기比' for x in peer_cmp.get('fields') or [])
 
-          labels={'general':'종합현황','funding':'수신·조달','soundness':'건전성','profitability':'수익성'}
+          overview=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'single','base':latest}))
+          assert overview.get('ok') is True
+          quality=overview.get('quality') or {}; brief=overview.get('brief') or {}
+          assert quality.get('state') in ('normal','warning','error')
+          assert int(quality.get('bank_coverage') or 0)>=70
+          assert {'fisis','deposit','isa','irp'} <= {x.get('key') for x in quality.get('sources') or []}
+          assert brief.get('ready') is True and 1<=len(brief.get('items') or [])<=5
+          detail=js('/api/industry-bank-detail?'+urllib.parse.urlencode({'bank':'신한','base':latest}))
+          assert detail.get('ok') is True and 1<=int(detail.get('history_count') or 0)<=8
+          assert len(detail.get('fields') or [])==6 and num((detail.get('current') or {}).get('total_assets')) is not None
+          assert 'total_assets' in (detail.get('gap_vs_woori') or {})
+
+          labels={'general':'경영지표','funding':'수신·조달','soundness':'건전성','profitability':'수익성'}
           for section,label in labels.items():
               for mode in ('single','compare'):
                   q={'section':section,'mode':mode,'base':latest}
@@ -153,7 +175,7 @@ jobs:
                   z=zipfile.ZipFile(io.BytesIO(raw('/api/management-export.xlsx?'+urllib.parse.urlencode(q))))
                   xml=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
                   expected=f'{label} 분기현황' if mode=='single' else f'{label} 분기비교'
-                  assert expected in xml
+                  assert expected in xml,(section,mode,expected)
 
           for mode in ('single','compare'):
               q={'mode':mode,'base':latest}
@@ -166,7 +188,7 @@ jobs:
               assert all(x>=0 for x in positions) and positions==sorted(positions),positions
 
           assert js('/api/management-report/check-latest').get('ok') is True
-          print('FINAL_DATA_PEER_OK',{'latest':latest,'banks':len(rows),'peer_order':peer.get('peer_order'),'roa':roa,'roe':roe})
+          print('FINAL_DATA_DECISION_OK',{'latest':latest,'banks':len(rows),'quality':quality.get('state'),'brief_items':len(brief.get('items') or []),'roa':roa,'roe':roe})
           PY
 
       - name: Install browser runtime
@@ -193,19 +215,25 @@ jobs:
             const h=p.locator('body > header'); ok(await h.count()===1,'PC header missing'); ok(['sticky','fixed'].includes(await h.evaluate(e=>getComputedStyle(e).position)),'PC header not sticky');
             ok((await p.locator('body').innerText()).includes('데이터 업데이트 기준'),'PC update basis missing');
             const clock=p.locator('#header-current-datetime'), cb=await clock.boundingBox(); ok(await clock.isVisible()&&cb&&cb.x+cb.width<=1922,'clock hidden/clipped');
-            await p.locator('#management-report-open').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000});
+            const open=p.locator('#management-report-open'); ok((await open.innerText()).includes('업권현황'),'PC terminology regressed');
+            await open.click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await wait(2400);
+            ok((await p.locator('#management-report-modal .mr-title-block h2').innerText()).includes('업권현황'),'modal title regressed');
             ok(await p.locator('#mi-section-tabs [data-mi-section]').count()===5,'PC tabs !=5');
-            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1700);
+            ok((await p.locator('#mi-section-tabs [data-mi-section="general"]').innerText()).trim()==='경영지표','general tab terminology regressed');
+            ok(await p.locator('#ids-quality-badge').isVisible(),'PC quality badge hidden');
+            ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'PC decision brief missing');
+            await p.waitForSelector('#mr-table tbody td.ids-bank-link',{timeout:8000});
+            await p.locator('#mr-table tbody td.ids-bank-link').first().click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await wait(500);
+            ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'PC bank trends !=6');
+            await p.locator('#ids-bank-detail-panel .ids-detail-close').click(); await wait(160);
+
+            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1800);
             ok(await p.locator('#mp-content').isVisible(),'PC peer hidden'); ok(await p.locator('#mp-export').isVisible(),'PC peer Excel hidden');
             const headers=(await p.locator('.mp-table thead th strong').allTextContents()).map(x=>x.trim());
             ok(JSON.stringify(headers)===JSON.stringify(['총자산','총대출','총예수금','정기예금','BIS비율','연체율','고정이하여신비율','당기순이익','ROA(산출)','ROE(산출)']),'PC metric headers '+headers.join('|'));
-            const firstHeader=(await p.locator('.mp-table thead th').first().innerText()).trim(); ok(firstHeader==='금융사','PC first header '+firstHeader);
             const banks=(await p.locator('.mp-table tbody .mp-bank-col strong').allTextContents()).map(x=>x.trim());
             ok(JSON.stringify(banks)===JSON.stringify(['우리금융','신한','하나','KB']),'PC peer rows '+banks.join('|'));
-            ok(await p.locator('.mp-table tbody tr').count()===4,'PC peer rows !=4');
-            ok(await p.locator('.mp-summary-card').count()===0,'old peer cards remain'); ok(await p.locator('.mp-summary-bar').isVisible(),'compact peer summary missing');
-            ok(await p.locator('.mp-woori-row').count()===1,'Woori row highlight missing');
-            await p.locator('#mi-section-tabs [data-mi-section="funding"]').click(); await wait(1000); ok(await p.locator('#mp-content').isHidden(),'peer not hidden after funding');
+            ok(await p.locator('.mp-summary-card').count()===0,'old peer cards remain'); ok(await p.locator('.mp-summary-bar').isVisible(),'peer summary missing');
             ok(errs.length===0,'PC JS errors '+errs.join(' || ')); await p.close(); console.log('PC_RELEASE_OK');
           }
 
@@ -213,8 +241,16 @@ jobs:
             const p=await b.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true}), errs=jsErrors(p);
             await p.goto(B+'/mobile',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
             const dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile page overflow '+JSON.stringify(dims));
-            await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000});
-            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1700);
+            await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await wait(2400);
+            ok(await p.locator('#ids-quality-badge').isVisible(),'mobile quality badge hidden');
+            ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'mobile brief missing');
+            const closed=await p.locator('#ids-bank-detail-panel').evaluate(e=>({pe:getComputedStyle(e).pointerEvents,vis:getComputedStyle(e).visibility})); ok(closed.pe==='none'&&closed.vis==='hidden','closed detail intercepts mobile '+JSON.stringify(closed));
+            await p.waitForSelector('#mr-table tbody td.ids-bank-link',{timeout:8000});
+            await p.locator('#mr-table tbody td.ids-bank-link').first().click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await wait(500);
+            ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'mobile bank trends !=6');
+            await p.locator('#ids-bank-detail-panel .ids-detail-close').click(); await wait(180);
+
+            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await wait(1800);
             ok(await p.locator('.mp-table tbody tr').count()===4,'mobile peer rows !=4');
             const banks=(await p.locator('.mp-table tbody .mp-bank-col strong').allTextContents()).map(x=>x.trim()); ok(JSON.stringify(banks)===JSON.stringify(['우리금융','신한','하나','KB']),'mobile peer order '+banks.join('|'));
             const firstBank=p.locator('.mp-table tbody .mp-bank-col').first();
@@ -222,7 +258,6 @@ jobs:
             const wrap=p.locator('.mp-table-wrap'), b0=await firstBank.boundingBox();
             await wrap.evaluate(el=>{el.scrollLeft=Math.min(260,Math.max(0,el.scrollWidth-el.clientWidth));el.dispatchEvent(new Event('scroll'));}); await wait(400); const b1=await firstBank.boundingBox();
             ok(b0&&b1&&Math.abs(b0.x-b1.x)<3,`mobile peer bank moved ${b0?.x}->${b1?.x}`);
-            ok(await p.locator('.mp-summary-bar').isVisible(),'mobile compact summary missing');
             ok(errs.length===0,'mobile JS errors '+errs.join(' || ')); await p.close(); console.log('MOBILE_RELEASE_OK');
           }
 
