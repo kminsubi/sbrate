@@ -46,8 +46,9 @@ jobs:
           for f in static/js/dashboard.js static/js/mobile.js static/js/dashboard_final_guard.js static/js/management_report.js static/js/management_intelligence.js static/js/management_report_stability.js static/js/management_report_bank_focus.js static/js/management_report_mobile_bank_pin.js static/js/management_peer_compare.js static/js/management_terminology_patch.js static/js/industry_decision_support.js static/js/industry_detail_viewport_fix.js; do node --check "$f"; done
           grep -q 'PEER_COMPARE_VERSION = "20260827peer2"' management_report_v5_runtime.py
           grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
-          grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds4"' management_report_v5_runtime.py
-          grep -q 'document.body.appendChild(panel)' static/js/industry_detail_viewport_fix.js
+          grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"' management_report_v5_runtime.py
+          grep -q "PANEL_Z = '100060'" static/js/industry_detail_viewport_fix.js
+          grep -q "BACKDROP_Z = '100050'" static/js/industry_detail_viewport_fix.js
           grep -q 'pointer-events:none' static/css/industry_decision_support.css
           grep -q 'mp-summary-bar' static/js/management_peer_compare.js
           grep -q '시장 최저' static/js/dashboard_final_guard.js
@@ -74,7 +75,7 @@ jobs:
               'management_terminology_patch.js?v=20260827term1',
               'industry_decision_support.js?v=20260827ds3',
               'industry_decision_support.css?v=20260827ds3',
-              'industry_detail_viewport_fix.js?v=20260827ds4',
+              'industry_detail_viewport_fix.js?v=20260827ds5',
           )
           assert all(x in r and x in m for x in required)
           assert r.count('id="error-report-open"')==1
@@ -82,8 +83,8 @@ jobs:
           assert '데이터 업데이트 기준' in r
           PY
             then
-              curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/industry_detail_viewport_fix.js?v=20260827ds4' >/tmp/viewfix.js || true
-              if grep -q 'document.body.appendChild(panel)' /tmp/viewfix.js; then ready=1; echo EXACT_RELEASE_ASSETS_LIVE; break; fi
+              curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/industry_detail_viewport_fix.js?v=20260827ds5' >/tmp/viewfix.js || true
+              if grep -q "PANEL_Z = '100060'" /tmp/viewfix.js; then ready=1; echo EXACT_RELEASE_ASSETS_LIVE; break; fi
             fi
             echo "waiting exact release assets $i/90"; sleep 10
           done
@@ -95,7 +96,7 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import io,json,math,urllib.parse,urllib.request,zipfile,html
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Final-Audit/5.0'}
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Final-Audit/6.0'}
           def raw(path,timeout=180):
               req=urllib.request.Request(B+path,headers=H)
               with urllib.request.urlopen(req,timeout=timeout) as r:
@@ -112,7 +113,6 @@ jobs:
                   x=float(v); return x if math.isfinite(x) else None
               except: return None
 
-          # Core rate/pension dashboard data
           kpi=js('/api/kpi'); woori=js('/api/woori'); ai=js('/api/ai')
           top10=items(js('/api/rates?period=12')); products=items(js('/api/products'))
           isa=items(js('/api/isa?period=12')); irp=items(js('/api/irp?period=12'))
@@ -123,7 +123,6 @@ jobs:
           ai_text=' | '.join(map(str,ai.get('summary') or []))
           for token in ('분석상품','평균금리','최고금리','최저금리','금리 스프레드'): assert token in ai_text,token
 
-          # FISIS quarters/general/intelligence
           qs=js('/api/management-report/quarters').get('quarters') or []; assert len(qs)>=2
           latest,previous=qs[0]['key'],qs[1]['key']; year=int(latest[:4]); qn=int(latest[-1])
           assert previous==(f'{year-1}Q4' if qn==1 else f'{year}Q{qn-1}')
@@ -144,7 +143,6 @@ jobs:
           assert roe is not None and -300<float(roe)<300
           assert int(intelligence['profitability'].get('derived_profitability_count') or 0)>=70
 
-          # 4대금융 peer
           peer=js('/api/management-peer?'+urllib.parse.urlencode({'mode':'single','base':latest}))
           assert peer.get('ok') is True and peer.get('ready') is True
           assert peer.get('peer_order')==['woori','shinhan','hana','kb']
@@ -156,7 +154,6 @@ jobs:
           assert fm['deposits']['delta_label']=='전분기比'
           assert fm['net_income']['delta_label']=='전년동기比'
 
-          # Trust + change brief + bank detail
           overview=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'single','base':latest}))
           assert overview.get('ok') is True
           quality=overview.get('quality') or {}; brief=overview.get('brief') or {}
@@ -173,7 +170,6 @@ jobs:
           cmp=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'compare','base':latest,'compare':previous}))
           assert (cmp.get('brief') or {}).get('mode')=='compare' and (cmp.get('brief') or {}).get('compare')==previous
 
-          # 4 sections x 2 modes + peer 2 modes Excel
           labels={'general':'경영지표','funding':'수신·조달','soundness':'건전성','profitability':'수익성'}
           for section,label in labels.items():
               for mode in ('single','compare'):
@@ -225,9 +221,10 @@ jobs:
             ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'PC brief');
             await p.waitForSelector('#mr-table tbody td.ids-bank-link',{timeout:8000});
             await p.locator('#mr-table tbody td.ids-bank-link').first().click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(500);
-            ok(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.parentElement===document.body),'PC detail not viewport anchored');
+            const layer=await p.locator('#ids-bank-detail-panel').evaluate(e=>({parent:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex)})); ok(layer.parent&&layer.z>99990,'PC detail layer '+JSON.stringify(layer));
             ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'PC trends');
-            await p.locator('#ids-bank-detail-panel .ids-detail-close').click();
+            await p.locator('#ids-bank-detail-panel .ids-detail-close').click(); await p.waitForTimeout(160);
+            ok(!(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.classList.contains('is-open'))),'PC detail close');
             await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await p.waitForTimeout(1800);
             const headers=(await p.locator('.mp-table thead th strong').allTextContents()).map(x=>x.trim());
             ok(JSON.stringify(headers)===JSON.stringify(['총자산','총대출','총예수금','정기예금','BIS비율','연체율','고정이하여신비율','당기순이익','ROA(산출)','ROE(산출)']),'peer headers '+headers.join('|'));
@@ -244,12 +241,12 @@ jobs:
             await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2400);
             ok(await p.locator('#ids-quality-badge').isVisible(),'mobile trust badge');
             ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'mobile brief');
-            const closed=await p.locator('#ids-bank-detail-panel').evaluate(e=>({parent:e.parentElement===document.body,pe:getComputedStyle(e).pointerEvents,vis:getComputedStyle(e).visibility}));
-            ok(closed.parent&&closed.pe==='none'&&closed.vis==='hidden','mobile closed detail '+JSON.stringify(closed));
+            const closed=await p.locator('#ids-bank-detail-panel').evaluate(e=>({parent:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex),pe:getComputedStyle(e).pointerEvents,vis:getComputedStyle(e).visibility}));
+            ok(closed.parent&&closed.z>99990&&closed.pe==='none'&&closed.vis==='hidden','mobile closed detail '+JSON.stringify(closed));
             await p.waitForSelector('#mr-table tbody td.ids-bank-link',{timeout:8000});
             await p.locator('#mr-table tbody td.ids-bank-link').first().click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(500);
-            const geo=await p.locator('#ids-bank-detail-panel').evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,b:r.bottom,parent:e.parentElement===document.body}});
-            ok(geo.parent&&geo.x>=-1&&geo.w<=392&&geo.y>=80&&geo.b<=846,'mobile detail geometry '+JSON.stringify(geo));
+            const geo=await p.locator('#ids-bank-detail-panel').evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,b:r.bottom,parent:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex)}});
+            ok(geo.parent&&geo.z>99990&&geo.x>=-1&&geo.w<=392&&geo.y>=80&&geo.b<=846,'mobile detail geometry '+JSON.stringify(geo));
             ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'mobile trends');
             await p.locator('#ids-bank-detail-panel .ids-detail-close').click(); await p.waitForTimeout(160);
             await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await p.waitForTimeout(1800);
