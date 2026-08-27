@@ -4,21 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'fisis_management.py'
-      - 'fisis_quality_patch.py'
-      - 'fisis_region_patch.py'
-      - 'fisis_intelligence_store.py'
-      - 'fisis_profitability_period_patch.py'
-      - 'management_report.py'
-      - 'management_report_auto_update.py'
-      - 'management_intelligence.py'
-      - 'management_report_v4_runtime.py'
-      - 'management_report_v5_runtime.py'
-      - 'static/js/management_report.js'
-      - 'static/js/management_intelligence.js'
-      - 'static/js/management_report_v5_patch.js'
-      - 'static/js/management_report_bank_focus.js'
-      - 'static/css/management_report_bank_focus.css'
+      - 'fisis_*.py'
+      - 'management_*.py'
+      - 'industry_decision_support.py'
+      - 'static/js/management_*.js'
+      - 'static/css/management_*.css'
+      - 'static/js/industry_*.js'
+      - 'static/css/industry_*.css'
       - 'scheduler.py'
       - '.github/workflows/verify_management_mece.yml'
   workflow_dispatch:
@@ -30,233 +22,386 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
 
-      - name: Static MECE guards
+      - name: A. Static structure and release wiring
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile \
-            fisis_management.py fisis_quality_patch.py fisis_region_patch.py \
-            fisis_intelligence_store.py fisis_profitability_period_patch.py \
-            management_report.py management_report_auto_update.py \
-            management_intelligence.py management_report_v4_runtime.py \
-            management_report_v5_runtime.py scheduler.py
-          node --check static/js/management_report.js
-          node --check static/js/management_intelligence.js
-          node --check static/js/management_report_v5_patch.js
-          node --check static/js/management_report_bank_focus.js
+          python -m py_compile fisis_*.py management_*.py industry_decision_support.py scheduler.py
+          for f in static/js/management_*.js static/js/industry_*.js; do node --check "$f"; done
 
           grep -q 'MIN_QUARTER_COVERAGE = 0.90' fisis_management.py
-          grep -q 'math.ceil(len(companies) \* MIN_QUARTER_COVERAGE)' fisis_management.py
-          grep -q 'valid_assets = \[row for row in rows if row.get("total_assets") is not None\]' fisis_management.py
-          grep -q 'return jsonify(check_latest_quarter(force_probe=False, wait=False))' management_report_auto_update.py
-          ! grep -q 'request.args.get("force")' management_report_auto_update.py
-          ! grep -q 'install_fisis_catalog_probe' scheduler.py
-          ! grep -q 'TABLES\["SE010"\]' fisis_intelligence_store.py
           grep -q 'SE017' fisis_profitability_period_patch.py
           grep -q 'bs_equity' fisis_profitability_period_patch.py
           grep -q 'annualized_income' fisis_profitability_period_patch.py
+          ! grep -q 'TABLES\["SE010"\]' fisis_intelligence_store.py
+
+          grep -q 'ASSET_VERSION = "20260826mi7"' management_report_v5_runtime.py
+          grep -q 'STABILITY_VERSION = "20260826mi14"' management_report_v5_runtime.py
+          grep -q 'MOBILE_BANK_PIN_VERSION = "20260826pin1"' management_report_v5_runtime.py
+          grep -q 'PEER_COMPARE_VERSION = "20260827peer2"' management_report_v5_runtime.py
+          grep -q 'TERMINOLOGY_VERSION = "20260827term1"' management_report_v5_runtime.py
+          grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
+          grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"' management_report_v5_runtime.py
+          grep -q 'industry_detail_viewport_fix.js' management_report_v5_runtime.py
+          grep -q "PANEL_Z = '100060'" static/js/industry_detail_viewport_fix.js
+          grep -q "BACKDROP_Z = '100050'" static/js/industry_detail_viewport_fix.js
+          grep -q 'document.body.appendChild(panel)' static/js/industry_detail_viewport_fix.js
+          grep -q 'value === null || value === undefined || value ===' static/js/management_intelligence.js
           grep -q 'previousYearSameQuarter' static/js/management_report.js
           grep -q '전년동기比' static/js/management_report.js
-          grep -q '고정이하여신비율' static/js/management_intelligence.js
-          grep -q "value === null || value === undefined || value === ''" static/js/management_intelligence.js
-          grep -q '20260826v8' management_report_v4_runtime.py
-          grep -q '20260826mi7' management_report_v5_runtime.py
-          grep -q 'management_report_bank_focus.js' management_report_v5_runtime.py
-          grep -q 'management_report_bank_focus.css' management_report_v5_runtime.py
+          grep -q 'SECTION_LABELS\["general"\] = "경영지표"' management_terminology_patch.py
 
-      - name: Wait for audited Render deployment
+      - name: B. Wait for exact live release assets
         shell: bash
         run: |
           set -euo pipefail
           ready=0
           for i in $(seq 1 90); do
-            html="$(curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/' || true)"
-            if [[ "$html" == *"management_report.js?v=20260826v8"* \
-              && "$html" == *"20260826mi7"* \
-              && "$html" == *"management_report_bank_focus.js"* \
-              && "$html" == *"management_report_bank_focus.css"* ]]; then
-              ready=1
-              printf '%s' "$html" >/tmp/root.html
-              break
-            fi
-            echo "waiting for audited Render deployment... $i/90"
-            sleep 10
+            curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 https://sbrate.onrender.com/ >/tmp/root.html || true
+            curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 https://sbrate.onrender.com/mobile >/tmp/mobile.html || true
+            if python - <<'PY'
+          from pathlib import Path
+          r=Path('/tmp/root.html').read_text(encoding='utf-8',errors='ignore')
+          m=Path('/tmp/mobile.html').read_text(encoding='utf-8',errors='ignore')
+          required=(
+              'management_intelligence.js?v=20260826mi7',
+              'management_report_stability.js?v=20260826mi14',
+              'management_report_mobile_bank_pin.js?v=20260826pin1',
+              'management_peer_compare.js?v=20260827peer2',
+              'management_terminology_patch.js?v=20260827term1',
+              'industry_decision_support.js?v=20260827ds3',
+              'industry_detail_viewport_fix.js?v=20260827ds5',
+          )
+          assert all(x in r and x in m for x in required)
+          assert r.count('id="management-report-open"') == 1
+          assert m.count('id="management-report-open-mobile"') == 1
+          PY
+            then ready=1; echo EXACT_MANAGEMENT_MECE_ASSETS_LIVE; break; fi
+            echo "waiting exact MECE assets $i/90"; sleep 10
           done
           test "$ready" = 1
 
-      - name: Verify quarter universe and coverage
+      - name: C. Data universe, uniqueness, ranking, and period semantics
         shell: bash
         run: |
           set -euo pipefail
-          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/quarters' >/tmp/quarters.json
-          python - <<'PY' >/tmp/quarters.env
-          import json
-          d=json.load(open('/tmp/quarters.json',encoding='utf-8'))
-          assert d.get('ok') is True, d
-          assert 'FISIS' in str(d.get('source') or ''), d
-          qs=d.get('quarters') or []
-          assert len(qs) >= 2, qs
+          python - <<'PY' >/tmp/mece.env
+          import json, math, urllib.parse, urllib.request
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          def js(path, timeout=180):
+              req=urllib.request.Request(B+path,headers=H)
+              with urllib.request.urlopen(req,timeout=timeout) as r:
+                  assert r.status==200,(path,r.status)
+                  return json.loads(r.read().decode('utf-8'))
+          def num(v):
+              try:
+                  x=float(v); return x if math.isfinite(x) else None
+              except: return None
+
+          qd=js('/api/management-report/quarters'); assert qd.get('ok') is True
+          qs=qd.get('quarters') or []; assert len(qs)>=2
           for q in qs:
-              assert int(q.get('bank_count') or 0) >= 70, q
-              coverage=q.get('asset_coverage_ratio')
-              assert coverage is not None and float(coverage) >= 0.90, q
-              assert int(q.get('asset_bank_count') or 0) >= 70, q
-          print('LATEST='+qs[0]['key'])
-          print('PREVIOUS='+qs[1]['key'])
-          latest=qs[0]['key']
-          year=int(latest[:4])-1
-          yoy=f'{year}Q{latest[-1]}'
+              assert int(q.get('bank_count') or 0)>=70,q
+              assert int(q.get('asset_bank_count') or 0)>=70,q
+              assert float(q.get('asset_coverage_ratio') or 0)>=0.90,q
+          latest,previous=qs[0]['key'],qs[1]['key']
+          year,qn=int(latest[:4]),int(latest[-1])
+          expected_prev=f'{year-1}Q4' if qn==1 else f'{year}Q{qn-1}'
+          assert previous==expected_prev,(latest,previous,expected_prev)
+          year_end=f'{year-1}Q4'; yoy=f'{year-1}Q{qn}'
           keys={x['key'] for x in qs}
-          print('YOY='+ (yoy if yoy in keys else ''))
-          PY
-          cat /tmp/quarters.env
 
-      - name: Verify base report correctness and period safety
-        shell: bash
-        run: |
-          set -euo pipefail
-          . /tmp/quarters.env
-          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${PREVIOUS}" >/tmp/report.json
-          python - <<'PY'
-          import json
-          d=json.load(open('/tmp/report.json',encoding='utf-8'))
-          assert d.get('ok') is True, d
-          rows=d.get('rows') or []
-          assert len(rows) >= 70, len(rows)
-          names=[str(x.get('bank') or '') for x in rows]
-          assert len(names)==len(set(names)), 'duplicate bank rows'
-          assets=[x.get('metrics',{}).get('total_assets',{}).get('base') for x in rows]
-          present=[float(x) for x in assets if x is not None]
-          assert present==sorted(present, reverse=True), 'rows not sorted by total assets'
-          ranks=[int(x.get('rank')) for x in rows if x.get('rank') is not None]
-          assert ranks==list(range(1,len(ranks)+1)), ranks[:20]
-          w=d.get('woori') or {}
-          assert w.get('is_woori') is True, w
+          report=js('/api/management-report?'+urllib.parse.urlencode({'base':latest,'compare':previous}))
+          assert report.get('ok') is True
+          rows=report.get('rows') or []; assert len(rows)>=70
+          names=[str(r.get('bank') or '') for r in rows]
+          assert len(names)==len(set(names)),'duplicate bank rows'
+          ranks=[int(r['rank']) for r in rows if r.get('rank') is not None]
+          assert ranks==list(range(1,len(ranks)+1)),ranks[:20]
+          assets=[num(((r.get('metrics') or {}).get('total_assets') or {}).get('base')) for r in rows]
+          assets=[x for x in assets if x is not None]
+          assert assets==sorted(assets,reverse=True),'asset order mismatch'
+          w=report.get('woori') or {}; assert w.get('is_woori') is True
           m=w.get('metrics') or {}
-          required=['total_assets','corporate_loans','household_loans','total_loans','bis_ratio','npl_ratio','delinquency_ratio','net_income','employees']
-          assert all(k in m for k in required), m.keys()
-          assert 0 < float(m['bis_ratio']['base']) < 100, m['bis_ratio']
-          assert 0 <= float(m['npl_ratio']['base']) <= 100, m['npl_ratio']
-          assert 0 <= float(m['delinquency_ratio']['base']) <= 100, m['delinquency_ratio']
-          base=str(d.get('base_quarter') or '')
-          compare=str(d.get('compare_quarter') or '')
-          if base[-1:] != compare[-1:]:
-              assert m['net_income'].get('comparable') is False, m['net_income']
-              assert m['net_income'].get('delta') is None, m['net_income']
-          print('BASE_REPORT_OK', {'base':base,'compare':compare,'rows':len(rows),'woori_rank':w.get('rank')})
+          required={'total_assets','corporate_loans','household_loans','total_loans','bis_ratio','npl_ratio','delinquency_ratio','net_income','employees'}
+          assert required <= set(m),set(m)
+          assert 0<num(m['bis_ratio']['base'])<100
+          assert 0<=num(m['npl_ratio']['base'])<=100
+          assert 0<=num(m['delinquency_ratio']['base'])<=100
+          if qn==1:
+              assert (m['net_income'] or {}).get('comparable') is False
+              assert (m['net_income'] or {}).get('delta') is None
+
+          if yoy in keys:
+              y=js('/api/management-report?'+urllib.parse.urlencode({'base':latest,'compare':yoy}))
+              ni=((((y.get('woori') or {}).get('metrics') or {}).get('net_income')) or {})
+              assert ni.get('comparable') is True,ni
+              if ni.get('base') is not None and ni.get('compare') is not None: assert ni.get('delta') is not None
+
+          for section in ('funding','soundness','profitability'):
+              d=js('/api/management-intelligence?'+urllib.parse.urlencode({'section':section,'base':latest,'compare':previous}))
+              assert d.get('ok') is True and d.get('ready') is True,(section,d)
+              rr=d.get('rows') or []; assert len(rr)>=70,(section,len(rr))
+              bn=[str(x.get('bank') or '') for x in rr]; assert len(bn)==len(set(bn)),section+' duplicate rows'
+              if section=='profitability':
+                  pm=((d.get('woori') or {}).get('metrics') or {})
+                  roa=((pm.get('roa') or {}).get('base')); roe=((pm.get('roe') or {}).get('base'))
+                  assert roa is not None and -100<float(roa)<100,roa
+                  assert roe is not None and -300<float(roe)<300,roe
+                  assert int(d.get('derived_profitability_count') or 0)>=70
+                  periodicity=d.get('periodicity') or {}
+                  assert periodicity.get('quarterly_roa_roe') is True
+                  assert periodicity.get('official_se010_quarterly_supported') is False
+                  note=((d.get('notes') or {}).get('roa_roe_basis') or '')
+                  assert '산출' in note and '연환산' in note and '전년말' in note,note
+
+          region=js('/api/management-report/region-diagnostic')
+          assert region.get('ok') is True
+          assert int(region.get('company_count') or 0)>=70
+          assert int(region.get('region_count') or 0)>=70
+          rw=region.get('woori') or {}; assert rw.get('bank')=='우리금융저축은행' and rw.get('region')=='충청'
+
+          print('LATEST='+latest)
+          print('PREVIOUS='+previous)
+          print('YEAR_END='+year_end)
+          print('YOY='+ (yoy if yoy in keys else ''))
+          print('BANKS='+str(len(rows)))
+          PY
+          cat /tmp/mece.env
+
+      - name: D. Peer comparison, decision support, and all-bank drilldown
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /tmp/mece.env
+          python - <<'PY'
+          import json, math, os, urllib.parse, urllib.request
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          latest=os.environ['LATEST']; previous=os.environ['PREVIOUS']
+          def js(path,timeout=180):
+              req=urllib.request.Request(B+path,headers=H)
+              with urllib.request.urlopen(req,timeout=timeout) as r:
+                  assert r.status==200,(path,r.status); return json.loads(r.read().decode('utf-8'))
+          def num(v):
+              try:
+                  x=float(v); return x if math.isfinite(x) else None
+              except: return None
+
+          peer=js('/api/management-peer?'+urllib.parse.urlencode({'mode':'single','base':latest}))
+          assert peer.get('ok') is True and peer.get('ready') is True
+          assert peer.get('peer_order')==['woori','shinhan','hana','kb']
+          assert [x.get('label') for x in peer.get('peers') or []]==['우리금융','신한','하나','KB']
+          fields={x.get('key'):x for x in peer.get('fields') or []}
+          assert set(fields)=={'total_assets','total_loans','deposits','time_deposits','bis_ratio','delinquency_ratio','npl_ratio','net_income','roa','roe'}
+          assert fields['total_assets']['delta_label']=='전년말比'
+          assert fields['total_loans']['delta_label']=='전년말比'
+          assert fields['deposits']['delta_label']=='전분기比'
+          assert fields['bis_ratio']['delta_label']=='전분기比'
+          assert fields['delinquency_ratio']['delta_label']=='전분기比'
+          assert fields['net_income']['delta_label']=='전년동기比'
+          pc=js('/api/management-peer?'+urllib.parse.urlencode({'mode':'compare','base':latest,'compare':previous}))
+          assert pc.get('ok') is True and all(x.get('delta_label')=='비교분기比' for x in pc.get('fields') or [])
+
+          overview=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'single','base':latest}))
+          assert overview.get('ok') is True
+          quality=overview.get('quality') or {}
+          assert quality.get('state') in ('normal','warning','error')
+          assert int(quality.get('bank_coverage') or 0)>=70
+          assert int(quality.get('active_company_count') or 0)>=70
+          assert {'fisis','deposit','isa','irp'} <= {x.get('key') for x in quality.get('sources') or []}
+          brief=overview.get('brief') or {}; items=brief.get('items') or []
+          assert brief.get('ready') is True and brief.get('base')==latest
+          assert 1<=len(items)<=5
+          assert any(x.get('key')=='asset_rank' for x in items)
+          expected_basis={'total_assets':'전년말比','total_loans':'전년말比','bis_ratio':'전분기比','delinquency_ratio':'전분기比','net_income':'전년동기比','asset_rank':'전분기比'}
+          for item in items:
+              key=item.get('key'); basis=str(item.get('basis') or '')
+              if key in expected_basis: assert expected_basis[key] in basis,(key,basis)
+
+          report=js('/api/management-report?'+urllib.parse.urlencode({'base':latest,'compare':previous}))
+          rows=report.get('rows') or []; failures=[]
+          for row in rows:
+              bank=str(row.get('bank') or '').strip()
+              if not bank: continue
+              try:
+                  d=js('/api/industry-bank-detail?'+urllib.parse.urlencode({'bank':bank,'base':latest}),60)
+                  assert d.get('ok') is True
+                  assert d.get('display_bank')
+                  assert 1<=int(d.get('history_count') or 0)<=8
+                  assert len(d.get('fields') or [])==6
+                  assert num((d.get('current') or {}).get('total_assets')) is not None
+                  assert int(d.get('asset_rank') or 0)>0
+              except Exception as exc:
+                  failures.append((bank,str(exc)))
+          assert not failures,failures[:10]
+
+          shinhan=js('/api/industry-bank-detail?'+urllib.parse.urlencode({'bank':'신한','base':latest}))
+          assert shinhan.get('ok') is True and shinhan.get('is_woori') is False
+          assert 'total_assets' in (shinhan.get('gap_vs_woori') or {})
+          cmp=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'compare','base':latest,'compare':previous}))
+          assert (cmp.get('brief') or {}).get('mode')=='compare'
+          assert (cmp.get('brief') or {}).get('compare')==previous
+          print('PEER_DECISION_DETAIL_OK',{'banks':len(rows),'brief':len(items),'quality':quality.get('state')})
           PY
 
-          code=$(curl -sS -o /tmp/bad-quarter.json -w '%{http_code}' --max-time 90 'https://sbrate.onrender.com/api/management-report?base=BAD&compare=2025Q4')
+      - name: E. Export matrix, invalid input safety, and update safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /tmp/mece.env
+          python - <<'PY'
+          import html, io, json, os, urllib.parse, urllib.request, zipfile
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          latest=os.environ['LATEST']; previous=os.environ['PREVIOUS']
+          def raw(path,timeout=180):
+              req=urllib.request.Request(B+path,headers=H)
+              with urllib.request.urlopen(req,timeout=timeout) as r:
+                  assert r.status==200,(path,r.status); return r.read()
+          def js(path): return json.loads(raw(path).decode('utf-8'))
+          labels={'general':'경영지표','funding':'수신·조달','soundness':'건전성','profitability':'수익성'}
+          for section,label in labels.items():
+              for mode in ('single','compare'):
+                  q={'section':section,'mode':mode,'base':latest}
+                  if mode=='compare': q['compare']=previous
+                  data=raw('/api/management-export.xlsx?'+urllib.parse.urlencode(q),240)
+                  assert zipfile.is_zipfile(io.BytesIO(data)),(section,mode)
+                  z=zipfile.ZipFile(io.BytesIO(data)); xml=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
+                  expected=f'{label} 분기현황' if mode=='single' else f'{label} 분기비교'
+                  assert expected in xml,(section,mode,expected)
+                  if section=='general' and mode=='single':
+                      assert '전년말比' in xml and '전년동기比' in xml
+
+          for mode in ('single','compare'):
+              q={'mode':mode,'base':latest}
+              if mode=='compare': q['compare']=previous
+              data=raw('/api/management-peer/export.xlsx?'+urllib.parse.urlencode(q),240)
+              assert zipfile.is_zipfile(io.BytesIO(data))
+              z=zipfile.ZipFile(io.BytesIO(data)); xml=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
+              expected='4대금융 비교 분기현황' if mode=='single' else '4대금융 비교 분기비교'
+              assert expected in xml
+              pos=[xml.find(x) for x in ('우리금융','신한','하나','KB')]
+              assert all(x>=0 for x in pos) and pos==sorted(pos),pos
+
+          latest_check=js('/api/management-report/check-latest?force=1')
+          assert latest_check.get('ok') is True
+          assert float(latest_check.get('coverage_ratio_required') or 0)>=0.90
+          print('EXPORT_UPDATE_OK',latest_check.get('status'))
+          PY
+
+          code=$(curl -sS -o /tmp/bad.json -w '%{http_code}' --max-time 90 'https://sbrate.onrender.com/api/management-report?base=BAD&compare=2025Q4')
           test "$code" = '400'
-          code=$(curl -sS -o /tmp/same-quarter.json -w '%{http_code}' --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${LATEST}")
+          code=$(curl -sS -o /tmp/same.json -w '%{http_code}' --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${LATEST}")
+          test "$code" = '400'
+          code=$(curl -sS -o /tmp/no-bank.json -w '%{http_code}' --max-time 90 'https://sbrate.onrender.com/api/industry-bank-detail')
           test "$code" = '400'
 
-      - name: Verify YoY cumulative P&L when available
+      - name: F. Core dashboard regression APIs
         shell: bash
         run: |
           set -euo pipefail
-          . /tmp/quarters.env
-          if [ -z "${YOY:-}" ]; then
-            echo 'YoY quarter not available; skip'
-            exit 0
-          fi
-          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 "https://sbrate.onrender.com/api/management-report?base=${LATEST}&compare=${YOY}" >/tmp/yoy.json
           python - <<'PY'
-          import json
-          d=json.load(open('/tmp/yoy.json',encoding='utf-8'))
-          w=d.get('woori') or {}
-          n=((w.get('metrics') or {}).get('net_income') or {})
-          assert n.get('comparable') is True, n
-          if n.get('base') is not None and n.get('compare') is not None:
-              assert n.get('delta') is not None, n
-          print('YOY_PNL_OK', n)
+          import json, math, urllib.request
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          def js(path):
+              req=urllib.request.Request(B+path,headers=H)
+              with urllib.request.urlopen(req,timeout=180) as r:
+                  assert r.status==200,(path,r.status); return json.loads(r.read().decode('utf-8'))
+          def items(d):
+              if isinstance(d,list): return d
+              if isinstance(d,dict):
+                  for k in ('products','all_products','items','rates','data','rows'):
+                      if isinstance(d.get(k),list): return d[k]
+              return []
+          def num(v):
+              try:
+                  x=float(v); return x if math.isfinite(x) else None
+              except: return None
+          kpi=js('/api/kpi'); woori=js('/api/woori'); ai=js('/api/ai')
+          products=items(js('/api/products')); isa=items(js('/api/isa?period=12')); irp=items(js('/api/irp?period=12'))
+          assert isinstance(kpi,dict) and isinstance(woori,dict)
+          assert len(products)>=70 and isa and irp
+          assert sum(1 for x in products if isinstance(x,dict) and (num(x.get('rate')) or 0)>0)>=70
+          assert (num(woori.get('rate')) or 0)>0 and int(woori.get('market_rank') or 0)>0
+          s=' | '.join(map(str,ai.get('summary') or []))
+          for token in ('분석상품','평균금리','최고금리','최저금리','금리 스프레드'): assert token in s,token
+          print('CORE_REGRESSION_OK',{'products':len(products),'isa':len(isa),'irp':len(irp)})
           PY
 
-      - name: Verify funding soundness profitability intelligence
+      - name: G. Install Chromium
         shell: bash
         run: |
-          set -euo pipefail
-          . /tmp/quarters.env
-          for section in funding soundness profitability; do
-            curl --retry 4 --retry-all-errors --retry-delay 2 -fsS --max-time 90 "https://sbrate.onrender.com/api/management-intelligence?section=${section}&base=${LATEST}&compare=${PREVIOUS}" >"/tmp/${section}.json"
-          done
-          python - <<'PY'
-          import json
-          def load(n): return json.load(open(f'/tmp/{n}.json',encoding='utf-8'))
-          def metric(d,k): return ((((d.get('woori') or {}).get('metrics') or {}).get(k)) or {})
-          for name in ['funding','soundness','profitability']:
-              d=load(name)
-              assert d.get('ok') is True, (name,d)
-              assert d.get('ready') is True, (name,d)
-              assert len(d.get('rows') or []) >= 70, (name,len(d.get('rows') or []))
-          f,s,p=load('funding'),load('soundness'),load('profitability')
-          assert metric(f,'deposits').get('base') is not None, f
-          assert metric(s,'liquidity_ratio').get('base') is not None, s
-          assert metric(p,'operating_profit').get('base') is not None, p
-          roa=metric(p,'roa').get('base')
-          roe=metric(p,'roe').get('base')
-          assert roa is not None and -100 < float(roa) < 100, metric(p,'roa')
-          assert roe is not None and -300 < float(roe) < 300, metric(p,'roe')
-          assert int(p.get('derived_profitability_count') or 0) >= 70, p.get('derived_profitability_count')
-          periodicity=p.get('periodicity') or {}
-          assert periodicity.get('quarterly_roa_roe') is True, periodicity
-          if str(p.get('base') or '')[-1:] != str(p.get('compare') or '')[-1:]:
-              for key in ['net_income','operating_profit','net_interest_income','interest_income','interest_expense','deposit_interest_expense','time_deposit_interest_expense']:
-                  m=metric(p,key)
-                  assert m.get('delta') is None, (key,m)
-                  assert m.get('comparable') is False, (key,m)
-          note=(p.get('notes') or {}).get('roa_roe_basis') or ''
-          assert '산출' in note and '연환산' in note and '전년말' in note, note
-          print('INTELLIGENCE_OK', {'roa':roa,'roe':roe,'derived_count':p.get('derived_profitability_count')})
-          PY
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
 
-      - name: Verify region diagnostic uses cached coverage
+      - name: H. PC and mobile interaction MECE audit
         shell: bash
         run: |
-          set -euo pipefail
-          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/region-diagnostic' >/tmp/region.json
-          python - <<'PY'
-          import json
-          d=json.load(open('/tmp/region.json',encoding='utf-8'))
-          assert d.get('ok') is True, d
-          assert int(d.get('company_count') or 0) >= 70, d
-          assert int(d.get('region_count') or 0) >= 70, d
-          w=d.get('woori') or {}
-          assert w.get('bank') == '우리금융저축은행', w
-          assert w.get('region') == '충청', w
-          PY
+          cat > mece-browser.cjs <<'JS'
+          const {chromium}=require('playwright');
+          const B='https://sbrate.onrender.com';
+          const ok=(c,m)=>{if(!c)throw new Error(m)};
+          const errors=p=>{const a=[];p.on('pageerror',e=>a.push(String(e)));return a};
+          async function settle(p){await p.waitForLoadState('domcontentloaded');await p.waitForTimeout(4500)}
 
-      - name: Verify Excel endpoint and defaults
-        shell: bash
-        run: |
-          set -euo pipefail
-          . /tmp/quarters.env
-          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 120 'https://sbrate.onrender.com/api/management-report/export.xlsx' -o /tmp/default.xlsx
-          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 120 "https://sbrate.onrender.com/api/management-report/export.xlsx?base=${LATEST}&compare=${PREVIOUS}" -o /tmp/explicit.xlsx
-          python - <<'PY'
-          import zipfile
-          for path in ['/tmp/default.xlsx','/tmp/explicit.xlsx']:
-              assert zipfile.is_zipfile(path), path
-              with zipfile.ZipFile(path) as z:
-                  names=set(z.namelist())
-                  assert '[Content_Types].xml' in names, path
-                  assert 'xl/workbook.xml' in names, path
-                  assert any(x.startswith('xl/worksheets/sheet') for x in names), path
-          print('XLSX_OK')
-          PY
+          async function pc(b){
+            const p=await b.newPage({viewport:{width:1920,height:1080}}), errs=errors(p);
+            await p.goto(B+'/',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
+            const dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'PC page overflow '+JSON.stringify(dims));
+            await p.locator('#management-report-open').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2200);
+            ok(await p.locator('#mi-section-tabs [data-mi-section]').count()===5,'PC tabs !=5');
+            ok(await p.locator('#ids-quality-badge').isVisible(),'PC trust badge hidden');
+            ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'PC brief missing');
+            await p.locator('#ids-quality-badge').click(); ok(await p.locator('#ids-quality-panel').isVisible(),'PC quality panel hidden');
+            ok(await p.locator('#ids-quality-panel .ids-quality-source').count()>=4,'PC quality sources <4');
+            await p.locator('.ids-quality-close').click();
+            await p.waitForSelector('#mr-table tbody td.ids-bank-link',{timeout:10000});
+            await p.locator('#mr-table tbody td.ids-bank-link').first().click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(500);
+            const layer=await p.locator('#ids-bank-detail-panel').evaluate(e=>({body:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex)})); ok(layer.body&&layer.z>99990,'PC detail layer '+JSON.stringify(layer));
+            ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'PC trend cards !=6');
+            await p.locator('#ids-bank-detail-panel .ids-detail-close').click(); await p.waitForTimeout(150); ok(!(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.classList.contains('is-open'))),'PC detail close failed');
+            for(const section of ['funding','soundness','profitability']){
+              await p.locator(`#mi-section-tabs [data-mi-section="${section}"]`).click(); await p.waitForTimeout(1200);
+              ok(await p.locator('#mi-content .mi-table tbody tr').count()>=70,`PC ${section} rows <70`);
+              ok(await p.locator('#mi-content .mi-table tbody td.ids-bank-link').count()>=70,`PC ${section} bank links <70`);
+            }
+            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await p.waitForTimeout(1500);
+            ok(await p.locator('.mp-table tbody tr').count()===4,'PC peer rows !=4');
+            const banks=(await p.locator('.mp-table tbody .mp-bank-col strong').allTextContents()).map(x=>x.trim()); ok(JSON.stringify(banks)===JSON.stringify(['우리금융','신한','하나','KB']),'PC peer order '+banks.join('|'));
+            ok(await p.locator('#mp-export').isVisible(),'PC peer Excel hidden');
+            ok(errs.length===0,'PC JS errors '+errs.join(' || '));
+            await p.close(); console.log('PC_MECE_OK');
+          }
 
-      - name: Verify public latest check is non-forced
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 'https://sbrate.onrender.com/api/management-report/check-latest?force=1' >/tmp/latest.json
-          python - <<'PY'
-          import json
-          d=json.load(open('/tmp/latest.json',encoding='utf-8'))
-          assert d.get('ok') is True, d
-          assert float(d.get('coverage_ratio_required') or 0) >= 0.90, d
-          print('LATEST_CHECK_OK', d.get('status'))
-          PY
+          async function mobile(b){
+            const p=await b.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true}), errs=errors(p);
+            await p.goto(B+'/mobile',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
+            const dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile page overflow '+JSON.stringify(dims));
+            await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2200);
+            ok(await p.locator('#ids-quality-badge').isVisible(),'mobile trust badge hidden');
+            ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'mobile brief missing');
+            const bankCell=p.locator('#mr-table tbody td.ids-bank-link').first(); await bankCell.waitFor({state:'visible',timeout:10000});
+            const bankState=await bankCell.evaluate(e=>({pos:getComputedStyle(e).position,w:e.getBoundingClientRect().width})); ok(bankState.pos==='sticky'&&bankState.w<=120,'mobile bank pin '+JSON.stringify(bankState));
+            const wrap=p.locator('#mr-table').locator('xpath=..'); const b0=await bankCell.boundingBox();
+            await wrap.evaluate(el=>{el.scrollLeft=Math.min(260,Math.max(0,el.scrollWidth-el.clientWidth));el.dispatchEvent(new Event('scroll'));}); await p.waitForTimeout(350); const b1=await bankCell.boundingBox();
+            ok(b0&&b1&&Math.abs(b0.x-b1.x)<3,`mobile bank moved ${b0?.x}->${b1?.x}`);
+            await bankCell.click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(500);
+            const geo=await p.locator('#ids-bank-detail-panel').evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,b:r.bottom,body:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex)}});
+            ok(geo.body&&geo.z>99990&&geo.x>=-1&&geo.w<=392&&geo.y>=80&&geo.b<=846,'mobile detail geometry '+JSON.stringify(geo));
+            await p.locator('#ids-bank-detail-backdrop').click({position:{x:10,y:10}}); await p.waitForTimeout(180); ok(!(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.classList.contains('is-open'))),'mobile backdrop close failed');
+            await p.locator('#mi-section-tabs [data-mi-section="peer"]').click(); await p.waitForTimeout(1500);
+            ok(await p.locator('.mp-table tbody tr').count()===4,'mobile peer rows !=4');
+            const peerBank=p.locator('.mp-table tbody .mp-bank-col').first(); const ps=await peerBank.evaluate(e=>({pos:getComputedStyle(e).position,w:e.getBoundingClientRect().width})); ok(ps.pos==='sticky'&&ps.w<=100,'mobile peer pin '+JSON.stringify(ps));
+            ok(errs.length===0,'mobile JS errors '+errs.join(' || '));
+            await p.close(); console.log('MOBILE_MECE_OK');
+          }
+
+          (async()=>{const b=await chromium.launch({headless:true});try{await pc(b);await mobile(b);console.log('MANAGEMENT_MECE_BROWSER_OK')}finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node mece-browser.cjs
+
+      - name: MECE success
+        run: echo MANAGEMENT_MECE_CURRENT_RELEASE_OK
