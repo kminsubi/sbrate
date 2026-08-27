@@ -12,6 +12,7 @@ MOBILE_BANK_PIN_VERSION = "20260826pin1"
 PEER_COMPARE_VERSION = "20260827peer2"
 TERMINOLOGY_VERSION = "20260827term1"
 DECISION_SUPPORT_VERSION = "20260827ds3"
+DECISION_VIEWPORT_FIX_VERSION = "20260827ds4"
 
 
 def install_management_report_v5_runtime():
@@ -113,6 +114,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</body>",
                         f'<script src="/static/js/management_terminology_patch.js?v={TERMINOLOGY_VERSION}"></script>\n</body>',
+                        1,
+                    )
+                if "industry_detail_viewport_fix.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/industry_detail_viewport_fix.js?v={DECISION_VIEWPORT_FIX_VERSION}"></script>\n</body>',
                         1,
                     )
                 if "management_report_stability.js" not in html:
