@@ -1,5 +1,6 @@
 import sys
 
+from industry_decision_support import install_industry_decision_support
 from management_terminology_patch import install_management_terminology_patch
 
 
@@ -19,6 +20,7 @@ def install_management_report_v5_runtime():
         return True
 
     install_management_terminology_patch()
+    install_industry_decision_support()
 
     flask_app = app_module.app
     from flask import request
