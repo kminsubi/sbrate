@@ -38,6 +38,10 @@ jobs:
           grep -q 'bs_equity' fisis_profitability_period_patch.py
           grep -q 'annualized_income' fisis_profitability_period_patch.py
           ! grep -q 'TABLES\["SE010"\]' fisis_intelligence_store.py
+          grep -q 'previousYearSameQuarter' static/js/management_report.js
+          grep -q '전년동기比' static/js/management_report.js
+          grep -q "value === null || value === undefined || value === ''" static/js/management_intelligence.js
+          grep -q 'mr-mobile-column-header' static/js/management_report_stability.js
 
           grep -q 'ASSET_VERSION = "20260826mi7"' management_report_v5_runtime.py
           grep -q 'STABILITY_VERSION = "20260826mi14"' management_report_v5_runtime.py
@@ -46,16 +50,12 @@ jobs:
           grep -q 'TERMINOLOGY_VERSION = "20260827term1"' management_report_v5_runtime.py
           grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
           grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"' management_report_v5_runtime.py
-          grep -q 'industry_detail_viewport_fix.js' management_report_v5_runtime.py
+          grep -q 'SECTION_LABELS\["general"\] = "경영지표"' management_terminology_patch.py
           grep -q "PANEL_Z = '100060'" static/js/industry_detail_viewport_fix.js
           grep -q "BACKDROP_Z = '100050'" static/js/industry_detail_viewport_fix.js
           grep -q 'document.body.appendChild(panel)' static/js/industry_detail_viewport_fix.js
-          grep -q 'value === null || value === undefined || value ===' static/js/management_intelligence.js
-          grep -q 'previousYearSameQuarter' static/js/management_report.js
-          grep -q '전년동기比' static/js/management_report.js
-          grep -q 'SECTION_LABELS\["general"\] = "경영지표"' management_terminology_patch.py
 
-      - name: B. Wait for exact live release assets
+      - name: B. Exact live asset deployment only
         shell: bash
         run: |
           set -euo pipefail
@@ -74,13 +74,15 @@ jobs:
               'management_peer_compare.js?v=20260827peer2',
               'management_terminology_patch.js?v=20260827term1',
               'industry_decision_support.js?v=20260827ds3',
+              'industry_decision_support.css?v=20260827ds3',
               'industry_detail_viewport_fix.js?v=20260827ds5',
           )
           assert all(x in r and x in m for x in required)
-          assert r.count('id="management-report-open"') == 1
-          assert m.count('id="management-report-open-mobile"') == 1
           PY
-            then ready=1; echo EXACT_MANAGEMENT_MECE_ASSETS_LIVE; break; fi
+            then
+              curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/industry_detail_viewport_fix.js?v=20260827ds5' >/tmp/viewfix.js || true
+              if grep -q "PANEL_Z = '100060'" /tmp/viewfix.js; then ready=1; echo EXACT_MANAGEMENT_MECE_ASSETS_LIVE; break; fi
+            fi
             echo "waiting exact MECE assets $i/90"; sleep 10
           done
           test "$ready" = 1
@@ -89,20 +91,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY' >/tmp/mece.env
-          import json, math, urllib.parse, urllib.request
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          python - <<'PY'
+          import json, math, os, urllib.parse, urllib.request
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/3.0'}
           def js(path, timeout=180):
               req=urllib.request.Request(B+path,headers=H)
               with urllib.request.urlopen(req,timeout=timeout) as r:
-                  assert r.status==200,(path,r.status)
-                  return json.loads(r.read().decode('utf-8'))
+                  assert r.status==200,(path,r.status); return json.loads(r.read().decode('utf-8'))
           def num(v):
               try:
                   x=float(v); return x if math.isfinite(x) else None
               except: return None
 
           qd=js('/api/management-report/quarters'); assert qd.get('ok') is True
+          assert 'FISIS' in str(qd.get('source') or '')
           qs=qd.get('quarters') or []; assert len(qs)>=2
           for q in qs:
               assert int(q.get('bank_count') or 0)>=70,q
@@ -112,8 +114,7 @@ jobs:
           year,qn=int(latest[:4]),int(latest[-1])
           expected_prev=f'{year-1}Q4' if qn==1 else f'{year}Q{qn-1}'
           assert previous==expected_prev,(latest,previous,expected_prev)
-          year_end=f'{year-1}Q4'; yoy=f'{year-1}Q{qn}'
-          keys={x['key'] for x in qs}
+          year_end=f'{year-1}Q4'; yoy=f'{year-1}Q{qn}'; keys={x['key'] for x in qs}
 
           report=js('/api/management-report?'+urllib.parse.urlencode({'base':latest,'compare':previous}))
           assert report.get('ok') is True
@@ -128,13 +129,12 @@ jobs:
           w=report.get('woori') or {}; assert w.get('is_woori') is True
           m=w.get('metrics') or {}
           required={'total_assets','corporate_loans','household_loans','total_loans','bis_ratio','npl_ratio','delinquency_ratio','net_income','employees'}
-          assert required <= set(m),set(m)
+          assert required <= set(m)
           assert 0<num(m['bis_ratio']['base'])<100
           assert 0<=num(m['npl_ratio']['base'])<=100
           assert 0<=num(m['delinquency_ratio']['base'])<=100
-          if qn==1:
-              assert (m['net_income'] or {}).get('comparable') is False
-              assert (m['net_income'] or {}).get('delta') is None
+          assert (m['net_income'] or {}).get('comparable') is False
+          assert (m['net_income'] or {}).get('delta') is None
 
           if yoy in keys:
               y=js('/api/management-report?'+urllib.parse.urlencode({'base':latest,'compare':yoy}))
@@ -161,28 +161,21 @@ jobs:
 
           region=js('/api/management-report/region-diagnostic')
           assert region.get('ok') is True
-          assert int(region.get('company_count') or 0)>=70
-          assert int(region.get('region_count') or 0)>=70
+          assert int(region.get('company_count') or 0)>=70 and int(region.get('region_count') or 0)>=70
           rw=region.get('woori') or {}; assert rw.get('bank')=='우리금융저축은행' and rw.get('region')=='충청'
 
-          print('LATEST='+latest)
-          print('PREVIOUS='+previous)
-          print('YEAR_END='+year_end)
-          print('YOY='+ (yoy if yoy in keys else ''))
-          print('BANKS='+str(len(rows)))
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as f:
+              f.write(f'LATEST={latest}\nPREVIOUS={previous}\nYEAR_END={year_end}\nYOY={yoy if yoy in keys else ""}\nBANKS={len(rows)}\n')
+          print('DATA_PERIOD_MECE_OK',{'latest':latest,'previous':previous,'banks':len(rows)})
           PY
-          cat /tmp/mece.env
 
-      - name: D. Peer comparison, decision support, and all-bank drilldown
+      - name: D. Peer comparison, decision support, and 79-bank drilldown
         shell: bash
         run: |
           set -euo pipefail
-          set -a
-          . /tmp/mece.env
-          set +a
           python - <<'PY'
           import json, math, os, urllib.parse, urllib.request
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/3.0'}
           latest=os.environ['LATEST']; previous=os.environ['PREVIOUS']
           def js(path,timeout=180):
               req=urllib.request.Request(B+path,headers=H)
@@ -212,13 +205,11 @@ jobs:
           assert overview.get('ok') is True
           quality=overview.get('quality') or {}
           assert quality.get('state') in ('normal','warning','error')
-          assert int(quality.get('bank_coverage') or 0)>=70
-          assert int(quality.get('active_company_count') or 0)>=70
+          assert int(quality.get('bank_coverage') or 0)>=70 and int(quality.get('active_company_count') or 0)>=70
           assert {'fisis','deposit','isa','irp'} <= {x.get('key') for x in quality.get('sources') or []}
           brief=overview.get('brief') or {}; items=brief.get('items') or []
           assert brief.get('ready') is True and brief.get('base')==latest
-          assert 1<=len(items)<=5
-          assert any(x.get('key')=='asset_rank' for x in items)
+          assert 1<=len(items)<=5 and any(x.get('key')=='asset_rank' for x in items)
           expected_basis={'total_assets':'전년말比','total_loans':'전년말比','bis_ratio':'전분기比','delinquency_ratio':'전분기比','net_income':'전년동기比','asset_rank':'전분기比'}
           for item in items:
               key=item.get('key'); basis=str(item.get('basis') or '')
@@ -231,8 +222,7 @@ jobs:
               if not bank: continue
               try:
                   d=js('/api/industry-bank-detail?'+urllib.parse.urlencode({'bank':bank,'base':latest}),60)
-                  assert d.get('ok') is True
-                  assert d.get('display_bank')
+                  assert d.get('ok') is True and d.get('display_bank')
                   assert 1<=int(d.get('history_count') or 0)<=8
                   assert len(d.get('fields') or [])==6
                   assert num((d.get('current') or {}).get('total_assets')) is not None
@@ -240,32 +230,30 @@ jobs:
               except Exception as exc:
                   failures.append((bank,str(exc)))
           assert not failures,failures[:10]
+          assert len(rows)==int(os.environ['BANKS'])
 
           shinhan=js('/api/industry-bank-detail?'+urllib.parse.urlencode({'bank':'신한','base':latest}))
           assert shinhan.get('ok') is True and shinhan.get('is_woori') is False
           assert 'total_assets' in (shinhan.get('gap_vs_woori') or {})
           cmp=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'compare','base':latest,'compare':previous}))
-          assert (cmp.get('brief') or {}).get('mode')=='compare'
-          assert (cmp.get('brief') or {}).get('compare')==previous
-          print('PEER_DECISION_DETAIL_OK',{'banks':len(rows),'brief':len(items),'quality':quality.get('state')})
+          assert (cmp.get('brief') or {}).get('mode')=='compare' and (cmp.get('brief') or {}).get('compare')==previous
+          print('PEER_DECISION_79BANK_OK',{'banks':len(rows),'brief':len(items),'quality':quality.get('state')})
           PY
 
-      - name: E. Export matrix, invalid input safety, and update safety
+      - name: E. Export matrix, invalid inputs, and latest-quarter safety
         shell: bash
         run: |
           set -euo pipefail
-          set -a
-          . /tmp/mece.env
-          set +a
           python - <<'PY'
           import html, io, json, os, urllib.parse, urllib.request, zipfile
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/3.0'}
           latest=os.environ['LATEST']; previous=os.environ['PREVIOUS']
           def raw(path,timeout=180):
               req=urllib.request.Request(B+path,headers=H)
               with urllib.request.urlopen(req,timeout=timeout) as r:
                   assert r.status==200,(path,r.status); return r.read()
           def js(path): return json.loads(raw(path).decode('utf-8'))
+
           labels={'general':'경영지표','funding':'수신·조달','soundness':'건전성','profitability':'수익성'}
           for section,label in labels.items():
               for mode in ('single','compare'):
@@ -276,8 +264,7 @@ jobs:
                   z=zipfile.ZipFile(io.BytesIO(data)); xml=html.unescape(z.read('xl/worksheets/sheet1.xml').decode('utf-8'))
                   expected=f'{label} 분기현황' if mode=='single' else f'{label} 분기비교'
                   assert expected in xml,(section,mode,expected)
-                  if section=='general' and mode=='single':
-                      assert '전년말比' in xml and '전년동기比' in xml
+                  if section=='general' and mode=='single': assert '전년말比' in xml and '전년동기比' in xml
 
           for mode in ('single','compare'):
               q={'mode':mode,'base':latest}
@@ -291,9 +278,8 @@ jobs:
               assert all(x>=0 for x in pos) and pos==sorted(pos),pos
 
           latest_check=js('/api/management-report/check-latest?force=1')
-          assert latest_check.get('ok') is True
-          assert float(latest_check.get('coverage_ratio_required') or 0)>=0.90
-          print('EXPORT_UPDATE_OK',latest_check.get('status'))
+          assert latest_check.get('ok') is True and float(latest_check.get('coverage_ratio_required') or 0)>=0.90
+          print('EXPORT_10_VARIANTS_AND_UPDATE_OK',latest_check.get('status'))
           PY
 
           code=$(curl -sS -o /tmp/bad.json -w '%{http_code}' --max-time 90 'https://sbrate.onrender.com/api/management-report?base=BAD&compare=2025Q4')
@@ -309,7 +295,7 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import json, math, urllib.request
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/2.0'}
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-MECE/3.0'}
           def js(path):
               req=urllib.request.Request(B+path,headers=H)
               with urllib.request.urlopen(req,timeout=180) as r:
@@ -355,8 +341,10 @@ jobs:
             const p=await b.newPage({viewport:{width:1920,height:1080}}), errs=errors(p);
             await p.goto(B+'/',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
             const dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'PC page overflow '+JSON.stringify(dims));
+            ok(await p.locator('#management-report-open').count()===1,'PC management button count');
             await p.locator('#management-report-open').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2200);
             ok(await p.locator('#mi-section-tabs [data-mi-section]').count()===5,'PC tabs !=5');
+            const generalText=(await p.locator('#mi-section-tabs [data-mi-section="general"]').innerText()).trim(); ok(generalText.includes('경영지표'),'PC general terminology '+generalText);
             ok(await p.locator('#ids-quality-badge').isVisible(),'PC trust badge hidden');
             ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'PC brief missing');
             await p.locator('#ids-quality-badge').click(); ok(await p.locator('#ids-quality-panel').isVisible(),'PC quality panel hidden');
@@ -384,6 +372,7 @@ jobs:
             const p=await b.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true}), errs=errors(p);
             await p.goto(B+'/mobile',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
             const dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile page overflow '+JSON.stringify(dims));
+            ok(await p.locator('#management-report-open-mobile').count()===1,'mobile management button count');
             await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2200);
             ok(await p.locator('#ids-quality-badge').isVisible(),'mobile trust badge hidden');
             ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'mobile brief missing');
