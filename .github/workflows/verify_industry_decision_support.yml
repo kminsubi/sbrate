@@ -31,10 +31,11 @@ jobs:
           node --check static/js/industry_decision_support.js
           node --check static/js/industry_detail_viewport_fix.js
           grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
-          grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds4"' management_report_v5_runtime.py
+          grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"' management_report_v5_runtime.py
           grep -q 'industry_detail_viewport_fix.js' management_report_v5_runtime.py
           grep -q 'document.body.appendChild(panel)' static/js/industry_detail_viewport_fix.js
-          grep -q 'document.body.appendChild(backdrop)' static/js/industry_detail_viewport_fix.js
+          grep -q "PANEL_Z = '100060'" static/js/industry_detail_viewport_fix.js
+          grep -q "BACKDROP_Z = '100050'" static/js/industry_detail_viewport_fix.js
           grep -q 'pointer-events:none' static/css/industry_decision_support.css
 
       - name: Wait for exact live assets
@@ -47,14 +48,14 @@ jobs:
             curl --retry 3 --retry-all-errors --retry-delay 2 -fsS --max-time 90 https://sbrate.onrender.com/mobile >/tmp/mobile.html || true
             if grep -q 'industry_decision_support.js?v=20260827ds3' /tmp/root.html \
               && grep -q 'industry_decision_support.css?v=20260827ds3' /tmp/root.html \
-              && grep -q 'industry_detail_viewport_fix.js?v=20260827ds4' /tmp/root.html \
-              && grep -q 'industry_detail_viewport_fix.js?v=20260827ds4' /tmp/mobile.html; then
-              curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/industry_detail_viewport_fix.js?v=20260827ds4' >/tmp/viewfix.js || true
-              if grep -q 'document.body.appendChild(panel)' /tmp/viewfix.js; then
-                ready=1; echo DECISION_SUPPORT_VIEWPORT_FIX_LIVE; break
+              && grep -q 'industry_detail_viewport_fix.js?v=20260827ds5' /tmp/root.html \
+              && grep -q 'industry_detail_viewport_fix.js?v=20260827ds5' /tmp/mobile.html; then
+              curl -fsS --max-time 90 'https://sbrate.onrender.com/static/js/industry_detail_viewport_fix.js?v=20260827ds5' >/tmp/viewfix.js || true
+              if grep -q "PANEL_Z = '100060'" /tmp/viewfix.js; then
+                ready=1; echo DECISION_SUPPORT_LAYER_FIX_LIVE; break
               fi
             fi
-            echo "waiting viewport-fix assets $i/90"; sleep 10
+            echo "waiting layer-fix assets $i/90"; sleep 10
           done
           test "$ready" = 1
 
@@ -64,7 +65,7 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import json, math, urllib.parse, urllib.request
-          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Decision-Support-Audit/4.0'}
+          B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Decision-Support-Audit/5.0'}
           def js(path, timeout=180):
               req=urllib.request.Request(B+path,headers=H)
               with urllib.request.urlopen(req,timeout=timeout) as r:
@@ -132,9 +133,11 @@ jobs:
             await p.locator('.ids-quality-close').click();
             await p.waitForSelector('#mr-table tbody td.ids-bank-link',{timeout:8000});
             await p.locator('#mr-table tbody td.ids-bank-link').first().click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(600);
-            ok(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.parentElement===document.body),'PC detail not body anchored');
+            const layer=await p.locator('#ids-bank-detail-panel').evaluate(e=>({parent:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex)}));
+            ok(layer.parent&&layer.z>99990,'PC detail layer '+JSON.stringify(layer));
             ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'PC trends !=6');
-            await p.locator('#ids-bank-detail-panel .ids-detail-close').click();
+            await p.locator('#ids-bank-detail-panel .ids-detail-close').click(); await p.waitForTimeout(150);
+            ok(!(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.classList.contains('is-open'))),'PC detail close failed');
             await p.locator('#mi-section-tabs [data-mi-section="funding"]').click(); await p.waitForTimeout(1700);
             await p.waitForSelector('#mi-content .mi-table tbody td.ids-bank-link',{timeout:8000});
             ok(await p.locator('#mi-content .mi-table tbody td.ids-bank-link').count()>=70,'funding detail links missing');
@@ -152,12 +155,12 @@ jobs:
             const pageDims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(pageDims.sw<=pageDims.cw+2,'mobile overflow '+JSON.stringify(pageDims));
             ok(await p.locator('#ids-quality-badge').isVisible(),'mobile trust badge hidden');
             ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'mobile brief missing');
-            const closed=await p.locator('#ids-bank-detail-panel').evaluate(e=>({parent:e.parentElement===document.body,pe:getComputedStyle(e).pointerEvents,vis:getComputedStyle(e).visibility}));
-            ok(closed.parent&&closed.pe==='none'&&closed.vis==='hidden','closed mobile sheet state '+JSON.stringify(closed));
+            const closed=await p.locator('#ids-bank-detail-panel').evaluate(e=>({parent:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex),pe:getComputedStyle(e).pointerEvents,vis:getComputedStyle(e).visibility}));
+            ok(closed.parent&&closed.z>99990&&closed.pe==='none'&&closed.vis==='hidden','closed mobile sheet '+JSON.stringify(closed));
             await p.waitForSelector('#mr-table tbody td.ids-bank-link',{timeout:8000});
             await p.locator('#mr-table tbody td.ids-bank-link').first().click(); await p.waitForSelector('#ids-bank-detail-panel.is-open',{timeout:15000}); await p.waitForTimeout(600);
-            const geo=await p.locator('#ids-bank-detail-panel').evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,b:r.bottom,parent:e.parentElement===document.body}});
-            ok(geo.parent&&geo.x>=-1&&geo.w<=392&&geo.y>=80&&geo.b<=846,'mobile sheet geometry '+JSON.stringify(geo));
+            const geo=await p.locator('#ids-bank-detail-panel').evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,b:r.bottom,parent:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex)}});
+            ok(geo.parent&&geo.z>99990&&geo.x>=-1&&geo.w<=392&&geo.y>=80&&geo.b<=846,'mobile sheet geometry '+JSON.stringify(geo));
             ok(await p.locator('#ids-bank-detail-panel .ids-trend-card').count()===6,'mobile trends !=6');
             await p.locator('#ids-bank-detail-backdrop').click({position:{x:10,y:10}}); await p.waitForTimeout(200);
             ok(!(await p.locator('#ids-bank-detail-panel').evaluate(e=>e.classList.contains('is-open'))),'mobile backdrop close failed');
