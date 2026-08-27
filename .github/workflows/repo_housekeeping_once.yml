@@ -1,0 +1,133 @@
+name: One-time Repository Housekeeping
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repo_housekeeping_once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  housekeeping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Verify cleaned repository structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          expected={
+              'fisis_management_auto_check.yml',
+              'rate_update.yml',
+              'render_keep_alive.yml',
+              'telegram_morning.yml',
+              'verify_final_release.yml',
+              'verify_management_mece.yml',
+              'repo_housekeeping_once.yml',
+          }
+          actual={p.name for p in Path('.github/workflows').glob('*.yml')}
+          assert actual == expected, (actual, expected)
+
+          must_exist=[
+              'app.py','data/latest_rates.json','data/isa_rates.json','data/irp_rates.json',
+              'data/pension_source_map.json','crawler/fsb.py','crawler/pension_entry.py',
+              'crawler/pension_rates.py','crawler/pension_retry_entry.py',
+              'crawler/irp_disclosure_safe.py','crawler/pension_disclosure_postprocess.py',
+              'management_report_v5_runtime.py','industry_decision_support.py',
+          ]
+          for path in must_exist:
+              assert Path(path).exists(), path
+
+          removed=[
+              '.github/workflows/verify_management_v4.yml',
+              '.github/workflows/verify_management_v5.yml',
+              '.github/workflows/verify_fisis_management.yml',
+              'crawler/kb_mobile_isa_irp_probe_v5(1).py',
+              'templates/index_backup_before_redesign.html',
+              'templates/index_gemini_backup.html',
+              'static/css/dashboard_backup_before_premium.css',
+              'data/kb_websquare_probe_cache',
+              'data/kb_mobile_isa_irp_probe_v5_cache',
+          ]
+          for path in removed:
+              assert not Path(path).exists(), path
+          print('REPOSITORY_STRUCTURE_CLEAN_OK')
+          PY
+
+          python -m py_compile \
+            app.py fisis_management.py management_report.py management_report_v5_runtime.py \
+            management_peer_compare.py management_export_v2.py industry_decision_support.py \
+            crawler/fsb.py crawler/pension_entry.py crawler/pension_rates.py \
+            crawler/pension_retry_entry.py crawler/irp_disclosure_safe.py \
+            crawler/pension_disclosure_postprocess.py data_quality_v3.py
+
+      - name: Upgrade surviving checkout actions to Node 24 generation
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in \
+            .github/workflows/rate_update.yml \
+            .github/workflows/verify_final_release.yml \
+            .github/workflows/verify_management_mece.yml
+          do
+            sed -i 's#actions/checkout@v4#actions/checkout@v5#g' "$f"
+          done
+          if grep -R --line-number 'actions/checkout@v4' .github/workflows; then
+            echo 'Legacy checkout@v4 still exists'
+            exit 1
+          fi
+          grep -q 'actions/checkout@v5' .github/workflows/rate_update.yml
+          grep -q 'actions/checkout@v5' .github/workflows/verify_final_release.yml
+          grep -q 'actions/checkout@v5' .github/workflows/verify_management_mece.yml
+          echo CHECKOUT_V5_MIGRATION_OK
+
+      - name: Live service smoke after repository cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 4 --retry-all-errors --retry-delay 3 --max-time 120 https://sbrate.onrender.com/ >/tmp/root.html
+          curl -fsS --retry 4 --retry-all-errors --retry-delay 3 --max-time 120 https://sbrate.onrender.com/api/management-report/quarters >/tmp/quarters.json
+          curl -fsS --retry 4 --retry-all-errors --retry-delay 3 --max-time 120 'https://sbrate.onrender.com/api/industry-overview?mode=single&base=2026Q1' >/tmp/overview.json
+          curl -fsS --retry 4 --retry-all-errors --retry-delay 3 --max-time 120 'https://sbrate.onrender.com/api/management-peer?mode=single&base=2026Q1' >/tmp/peer.json
+          curl -fsS --retry 4 --retry-all-errors --retry-delay 3 --max-time 120 https://sbrate.onrender.com/api/products >/tmp/products.json
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/quarters.json',encoding='utf-8'))
+          o=json.load(open('/tmp/overview.json',encoding='utf-8'))
+          p=json.load(open('/tmp/peer.json',encoding='utf-8'))
+          products=json.load(open('/tmp/products.json',encoding='utf-8'))
+          assert q.get('ok') is True and len(q.get('quarters') or []) >= 2, q
+          latest=(q.get('quarters') or [])[0]
+          assert int(latest.get('bank_count') or 0) >= 70, latest
+          assert o.get('ok') is True and (o.get('brief') or {}).get('ready') is True, o
+          assert p.get('ok') is True and p.get('peer_order') == ['woori','shinhan','hana','kb'], p
+          rows=products if isinstance(products,list) else products.get('products') or products.get('items') or []
+          assert len(rows) >= 70, len(rows)
+          print('CLEANUP_LIVE_SMOKE_OK', {'latest':latest.get('key'),'banks':latest.get('bank_count'),'products':len(rows)})
+          PY
+
+      - name: Commit checkout v5 migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/rate_update.yml .github/workflows/verify_final_release.yml .github/workflows/verify_management_mece.yml
+          if git diff --cached --quiet; then
+            echo 'No checkout migration changes needed'
+          else
+            git commit -m 'Upgrade surviving workflows to checkout v5'
+            git push origin main
+          fi
+
+      - name: Success
+        run: echo REPOSITORY_HOUSEKEEPING_OK
