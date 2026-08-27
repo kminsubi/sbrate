@@ -2,12 +2,21 @@
   'use strict';
 
   let timer = null;
+  const BACKDROP_Z = '100050';
+  const PANEL_Z = '100060';
 
   function reparentDetailLayers() {
     const panel = document.getElementById('ids-bank-detail-panel');
     const backdrop = document.getElementById('ids-bank-detail-backdrop');
-    if (backdrop && backdrop.parentElement !== document.body) document.body.appendChild(backdrop);
-    if (panel && panel.parentElement !== document.body) document.body.appendChild(panel);
+
+    if (backdrop) {
+      if (backdrop.parentElement !== document.body) document.body.appendChild(backdrop);
+      backdrop.style.zIndex = BACKDROP_Z;
+    }
+    if (panel) {
+      if (panel.parentElement !== document.body) document.body.appendChild(panel);
+      panel.style.zIndex = PANEL_Z;
+    }
   }
 
   function schedule() {
