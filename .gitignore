@@ -12,8 +12,23 @@ venv/
 # VS Code
 .vscode/
 
-# Data
+# Runtime JSON data
+# Existing tracked runtime JSON files continue to be versioned.
 data/*.json
+
+# One-off crawler / reverse-engineering artifacts
+data/*_probe_*.txt
+data/*_analysis_*.txt
+data/*_trace_*.txt
+data/*_cache/
+data/**/*_cache/
+*_probe_*.txt
+*_probe_*_result.txt
+
+# Local backup copies (Git history is the backup)
+*_backup_before_*.html
+*_backup_before_*.css
+*_gemini_backup.html
 
 # Logs
 logs/

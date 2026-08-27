@@ -1,632 +1,0 @@
-==========================================================================================
-SBRateBot V5 KB ISA / IRP Probe v1
-==========================================================================================
-
-------------------------------------------------------------------------------------------
-ISA
-------------------------------------------------------------------------------------------
-[1] score=20 https://m.kbsavings.com/mobweb/main.do
-  KEYWORD: ISA
-    ></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/swiper.min.js?ver=20260716"></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/lottie.min.js?ver=20260716"></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/maxy.js?ver=20260716"></script>                <!-- TO-BE script Start --> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=2026071
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  URL/API candidates:
-    http://m.kbret.co.kr/main/index.do
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://m.kbsavings.com/MainNotice.do
-    https://m.kbsavings.com/customer/appBridgeV2.do?appUrl=BNK890020M&utm_source=da&utm_medium=moweb&utm_campaign=2607_attcheck
-    https://m.kbsavings.com/customer/appBridgeV2.do?appUrl=LON820020M&utm_source=da&utm_medium=moweb&utm_campaign=2607_loan_move
-    https://m.kbsavings.com/customer/appBridgeV2.do?appUrl=SER400000M&utm_source=da&utm_medium=moweb&utm_campaign=2607_starclub
-    https://m.kbsavings.com/inqCnt.do
-    https://m.kbsavings.com/kbSavingsDirectBridge.do?chnlType=BS
-    https://m.kbsavings.com/kbSavingsLimitBridge.do?chnlType=BS
-    https://m.kbsavings.com/kiwicard/CAR100000M.do?utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_pangcard
-    https://m.kbsavings.com/kiwicustomer/bankTip_detail.do
-    https://m.kbsavings.com/kiwicustomer/bankTip_list.do
-    https://m.kbsavings.com/kiwicustomer/news_detail.do
-    https://m.kbsavings.com/kiwicustomer/notice_detail.do
-    https://m.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_loan_side
-    https://m.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_sun_normal
-    https://m.kbsavings.com/kiwisavings/eplusSavingsProd.do?utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_eplus_saving
-    https://m.kbsavings.com/kiwisavings/firstKiwiSavingsProd.do?utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_frist_saving
-    https://m.kbsavings.com/kiwisavings/installmentSavingsProd.do?utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_normal_eplus_saving
-    https://m.kbsavings.com/kiwisavings/kindEplusSavingsProd.do?utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_kind_eplus_saving
-    https://m.kbsavings.com/kiwisavings/kiwi369RotarySavingsProd.do?utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_369rotary
-    https://m.kbsavings.com/kiwisavings/kiwiRotarySavings2Prod.do?utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_plus_rotary
-    https://m.kbsavings.com/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiNOR&utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_kiwisaving
-    https://m.kbsavings.com/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK&utm_source=da&utm_medium=moweb&utm_campaign=2607_kiwipang
-    https://m.kbsavings.com/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK&utm_source=da&utm_medium=moweb_rec&utm_campaign=2607_kiwipang
-    https://m.kbsavings.com/mobweb/ETC400000M.do
-    https://m.kbsavings.com/mobweb/SEU900110M.do
-    https://m.kbsavings.com/mobweb/customer/appdown.do
-    https://m.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://m.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://m.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://m.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://m.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://m.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-[2] score=19 https://mbkt.kbsavings.com/mobweb/main.do
-  KEYWORD: ISA
-    ></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/swiper.min.js?ver=20260716"></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/lottie.min.js?ver=20260716"></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/maxy.js?ver=20260716"></script>                <!-- TO-BE script Start --> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=2026071
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  URL/API candidates:
-    http://m.kbret.co.kr/main/index.do
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://mbkt.kbsavings.com/MainNotice.do
-    https://mbkt.kbsavings.com/customer/appBridgeV2.do?appUrl=BNK890020M&utm_source=da&utm_medium=moweb&utm_campaign=2606_attcheck
-    https://mbkt.kbsavings.com/customer/appBridgeV2.do?appUrl=SER400000M&utm_source=da&utm_medium=moweb&utm_campaign=2607_starclub
-    https://mbkt.kbsavings.com/inqCnt.do
-    https://mbkt.kbsavings.com/kbSavingsLimitBridge.do?chnlType=BS
-    https://mbkt.kbsavings.com/kiwicustomer/bankTip_detail.do
-    https://mbkt.kbsavings.com/kiwicustomer/bankTip_list.do
-    https://mbkt.kbsavings.com/kiwicustomer/news_detail.do
-    https://mbkt.kbsavings.com/kiwicustomer/notice_detail.do
-    https://mbkt.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2606_loan_em
-    https://mbkt.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02&utm_source=da_mo&utm_campaign=264_dir_em
-    https://mbkt.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2606_loan_side
-    https://mbkt.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2606_sun_normal
-    https://mbkt.kbsavings.com/kiwisavings/firstKiwiSavingsProd.do?utm_source=da_mo&utm_campaign=264_savfirst
-    https://mbkt.kbsavings.com/kiwisavings/kiwiRotarySavings2Prod.do
-    https://mbkt.kbsavings.com/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK&utm_source=da&utm_medium=moweb&utm_campaign=2606_kiwipang
-    https://mbkt.kbsavings.com/mobweb/ETC400000M.do
-    https://mbkt.kbsavings.com/mobweb/SEU900110M.do
-    https://mbkt.kbsavings.com/mobweb/customer/appdown.do
-    https://mbkt.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-[3] score=19 https://mbkd.kbsavings.com/mobweb/main.do
-  KEYWORD: ISA
-    ></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/swiper.min.js?ver=20260716"></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/lottie.min.js?ver=20260716"></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/maxy.js?ver=20260716"></script>                <!-- TO-BE script Start --> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=2026071
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  URL/API candidates:
-    http://m.kbret.co.kr/main/index.do
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://mbkd.kbsavings.com/MainNotice.do
-    https://mbkd.kbsavings.com/customer/appBridgeV2.do?appUrl=BNK890020M&utm_source=da&utm_medium=moweb&utm_campaign=2606_attcheck
-    https://mbkd.kbsavings.com/customer/appBridgeV2.do?appUrl=SER400000M&utm_source=da&utm_medium=moweb&utm_campaign=2607_starclub
-    https://mbkd.kbsavings.com/inqCnt.do
-    https://mbkd.kbsavings.com/kbSavingsLimitBridge.do?chnlType=BS
-    https://mbkd.kbsavings.com/kiwicustomer/bankTip_detail.do
-    https://mbkd.kbsavings.com/kiwicustomer/bankTip_list.do
-    https://mbkd.kbsavings.com/kiwicustomer/news_detail.do
-    https://mbkd.kbsavings.com/kiwicustomer/notice_detail.do
-    https://mbkd.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2606_loan_em
-    https://mbkd.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02&utm_source=da_mo&utm_campaign=264_dir_em
-    https://mbkd.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2606_loan_side
-    https://mbkd.kbsavings.com/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02&utm_source=da&utm_medium=moweb_rec&utm_campaign=2606_sun_normal
-    https://mbkd.kbsavings.com/kiwisavings/firstKiwiSavingsProd.do?utm_source=da_mo&utm_campaign=264_savfirst
-    https://mbkd.kbsavings.com/kiwisavings/kiwiRotarySavings2Prod.do
-    https://mbkd.kbsavings.com/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK&utm_source=da&utm_medium=moweb&utm_campaign=2606_kiwipang
-    https://mbkd.kbsavings.com/mobweb/ETC400000M.do
-    https://mbkd.kbsavings.com/mobweb/SEU900110M.do
-    https://mbkd.kbsavings.com/mobweb/customer/appdown.do
-    https://mbkd.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-[4] score=17 https://mbkt.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-  KEYWORD: ISA정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">보통예금</td> 								<td class="align-center">저축예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">ISA정기예금</td> 								<td class="align-center">2016.03.31</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* ISA 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">KB e-plus 정기예금</td> 								<td class="align-center">2012
-  KEYWORD: ISA
-    ></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		 		<script type="text/javascript" src="/mobweb/js_kiwi/common.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=20260716"></script>  		 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel_skin.js?ver=20260716"></script>
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  KEYWORD: 퇴직연금 정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-cent
-  KEYWORD: 퇴직연금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align
-     								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.11.14</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금(대면)</td> 
-    					<dl> 									<dt>판매개시일</dt> 									<dd>-</dd> 								</dl> 								<dl> 									<dt>비고</dt> 									<dd>-</dd> 								</dl> 							</div> 						</div> 					</div> 					<!-- 20-05-21 컨텐츠추가 -->  					<ul class="list-bullet-cir mt20"> 						<li><sup>주1)</sup> 금소법에 따른 금융상품 유형(예금성, 투자성, 보장성) </li> 						<li><sup>주2)</sup> 보험, 퇴직연금, 개인종합자산관리계좌(ISA) 등 </li> 					</ul>  					<div class="ui-toggle notice-toggle"> 						<button type="button" class="btn-toggle btn-link"> 							<span>예금자보호제도 안내</span> 						</button> 						<!-- toggle 영역 --> 						<div class="toggle-contents"> 							<p> 								<small>예금자보호제도에 관한 자세한 내용은 영업점에 비치된 예금자보호 안내책자 등을 참고하시거나 예금보험공사 (<i class="
-    거나 예금보험공사 (<i class="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호
-    s="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호금융상품등록부 상세 PDF</sp
-  KEYWORD: IRP
-    align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.
-  KEYWORD: DC형
-    ass="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">
-  URL/API candidates:
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://mbkt.kbsavings.com/main.do
-    https://mbkt.kbsavings.com/mobweb/common/insDefect.do?bgno=2&urlinfo=
-    https://mbkt.kbsavings.com/mobweb/customer/appdown.do
-    https://mbkt.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=971&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=391&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=506&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=520&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=529&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=530&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=531&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=533&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=534&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=535&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=89&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LonTotalInqIntro.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/eplusSavingsProd.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/firstKiwiSavingsProd.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/installmentSavingsProd.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/kindEplusSavingsProd.do
-[5] score=17 https://m.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-  KEYWORD: ISA정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">보통예금</td> 								<td class="align-center">저축예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">ISA정기예금</td> 								<td class="align-center">2016.03.31</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* ISA 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">KB e-plus 정기예금</td> 								<td class="align-center">2012
-  KEYWORD: ISA
-    ></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		 		<script type="text/javascript" src="/mobweb/js_kiwi/common.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=20260716"></script>  		 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel_skin.js?ver=20260716"></script>
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  KEYWORD: 퇴직연금 정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-cent
-  KEYWORD: 퇴직연금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align
-     								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.11.14</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금(대면)</td> 
-    					<dl> 									<dt>판매개시일</dt> 									<dd>-</dd> 								</dl> 								<dl> 									<dt>비고</dt> 									<dd>-</dd> 								</dl> 							</div> 						</div> 					</div> 					<!-- 20-05-21 컨텐츠추가 -->  					<ul class="list-bullet-cir mt20"> 						<li><sup>주1)</sup> 금소법에 따른 금융상품 유형(예금성, 투자성, 보장성) </li> 						<li><sup>주2)</sup> 보험, 퇴직연금, 개인종합자산관리계좌(ISA) 등 </li> 					</ul>  					<div class="ui-toggle notice-toggle"> 						<button type="button" class="btn-toggle btn-link"> 							<span>예금자보호제도 안내</span> 						</button> 						<!-- toggle 영역 --> 						<div class="toggle-contents"> 							<p> 								<small>예금자보호제도에 관한 자세한 내용은 영업점에 비치된 예금자보호 안내책자 등을 참고하시거나 예금보험공사 (<i class="
-    거나 예금보험공사 (<i class="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호
-    s="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호금융상품등록부 상세 PDF</sp
-  KEYWORD: IRP
-    align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.
-  KEYWORD: DC형
-    ass="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">
-  URL/API candidates:
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://m.kbsavings.com/main.do
-    https://m.kbsavings.com/mobweb/common/insDefect.do?bgno=2&urlinfo=
-    https://m.kbsavings.com/mobweb/customer/appdown.do
-    https://m.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://m.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://m.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://m.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://m.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://m.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=971&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=391&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=506&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=520&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=529&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=530&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=531&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=533&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=534&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=535&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=89&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LonTotalInqIntro.do
-    https://m.kbsavings.com/mobweb/kiwisavings/eplusSavingsProd.do
-    https://m.kbsavings.com/mobweb/kiwisavings/firstKiwiSavingsProd.do
-    https://m.kbsavings.com/mobweb/kiwisavings/installmentSavingsProd.do
-    https://m.kbsavings.com/mobweb/kiwisavings/kindEplusSavingsProd.do
-[6] score=17 https://mbkd.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-  KEYWORD: ISA정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">보통예금</td> 								<td class="align-center">저축예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">ISA정기예금</td> 								<td class="align-center">2016.03.31</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* ISA 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">KB e-plus 정기예금</td> 								<td class="align-center">2012
-  KEYWORD: ISA
-    ></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		 		<script type="text/javascript" src="/mobweb/js_kiwi/common.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=20260716"></script>  		 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel_skin.js?ver=20260716"></script>
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  KEYWORD: 퇴직연금 정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-cent
-  KEYWORD: 퇴직연금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align
-     								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.11.14</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금(대면)</td> 
-    					<dl> 									<dt>판매개시일</dt> 									<dd>-</dd> 								</dl> 								<dl> 									<dt>비고</dt> 									<dd>-</dd> 								</dl> 							</div> 						</div> 					</div> 					<!-- 20-05-21 컨텐츠추가 -->  					<ul class="list-bullet-cir mt20"> 						<li><sup>주1)</sup> 금소법에 따른 금융상품 유형(예금성, 투자성, 보장성) </li> 						<li><sup>주2)</sup> 보험, 퇴직연금, 개인종합자산관리계좌(ISA) 등 </li> 					</ul>  					<div class="ui-toggle notice-toggle"> 						<button type="button" class="btn-toggle btn-link"> 							<span>예금자보호제도 안내</span> 						</button> 						<!-- toggle 영역 --> 						<div class="toggle-contents"> 							<p> 								<small>예금자보호제도에 관한 자세한 내용은 영업점에 비치된 예금자보호 안내책자 등을 참고하시거나 예금보험공사 (<i class="
-    거나 예금보험공사 (<i class="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호
-    s="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호금융상품등록부 상세 PDF</sp
-  KEYWORD: IRP
-    align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.
-  KEYWORD: DC형
-    ass="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">
-  URL/API candidates:
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://mbkd.kbsavings.com/main.do
-    https://mbkd.kbsavings.com/mobweb/common/insDefect.do?bgno=2&urlinfo=
-    https://mbkd.kbsavings.com/mobweb/customer/appdown.do
-    https://mbkd.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=971&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=391&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=506&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=520&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=529&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=530&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=531&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=533&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=534&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=535&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=89&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400012M.do?lonGdsNo=1225&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LonTotalInqIntro.do
-    https://mbkd.kbsavings.com/mobweb/kiwisavings/eplusSavingsProd.do
-    https://mbkd.kbsavings.com/mobweb/kiwisavings/firstKiwiSavingsProd.do
-    https://mbkd.kbsavings.com/mobweb/kiwisavings/installmentSavingsProd.do
-[7] score=1 https://mbkt.kbsavings.com/mobweb/css_kiwi/mobiscroll/mobiscroll.custom-2.15.1.css?ver=20260716
-  KEYWORD: ISA
-    em; 	line-height: 2.125em; 	display: none; }  .mbsc-lv-multi-ic-right { 	margin-left: 10%; }  .mbsc-lv-multi-ic-left { 	margin-right: 10%; }  .mbsc-lv-right .mbsc-lv-multi-ic-right { 	display: table; }  .mbsc-lv-left .mbsc-lv-multi-ic-left { 	display: table; }  .mbsc-lv-ic-m { 	display: table-cell; 	margin: 0 1em; 	cursor: pointer; }  .mbsc-lv-ic-disabled { 	opacity: .5; 	filter: alpha(opacity=50); }  .mbsc-lv-sl-c { 	position: relative; 	-webkit-animation-fill-mode: forwards; 	-webkit-transform: translateX(0); 	transform: translateX(0); }  .mbsc-lv-sl-r { 	-webkit-animation: mbsc-lv-remove-left 300ms; 	animation: mbsc-lv-remove-left 300ms; }  .mbsc-lv-sl-l { 	-webkit-animation: mbsc-lv-remove-
-  KEYWORD: IRP
-    i5j5#icons_mobiscroll') format('svg'); 	font-style: normal; }  .mbsc-ic:before { 	font-family: 'icons_mobiscroll'; 	speak: none; 	font-style: normal; 	font-weight: normal; 	font-variant: normal; 	text-transform: none; 	-webkit-font-smoothing: antialiased; 	-moz-osx-font-smoothing: grayscale; }  .mbsc-ic-aid:before { 	content: "\f100"; }  .mbsc-ic-airplane:before { 	content: "\f101"; }  .mbsc-ic-alarm2:before { 	content: "\f102"; }  .mbsc-ic-arrow-down5:before { 	content: "\f103"; }  .mbsc-ic-arrow-left4:before { 	content: "\f104"; }  .mbsc-ic-arrow-left5:before { 	content: "\f105"; }  .mbsc-ic-arrow-left6:before { 	content: "\f106"; }  .mbsc-ic-arrow-right4:before { 	content: "\f107"; }  .mbsc-
-[8] score=1 https://mbkt.kbsavings.com/mobweb/customer/appdown.do
-  KEYWORD: ISA
-    ></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		 		<script type="text/javascript" src="/mobweb/js_kiwi/common.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=20260716"></script>  		 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel_skin.js?ver=20260716"></script>
-  URL/API candidates:
-    https://mbkt.kbsavings.com/mobweb/common/insDefect.do?bgno=2&urlinfo=
-
-------------------------------------------------------------------------------------------
-IRP
-------------------------------------------------------------------------------------------
-[1] score=8 https://mbkt.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-  KEYWORD: ISA정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">보통예금</td> 								<td class="align-center">저축예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">ISA정기예금</td> 								<td class="align-center">2016.03.31</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* ISA 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">KB e-plus 정기예금</td> 								<td class="align-center">2012
-  KEYWORD: ISA
-    ></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		 		<script type="text/javascript" src="/mobweb/js_kiwi/common.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=20260716"></script>  		 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel_skin.js?ver=20260716"></script>
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  KEYWORD: 퇴직연금 정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-cent
-  KEYWORD: 퇴직연금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align
-     								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.11.14</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금(대면)</td> 
-    					<dl> 									<dt>판매개시일</dt> 									<dd>-</dd> 								</dl> 								<dl> 									<dt>비고</dt> 									<dd>-</dd> 								</dl> 							</div> 						</div> 					</div> 					<!-- 20-05-21 컨텐츠추가 -->  					<ul class="list-bullet-cir mt20"> 						<li><sup>주1)</sup> 금소법에 따른 금융상품 유형(예금성, 투자성, 보장성) </li> 						<li><sup>주2)</sup> 보험, 퇴직연금, 개인종합자산관리계좌(ISA) 등 </li> 					</ul>  					<div class="ui-toggle notice-toggle"> 						<button type="button" class="btn-toggle btn-link"> 							<span>예금자보호제도 안내</span> 						</button> 						<!-- toggle 영역 --> 						<div class="toggle-contents"> 							<p> 								<small>예금자보호제도에 관한 자세한 내용은 영업점에 비치된 예금자보호 안내책자 등을 참고하시거나 예금보험공사 (<i class="
-    거나 예금보험공사 (<i class="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호
-    s="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호금융상품등록부 상세 PDF</sp
-  KEYWORD: IRP
-    align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.
-  KEYWORD: DC형
-    ass="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">
-  URL/API candidates:
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://mbkt.kbsavings.com/main.do
-    https://mbkt.kbsavings.com/mobweb/common/insDefect.do?bgno=2&urlinfo=
-    https://mbkt.kbsavings.com/mobweb/customer/appdown.do
-    https://mbkt.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://mbkt.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://mbkt.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=971&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=391&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=506&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=520&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=529&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=530&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=531&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=533&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=534&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=535&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=89&type=2
-    https://mbkt.kbsavings.com/mobweb/kiwiloan/LonTotalInqIntro.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/eplusSavingsProd.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/firstKiwiSavingsProd.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/installmentSavingsProd.do
-    https://mbkt.kbsavings.com/mobweb/kiwisavings/kindEplusSavingsProd.do
-[2] score=8 https://m.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-  KEYWORD: ISA정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">보통예금</td> 								<td class="align-center">저축예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">ISA정기예금</td> 								<td class="align-center">2016.03.31</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* ISA 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">KB e-plus 정기예금</td> 								<td class="align-center">2012
-  KEYWORD: ISA
-    ></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		 		<script type="text/javascript" src="/mobweb/js_kiwi/common.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=20260716"></script>  		 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel_skin.js?ver=20260716"></script>
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  KEYWORD: 퇴직연금 정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-cent
-  KEYWORD: 퇴직연금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align
-     								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.11.14</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금(대면)</td> 
-    					<dl> 									<dt>판매개시일</dt> 									<dd>-</dd> 								</dl> 								<dl> 									<dt>비고</dt> 									<dd>-</dd> 								</dl> 							</div> 						</div> 					</div> 					<!-- 20-05-21 컨텐츠추가 -->  					<ul class="list-bullet-cir mt20"> 						<li><sup>주1)</sup> 금소법에 따른 금융상품 유형(예금성, 투자성, 보장성) </li> 						<li><sup>주2)</sup> 보험, 퇴직연금, 개인종합자산관리계좌(ISA) 등 </li> 					</ul>  					<div class="ui-toggle notice-toggle"> 						<button type="button" class="btn-toggle btn-link"> 							<span>예금자보호제도 안내</span> 						</button> 						<!-- toggle 영역 --> 						<div class="toggle-contents"> 							<p> 								<small>예금자보호제도에 관한 자세한 내용은 영업점에 비치된 예금자보호 안내책자 등을 참고하시거나 예금보험공사 (<i class="
-    거나 예금보험공사 (<i class="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호
-    s="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호금융상품등록부 상세 PDF</sp
-  KEYWORD: IRP
-    align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.
-  KEYWORD: DC형
-    ass="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">
-  URL/API candidates:
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://m.kbsavings.com/main.do
-    https://m.kbsavings.com/mobweb/common/insDefect.do?bgno=2&urlinfo=
-    https://m.kbsavings.com/mobweb/customer/appdown.do
-    https://m.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://m.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://m.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://m.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://m.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://m.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://m.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://m.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=971&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=391&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=506&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=520&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=529&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=530&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=531&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=533&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=534&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=535&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=89&type=2
-    https://m.kbsavings.com/mobweb/kiwiloan/LonTotalInqIntro.do
-    https://m.kbsavings.com/mobweb/kiwisavings/eplusSavingsProd.do
-    https://m.kbsavings.com/mobweb/kiwisavings/firstKiwiSavingsProd.do
-    https://m.kbsavings.com/mobweb/kiwisavings/installmentSavingsProd.do
-    https://m.kbsavings.com/mobweb/kiwisavings/kindEplusSavingsProd.do
-[3] score=8 https://mbkd.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-  KEYWORD: ISA정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">보통예금</td> 								<td class="align-center">저축예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">ISA정기예금</td> 								<td class="align-center">2016.03.31</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* ISA 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">KB e-plus 정기예금</td> 								<td class="align-center">2012
-  KEYWORD: ISA
-    ></script>  		<script type="text/javascript" src="/mobweb/js_kiwi/ui-script.js?ver=20260716"></script> 		 		<script type="text/javascript" src="/mobweb/js_kiwi/common.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/appBridge_PC.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kiwiSavingsCommon.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/kds_hybrid_lib.js?ver=20260716"></script>  		 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel.js?ver=20260716"></script> 		<script type="text/javascript" src="/mobweb/js_kiwi/netfunnel/netfunnel_skin.js?ver=20260716"></script>
-    class="ico" src="/mobweb/images_kiwi/main/img-search.png" /> 통합한도조회</a> 			<a href="/mobweb/kiwiintro/guide_brnc_info.do"><img class="ico" src="/mobweb/images_kiwi/main/img-kb-office.png" /> 영업점안내</a> 			<a href="/mobweb/kiwicustomer/cust_view.do"><img class="ico" src="/mobweb/images_kiwi/main/img-counsel.png" /> 상담예약</a> 			<a href="/mobweb/kiwisavings/liivSavingsProd2.do?KIWI_GOODS_CODE=kiwiPAK"><img class="ico" src="/mobweb/images_kiwi/main/img-kiwi.png" /> kiwi팡팡통장</a> 			<!--// 2025-10-21 아이콘 수정 --> 		</div>  		<hr class="divider" />  		<div class="ui-tab"> 			<!-- 탭메뉴 --> 			<div class="tab-menu type2"> 				<ul> 					<li class="active"> 						<button type="button" aria-contr
-    011M.do?lonGdsNo=535&type=2">주식담보대출</a></li> 						</ul> 					</li> 				</ul> 			</nav> 	 			<!-- 예금 --> 			<nav class="menu-lists" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>        
-    s" id="menu02"> 				<h2><span class="s-tit"><img class="ico" src="/mobweb/images_kiwi/main/icon-deposit.svg" alt="" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</n
-    "" />예금</span></h2>      <!-- 2025.10.23 아이콘 변경 --> 				<ul> 					<li> 						<a href="/mobweb/kiwisavings/kiwiRotarySavings2Prod.do">플러스회전식정기예금</a> 					</li>                      <li>                          <a href="/mobweb/kiwisavings/eplusSavingsProd.do">KB e-plus정기예금</a>                      </li> 					<li> 						<a href="/mobweb/kiwisavings/kiwi369RotarySavingsProd.do">KB369회전식 정기예금</a> 					</li>                      <li>                          <a href="/mobweb/savings/savingInfo.do?SAVINGS_GOODS_CODE=3">자유적립예금</a>                      </li> 				</ul> 			</nav> 	 			<!-- 적금 --> 			<nav class="menu-lists" id="menu03"> 				<h2><span class="s-tit"><img class="ico" src=
-  KEYWORD: 퇴직연금 정기예금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-cent
-  KEYWORD: 퇴직연금
-    				<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align
-     								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.11.14</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금(대면)</td> 
-    					<dl> 									<dt>판매개시일</dt> 									<dd>-</dd> 								</dl> 								<dl> 									<dt>비고</dt> 									<dd>-</dd> 								</dl> 							</div> 						</div> 					</div> 					<!-- 20-05-21 컨텐츠추가 -->  					<ul class="list-bullet-cir mt20"> 						<li><sup>주1)</sup> 금소법에 따른 금융상품 유형(예금성, 투자성, 보장성) </li> 						<li><sup>주2)</sup> 보험, 퇴직연금, 개인종합자산관리계좌(ISA) 등 </li> 					</ul>  					<div class="ui-toggle notice-toggle"> 						<button type="button" class="btn-toggle btn-link"> 							<span>예금자보호제도 안내</span> 						</button> 						<!-- toggle 영역 --> 						<div class="toggle-contents"> 							<p> 								<small>예금자보호제도에 관한 자세한 내용은 영업점에 비치된 예금자보호 안내책자 등을 참고하시거나 예금보험공사 (<i class="
-    거나 예금보험공사 (<i class="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호
-    s="ico-tel"></i>1588-0037, www.kdic.or.kr)로 문의하시기 바랍니다. </small> 							</p> 							<!-- 2020-04-01 오타 수정 --> 							<ul class="list-bullet-cir mt20"> 								<!-- 20200713 수정 - li 내용 수정 --> 								<li>정부, 지방자치단체, 한국은행, 금융감독원, 예금보험공사, 부보금융회사가 가입한 금융상품은 보호되지 않습니다. </li> 								<!-- //20200713 수정 - li 내용 수정 --> 								<li>퇴직연금 편입 상품은 확정급여형 퇴직연금(DB)으로 운용 시 보호되지 않습니다. </li> 							</ul> 						</div> 					</div> 					<!-- //ui-toggle //notice-toggle -->  					<div class="page-btns fixed"> 						<a href="/mobweb/images_kiwi/tms/CUS130010M/CUS130010M.pdf" download> 							<button type="button" class="btn-lg-primary protection-pdf-down" id="btnDown"> 								<span>보호금융상품등록부 상세 PDF</sp
-  KEYWORD: IRP
-    align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">2024.
-  KEYWORD: DC형
-    ass="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">정기예금</td> 								<td class="align-center">-</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" rowspan="2">정기예금</td> 								<td class="align-center">퇴직연금 정기예금(DC형, IRP형)</td> 								<td class="align-center">2018.11.01</td> 								<td class="align-center">-</td> 							</tr> 							<tr> 								<td class="align-center" colspan="3">* 퇴직연금 편입 상품</td> 							</tr> 							<tr> 								<td class="align-center">정기예금</td> 								<td class="align-center">플러스회전식정기예금</td> 								<td class="align-center">
-  URL/API candidates:
-    https://dchatbot.kbonefcc.com:6443/kbchatbot/chatSavings/mnChatbotWindow_M.do
-    https://mbkd.kbsavings.com/main.do
-    https://mbkd.kbsavings.com/mobweb/common/insDefect.do?bgno=2&urlinfo=
-    https://mbkd.kbsavings.com/mobweb/customer/appdown.do
-    https://mbkd.kbsavings.com/mobweb/kiwicard/CAR100000M.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/bankTip_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/cust_view.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/event_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/news_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/notice_list.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/prt_fnce_prd_regt.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/rept_qust.do
-    https://mbkd.kbsavings.com/mobweb/kiwicustomer/tms_view.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_brnc_info.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_trns_limt.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_use_pee.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/guide_use_time.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/kiwiceo.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/management_phil.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/membership.do
-    https://mbkd.kbsavings.com/mobweb/kiwiintro/privacy_policy.do
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON100000M.do
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=120&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=121&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=122&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1230&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1378&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1379&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=1380&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=64&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=66&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=69&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=970&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNo=971&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400010M.do?lonGdsNoE=57&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=391&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=506&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=520&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=529&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=530&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=531&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=533&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=534&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=535&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400011M.do?lonGdsNo=89&type=2
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LON400012M.do?lonGdsNo=1225&entryType=02
-    https://mbkd.kbsavings.com/mobweb/kiwiloan/LonTotalInqIntro.do
-    https://mbkd.kbsavings.com/mobweb/kiwisavings/eplusSavingsProd.do
-    https://mbkd.kbsavings.com/mobweb/kiwisavings/firstKiwiSavingsProd.do
-    https://mbkd.kbsavings.com/mobweb/kiwisavings/installmentSavingsProd.do
-[4] score=1 https://mbkt.kbsavings.com/mobweb/css_kiwi/mobiscroll/mobiscroll.custom-2.15.1.css?ver=20260716
-  KEYWORD: ISA
-    em; 	line-height: 2.125em; 	display: none; }  .mbsc-lv-multi-ic-right { 	margin-left: 10%; }  .mbsc-lv-multi-ic-left { 	margin-right: 10%; }  .mbsc-lv-right .mbsc-lv-multi-ic-right { 	display: table; }  .mbsc-lv-left .mbsc-lv-multi-ic-left { 	display: table; }  .mbsc-lv-ic-m { 	display: table-cell; 	margin: 0 1em; 	cursor: pointer; }  .mbsc-lv-ic-disabled { 	opacity: .5; 	filter: alpha(opacity=50); }  .mbsc-lv-sl-c { 	position: relative; 	-webkit-animation-fill-mode: forwards; 	-webkit-transform: translateX(0); 	transform: translateX(0); }  .mbsc-lv-sl-r { 	-webkit-animation: mbsc-lv-remove-left 300ms; 	animation: mbsc-lv-remove-left 300ms; }  .mbsc-lv-sl-l { 	-webkit-animation: mbsc-lv-remove-
-  KEYWORD: IRP
-    i5j5#icons_mobiscroll') format('svg'); 	font-style: normal; }  .mbsc-ic:before { 	font-family: 'icons_mobiscroll'; 	speak: none; 	font-style: normal; 	font-weight: normal; 	font-variant: normal; 	text-transform: none; 	-webkit-font-smoothing: antialiased; 	-moz-osx-font-smoothing: grayscale; }  .mbsc-ic-aid:before { 	content: "\f100"; }  .mbsc-ic-airplane:before { 	content: "\f101"; }  .mbsc-ic-alarm2:before { 	content: "\f102"; }  .mbsc-ic-arrow-down5:before { 	content: "\f103"; }  .mbsc-ic-arrow-left4:before { 	content: "\f104"; }  .mbsc-ic-arrow-left5:before { 	content: "\f105"; }  .mbsc-ic-arrow-left6:before { 	content: "\f106"; }  .mbsc-ic-arrow-right4:before { 	content: "\f107"; }  .mbsc-
