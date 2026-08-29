@@ -145,16 +145,20 @@
     "category": "IRP",
     "product": "퇴직연금 정기예금(DC/IRP)",
     "rates": {
-      "3m": null,
-      "6m": null,
-      "12m": 3.7,
+      "3m": 2.6,
+      "6m": 2.6,
+      "12m": 3.5,
       "24m": 3.0,
       "36m": 2.9
     },
-    "status": "fetch_or_parse_error",
+    "status": "verified_official",
     "source_url": "https://www.hanasavings.com/YPR/YPR0104",
-    "updated_at": "2026-08-29 09:05:05",
-    "error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0104 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fc6ab91d310>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
+    "updated_at": "2026-08-29 12:15:10",
+    "note": "하나저축은행 공식 퇴직연금 정기예금 DC/IRP형 연이율",
+    "rate_month": "2026-08",
+    "rate_type": "IRP/DC·IRP",
+    "rate_basis": "IRP/DC·IRP 약정금리",
+    "disclosure_date_source": "kb_thirdparty_disclosure_page",
     "disclosure_sources": [
       {
         "source_name": "KB퇴직연금_타사제공상품",
@@ -179,13 +183,11 @@
       }
     ],
     "disclosure_status": "verified_disclosure",
-    "rate_type": "IRP/DC·IRP",
-    "rate_basis": "IRP/DC·IRP 약정금리",
     "disclosure_date": "2026-08-27",
-    "collected_at": "2026-08-29 09:05:05",
-    "disclosure_date_source": "kb_thirdparty_disclosure_page",
+    "collected_at": "2026-08-29 12:15:10",
     "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-    "rate_month": "2026-09"
+    "retry_attempt_at": "2026-08-29 12:15:01",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "SBI",
