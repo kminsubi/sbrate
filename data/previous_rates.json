@@ -976,8 +976,8 @@
         "change_3": 0,
         "change_6": 0.0,
         "change_12": 0.0,
-        "change_24": 0.4,
-        "change_36": 0.1
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "HB",
@@ -1142,7 +1142,7 @@
         "tel": "18338889",
         "change_1": 0,
         "change_3": 0,
-        "change_6": -0.09,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -2290,8 +2290,8 @@
         "tel": "18779900",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": -0.1,
-        "change_12": -0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2318,8 +2318,8 @@
         "tel": "18779900",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": -0.1,
-        "change_12": -0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2347,9 +2347,9 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.1,
-        "change_24": -0.1,
-        "change_36": -0.1
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "고려",
@@ -2375,9 +2375,9 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.1,
-        "change_24": -0.1,
-        "change_36": -0.1
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "고려",
@@ -2402,8 +2402,8 @@
         "tel": "18779900",
         "change_1": 0,
         "change_3": 0,
-        "change_6": -0.1,
-        "change_12": -0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2431,9 +2431,9 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.1,
-        "change_24": -0.1,
-        "change_36": -0.1
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "국제",
