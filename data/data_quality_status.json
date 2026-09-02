@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-09-02 08:28:05",
+  "generated_at": "2026-09-03 03:53:46",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": false,
-  "fingerprint": "687639f252741a9b",
+  "notify": true,
+  "fingerprint": "fdb79803c7372568",
   "previous_fingerprint": "687639f252741a9b",
   "collector_outcomes": {
     "deposit": "success",
@@ -40,6 +40,12 @@
     }
   },
   "issues": [
+    {
+      "level": "WARNING",
+      "key": "deposit:large_rate_change",
+      "section": "정기예금",
+      "message": "비정상 급변 후보: 오투 정기예금 3개월 +1.00%p."
+    },
     {
       "level": "WARNING",
       "key": "isa:unavailable_rows",
