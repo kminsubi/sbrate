@@ -18,11 +18,52 @@ def _load_existing():
         return {}
 
 
+def _browser_fetch(url):
+    """Render the official KB disclosure page when requests receives an incomplete page."""
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.support.ui import WebDriverWait
+
+    options = Options()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,3000")
+    options.add_argument("--lang=ko-KR")
+
+    driver = webdriver.Chrome(options=options)
+    try:
+        driver.get(url)
+        WebDriverWait(driver, 25).until(
+            lambda d: "저축은행/정기예금" in d.page_source
+        )
+        return driver.page_source, driver.current_url
+    finally:
+        driver.quit()
+
+
+def _merge_rows(primary, secondary, targets):
+    """Keep the normal request result and fill only banks missing from it."""
+    present = {row.get("bank") for row in primary if isinstance(row, dict)}
+    merged = list(primary)
+    for row in secondary:
+        if not isinstance(row, dict):
+            continue
+        bank = row.get("bank")
+        if bank not in targets or bank in present:
+            continue
+        merged.append(row)
+        present.add(bank)
+    return merged
+
+
 def main():
     targets = source.load_targets()
     previous = _load_existing()
     all_rows = []
     source_errors = []
+    render_errors = []
 
     print("=" * 72)
     print("SBRate IRP disclosure safe refresh")
@@ -38,7 +79,43 @@ def main():
                 targets,
             )
             all_rows.extend(rows)
-            print(item["name"], "rows=", len(rows))
+            print(item["name"], "requests rows=", len(rows))
+
+            # KB's retirement-disclosure page can return a partially rendered
+            # document to CI requests. Use a real browser only for the missing
+            # banks; this preserves the fast requests path when it is complete.
+            present_banks = {
+                row.get("bank")
+                for row in all_rows
+                if isinstance(row, dict)
+            }
+            missing_banks = [bank for bank in targets if bank not in present_banks]
+
+            if missing_banks:
+                try:
+                    browser_html, browser_url = _browser_fetch(item["url"])
+                    browser_rows = source.parse_tables(
+                        browser_html,
+                        item["name"],
+                        browser_url,
+                        targets,
+                    )
+                    before = len(all_rows)
+                    all_rows = _merge_rows(all_rows, browser_rows, targets)
+                    print(
+                        item["name"],
+                        "browser rows=",
+                        len(browser_rows),
+                        "filled=",
+                        len(all_rows) - before,
+                    )
+                except Exception as error:
+                    render_errors.append({
+                        "source": item["name"],
+                        "error": str(error),
+                    })
+                    print(item["name"], "BROWSER ERROR:", error)
+
         except Exception as error:
             source_errors.append({
                 "source": item["name"],
@@ -83,6 +160,7 @@ def main():
         "strategy": "retirement_provider_disclosure",
         "sources": source.DISCLOSURE_URLS,
         "source_errors": source_errors,
+        "render_errors": render_errors,
         "banks": banks,
         "raw_match_count": len(all_rows),
         "daily_refresh_verified": True,
