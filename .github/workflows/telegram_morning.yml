@@ -2,23 +2,35 @@ name: SBRateBot Telegram Morning Brief
 
 on:
   schedule:
-    # Primary target: 07:30 KST. GitHub scheduled events can be delayed or
-    # dropped during high load, so retry windows are intentionally staggered.
-    # 22:30 UTC = 07:30 KST
-    # 23:00 UTC = 08:00 KST
-    # 23:30 UTC = 08:30 KST
-    # 00:00 UTC = 09:00 KST
-    # 00:30 UTC = 09:30 KST
-    - cron: "30 22 * * 0-4"
-    - cron: "0 23 * * 0-4"
-    - cron: "30 23 * * 0-4"
-    - cron: "0 0 * * 1-5"
-    - cron: "30 0 * * 1-5"
+    # Primary target: 07:30 KST. Fallback every 5 minutes through 09:30 KST.
+    # GitHub scheduled events can be delayed or dropped during high load.
+    - cron: "30 22 * * 0-4" # 07:30 KST
+    - cron: "35 22 * * 0-4" # 07:35 KST
+    - cron: "40 22 * * 0-4" # 07:40 KST
+    - cron: "45 22 * * 0-4" # 07:45 KST
+    - cron: "50 22 * * 0-4" # 07:50 KST
+    - cron: "55 22 * * 0-4" # 07:55 KST
+    - cron: "0 23 * * 0-4"  # 08:00 KST
+    - cron: "5 23 * * 0-4"  # 08:05 KST
+    - cron: "10 23 * * 0-4" # 08:10 KST
+    - cron: "15 23 * * 0-4" # 08:15 KST
+    - cron: "20 23 * * 0-4" # 08:20 KST
+    - cron: "25 23 * * 0-4" # 08:25 KST
+    - cron: "30 23 * * 0-4" # 08:30 KST
+    - cron: "35 23 * * 0-4" # 08:35 KST
+    - cron: "40 23 * * 0-4" # 08:40 KST
+    - cron: "45 23 * * 0-4" # 08:45 KST
+    - cron: "50 23 * * 0-4" # 08:50 KST
+    - cron: "55 23 * * 0-4" # 08:55 KST
+    - cron: "0 0 * * 1-5"   # 09:00 KST
+    - cron: "5 0 * * 1-5"   # 09:05 KST
+    - cron: "10 0 * * 1-5"  # 09:10 KST
+    - cron: "15 0 * * 1-5"  # 09:15 KST
+    - cron: "20 0 * * 1-5"  # 09:20 KST
+    - cron: "25 0 * * 1-5"  # 09:25 KST
+    - cron: "30 0 * * 1-5"  # 09:30 KST
   workflow_dispatch:
 
-# Multiple scheduled runs are used as a fallback chain. They must execute
-# sequentially so that a delayed primary run can send first and later fallback
-# runs can see the sent-date marker and exit without a duplicate Telegram post.
 concurrency:
   group: telegram-morning-brief
   cancel-in-progress: false
