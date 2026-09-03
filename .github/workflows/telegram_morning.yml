@@ -2,16 +2,39 @@ name: SBRateBot Telegram Morning Brief
 
 on:
   schedule:
-    # 07:30 KST target. GitHub scheduled workflows can start later under load.
-    # Weekdays only; Korean public holidays are filtered in the job below.
+    # Primary target: 07:30 KST. GitHub scheduled events can be delayed or
+    # dropped during high load, so retry windows are intentionally staggered.
+    # 22:30 UTC = 07:30 KST
+    # 23:00 UTC = 08:00 KST
+    # 23:30 UTC = 08:30 KST
+    # 00:00 UTC = 09:00 KST
+    # 00:30 UTC = 09:30 KST
     - cron: "30 22 * * 0-4"
+    - cron: "0 23 * * 0-4"
+    - cron: "30 23 * * 0-4"
+    - cron: "0 0 * * 1-5"
+    - cron: "30 0 * * 1-5"
   workflow_dispatch:
+
+# Multiple scheduled runs are used as a fallback chain. They must execute
+# sequentially so that a delayed primary run can send first and later fallback
+# runs can see the sent-date marker and exit without a duplicate Telegram post.
+concurrency:
+  group: telegram-morning-brief
+  cancel-in-progress: false
+  queue: max
+
+permissions:
+  contents: write
 
 jobs:
   send-brief:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout state
+        uses: actions/checkout@v4
+
       - name: Skip Korean public holidays
         id: business_day
         shell: bash
@@ -19,7 +42,6 @@ jobs:
           KST_DATE=$(TZ=Asia/Seoul date +%F)
           KST_MD=$(TZ=Asia/Seoul date +%m-%d)
 
-          # Fixed-date Korean public holidays.
           case "$KST_MD" in
             01-01|03-01|05-05|06-06|08-15|10-03|10-09|12-25)
               echo "run=false" >> "$GITHUB_OUTPUT"
@@ -28,7 +50,6 @@ jobs:
               ;;
           esac
 
-          # 2026 lunar/substitute holidays and statutory election day.
           case "$KST_DATE" in
             2026-02-16|2026-02-17|2026-02-18|2026-03-02|2026-05-25|2026-06-03|2026-08-17|2026-09-24|2026-09-25|2026-09-28|2026-10-05)
               echo "run=false" >> "$GITHUB_OUTPUT"
@@ -39,26 +60,62 @@ jobs:
 
           echo "run=true" >> "$GITHUB_OUTPUT"
 
-      - name: Wake Render
+      - name: Check daily send guard
+        id: guard
         if: steps.business_day.outputs.run == 'true'
+        shell: bash
+        run: |
+          KST_DATE=$(TZ=Asia/Seoul date +%F)
+          MARKER=".github/state/morning_brief_last_sent.txt"
+          LAST_SENT=""
+
+          if [ -f "$MARKER" ]; then
+            LAST_SENT=$(tr -d '[:space:]' < "$MARKER")
+          fi
+
+          echo "KST_DATE=$KST_DATE"
+          echo "LAST_SENT=$LAST_SENT"
+
+          if [ "$LAST_SENT" = "$KST_DATE" ]; then
+            echo "send=false" >> "$GITHUB_OUTPUT"
+            echo "Morning Brief already sent for $KST_DATE; skipping duplicate."
+          else
+            echo "send=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Wake Render
+        if: steps.business_day.outputs.run == 'true' && steps.guard.outputs.send == 'true'
         run: |
           curl --fail --show-error --silent \
-            --retry 2 \
+            --retry 3 \
             --retry-delay 5 \
             --connect-timeout 10 \
             --max-time 120 \
             "https://sbrate.onrender.com/" > /dev/null
 
       - name: Send Telegram morning brief
-        if: steps.business_day.outputs.run == 'true'
+        if: steps.business_day.outputs.run == 'true' && steps.guard.outputs.send == 'true'
         run: |
-          # Keep-alive starts at 06:00 KST, and this wake request provides an
-          # additional guard before sending the 07:30 KST Morning Brief.
           curl --fail --show-error --silent \
-            --retry 4 \
-            --retry-delay 5 \
+            --retry 5 \
+            --retry-delay 8 \
             --connect-timeout 10 \
-            --max-time 120 \
+            --max-time 180 \
             -X POST \
             -H "X-SBRate-Secret: ${{ secrets.TELEGRAM_BRIEF_SECRET }}" \
             "https://sbrate.onrender.com/telegram/morning-brief"
+
+      - name: Record successful send date
+        if: steps.business_day.outputs.run == 'true' && steps.guard.outputs.send == 'true'
+        shell: bash
+        run: |
+          KST_DATE=$(TZ=Asia/Seoul date +%F)
+          MARKER=".github/state/morning_brief_last_sent.txt"
+          mkdir -p "$(dirname "$MARKER")"
+          printf '%s\n' "$KST_DATE" > "$MARKER"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$MARKER"
+          git commit -m "Record Telegram morning brief $KST_DATE" || exit 0
+          git push
