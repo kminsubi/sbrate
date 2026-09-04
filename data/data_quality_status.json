@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-05 03:34:55",
+  "generated_at": "2026-09-05 08:10:23",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "fa8d96c866410efb",
-  "previous_fingerprint": "687639f252741a9b",
+  "fingerprint": "687639f252741a9b",
+  "previous_fingerprint": "fa8d96c866410efb",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,8 +22,8 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 9,
-      "retained_last_good": 1,
+      "verified_today": 10,
+      "retained_last_good": 0,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
       "woori_rate_12m": 3.6
@@ -32,7 +32,7 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 13,
-      "verified_today": 8,
+      "verified_today": 9,
       "retained_last_good": 0,
       "unavailable_rows": 0,
       "fetch_failed_rows": 0,
@@ -40,12 +40,6 @@
     }
   },
   "issues": [
-    {
-      "level": "WARNING",
-      "key": "isa:retained:신한",
-      "section": "ISA",
-      "message": "신한 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
-    },
     {
       "level": "WARNING",
       "key": "isa:unavailable_rows",

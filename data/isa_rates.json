@@ -52,19 +52,16 @@
       "24m": 3.0,
       "36m": null
     },
-    "status": "stale_retained_after_fetch_error",
+    "status": "verified_official",
     "source_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json",
-    "updated_at": "2026-09-04 03:50:35",
-    "note": "신한저축은행 공식 ISA정기예금 API. dscr10220.LIST의 CLASS_CD=24014, FM_TERM별 APLY_RATE 약정이율 사용. 공식 가입기간 3/6/12/24개월, 36개월 미제공. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
-    "disclosure_date": "2026-09-04",
-    "collected_at": "2026-09-04 03:50:35",
+    "updated_at": "2026-09-05 08:10:21",
+    "note": "신한저축은행 공식 ISA정기예금 API. dscr10220.LIST의 CLASS_CD=24014, FM_TERM별 APLY_RATE 약정이율 사용. 공식 가입기간 3/6/12/24개월, 36개월 미제공.",
+    "disclosure_date": "2026-09-05",
+    "collected_at": "2026-09-05 08:10:21",
     "disclosure_date_source": "shinhan_rate_guide_current_basis",
     "disclosure_date_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json",
-    "stale": true,
-    "retained_last_good": true,
-    "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-09-05 03:32:41",
-    "last_fetch_error": "신한 ISA 공식 API 수집 실패: HTTPSConnectionPool(host='www.shinhansavings.com', port=443): Max retries exceeded with url: /PD_0080 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.shinhansavings.com', port=443) at 0x7f233e961d10>, 'Connection to www.shinhansavings.com timed out. (connect timeout=20)'))"
+    "retry_attempt_at": "2026-09-05 08:10:20",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "하나",
