@@ -1675,7 +1675,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.02,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -1703,7 +1703,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.02,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2469,16 +2469,16 @@
         "top_1m": "1",
         "top_3m": "2",
         "top_6m": "2.2",
-        "top_12m": "3.8",
+        "top_12m": "4",
         "top_24m": "2.2",
         "top_36m": null,
         "base_1m": "1",
         "base_3m": "2",
         "base_6m": "2.2",
-        "base_12m": "3.8",
+        "base_12m": "4",
         "base_24m": "2.2",
         "base_36m": null,
-        "reg_date": "2026-08-31 00:00:00.0",
+        "reg_date": "2026-09-03 00:00:00.0",
         "join_target": "만 19세 이상의 개인",
         "sweetener": "없음",
         "url": "https://kukje.ibs.fsb.or.kr/DepDeinComp0100.act",
@@ -2487,7 +2487,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.0,
+        "change_12": 0.2,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -2572,7 +2572,7 @@
         "change_3": 0.0,
         "change_6": 0.0,
         "change_12": 0.0,
-        "change_24": -0.7,
+        "change_24": 0.0,
         "change_36": 0
     },
     {
@@ -2684,7 +2684,7 @@
         "change_3": 0.0,
         "change_6": 0.0,
         "change_12": 0.0,
-        "change_24": -0.7,
+        "change_24": 0.0,
         "change_36": 0
     },
     {
@@ -4111,7 +4111,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.55,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -5847,7 +5847,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.03,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7077,9 +7077,9 @@
         "homepage": "http://www.o2banking.com/",
         "tel": "16610022",
         "change_1": 0.0,
-        "change_3": 1.0,
+        "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.08,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7105,9 +7105,9 @@
         "homepage": "http://www.o2banking.com/",
         "tel": "16610022",
         "change_1": 0.0,
-        "change_3": 1.0,
+        "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.08,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7133,9 +7133,9 @@
         "homepage": "http://www.o2banking.com/",
         "tel": "16610022",
         "change_1": 0.0,
-        "change_3": 1.0,
+        "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.08,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7275,7 +7275,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.06,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7303,7 +7303,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.15,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7834,8 +7834,8 @@
         "tel": "0542754060",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.2,
-        "change_12": 0.2,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7862,8 +7862,8 @@
         "tel": "0542754060",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.2,
-        "change_12": 0.2,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7893,7 +7893,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.2
+        "change_36": 0.0
     },
     {
         "bank": "머스트삼일",
@@ -7921,7 +7921,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.2
+        "change_36": 0.0
     },
     {
         "bank": "오성",
