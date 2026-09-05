@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-05 08:10:23",
+  "generated_at": "2026-09-06 02:34:01",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "687639f252741a9b",
-  "previous_fingerprint": "fa8d96c866410efb",
+  "fingerprint": "3f95ce5b605d6287",
+  "previous_fingerprint": "687639f252741a9b",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,8 +22,8 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 10,
-      "retained_last_good": 0,
+      "verified_today": 9,
+      "retained_last_good": 1,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
       "woori_rate_12m": 3.6
@@ -32,7 +32,7 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 13,
-      "verified_today": 9,
+      "verified_today": 8,
       "retained_last_good": 0,
       "unavailable_rows": 0,
       "fetch_failed_rows": 0,
@@ -42,9 +42,21 @@
   "issues": [
     {
       "level": "WARNING",
+      "key": "isa:retained:신한",
+      "section": "ISA",
+      "message": "신한 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
+    },
+    {
+      "level": "WARNING",
       "key": "isa:unavailable_rows",
       "section": "ISA",
       "message": "금리 미확보 은행이 3개사입니다. 오늘 실패한 은행과는 별도 관리합니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "irp:missing_disclosure",
+      "section": "IRP",
+      "message": "오늘 공식확인이 되지 않은 데이터 중 공시기준일이 없는 은행이 5개사입니다."
     },
     {
       "level": "WARNING",
