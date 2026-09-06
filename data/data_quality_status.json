@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-06 08:08:00",
+  "generated_at": "2026-09-07 02:40:54",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "9394a5b2303660f2",
-  "previous_fingerprint": "3f95ce5b605d6287",
+  "fingerprint": "687639f252741a9b",
+  "previous_fingerprint": "9394a5b2303660f2",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -45,12 +45,6 @@
       "key": "isa:unavailable_rows",
       "section": "ISA",
       "message": "금리 미확보 은행이 3개사입니다. 오늘 실패한 은행과는 별도 관리합니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "irp:missing_disclosure",
-      "section": "IRP",
-      "message": "오늘 공식확인이 되지 않은 데이터 중 공시기준일이 없는 은행이 4개사입니다."
     },
     {
       "level": "WARNING",
