@@ -83,8 +83,10 @@
     "stale": true,
     "retained_last_good": true,
     "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-09-10 03:48:46",
-    "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fdbe6dc6850>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))"
+    "last_attempt_at": "2026-09-10 08:26:11",
+    "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7f07d1bcd160>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
+    "retry_attempt_at": "2026-09-10 08:25:55",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "SBI",

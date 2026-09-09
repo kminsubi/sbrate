@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-09-10 03:50:44",
+  "snapshot_at": "2026-09-10 08:27:34",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-09-10 03:48:17",
@@ -10622,8 +10622,10 @@
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-09-10 03:48:46",
-      "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fdbe6dc6850>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))"
+      "last_attempt_at": "2026-09-10 08:26:11",
+      "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7f07d1bcd160>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
+      "retry_attempt_at": "2026-09-10 08:25:55",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "SBI",
@@ -10961,8 +10963,8 @@
       },
       "status": "fetch_or_parse_error",
       "source_url": "https://www.hanasavings.com/YPR/YPR0104",
-      "updated_at": "2026-09-10 03:49:01",
-      "error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0104 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fdbe6dc4b90>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
+      "updated_at": "2026-09-10 08:26:42",
+      "error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0104 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7f07d1b9a490>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -10990,10 +10992,12 @@
       "rate_type": "IRP/DC·IRP",
       "rate_basis": "IRP/DC·IRP 약정금리",
       "disclosure_date": "2026-08-27",
-      "collected_at": "2026-09-10 03:49:01",
+      "collected_at": "2026-09-10 08:26:42",
       "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "rate_month": "2026-09"
+      "rate_month": "2026-09",
+      "retry_attempt_at": "2026-09-10 08:25:55",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "SBI",
