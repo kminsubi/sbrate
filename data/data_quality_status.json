@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-09-10 08:27:01",
+  "generated_at": "2026-09-11 03:41:25",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": false,
-  "fingerprint": "e9702955bfbd2b49",
+  "notify": true,
+  "fingerprint": "4b5f95a9896e7c9a",
   "previous_fingerprint": "e9702955bfbd2b49",
   "collector_outcomes": {
     "deposit": "success",
@@ -22,11 +22,11 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 9,
+      "verified_today": 8,
       "retained_last_good": 1,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
-      "woori_rate_12m": 3.6
+      "woori_rate_12m": 3.7
     },
     "irp": {
       "rows": 13,
@@ -42,9 +42,15 @@
   "issues": [
     {
       "level": "WARNING",
-      "key": "isa:retained:하나",
+      "key": "deposit:large_rate_change",
+      "section": "정기예금",
+      "message": "비정상 급변 후보: 대명 E-플러스 정기예금 12개월 +0.68%p."
+    },
+    {
+      "level": "WARNING",
+      "key": "isa:retained:신한",
       "section": "ISA",
-      "message": "하나 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
+      "message": "신한 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
     },
     {
       "level": "WARNING",
