@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-09-11 03:41:25",
+  "snapshot_at": "2026-09-11 08:20:56",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-09-11 03:38:18",
@@ -10551,15 +10551,17 @@
       },
       "status": "verified_official_fallback",
       "source_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-      "updated_at": "2026-09-11 03:38:40",
+      "updated_at": "2026-09-11 08:20:10",
       "collector": "woori_isa_verified_fallback",
       "disclosure_date": "2026-07-31",
       "reference_date": "2026-07-31",
       "disclosure_date_source": "verified_official_fallback_date",
       "disclosure_date_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-      "fetch_error": "https://www.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='www.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.woorisavingsbank.com', port=443) at 0x7ff4ccd9d010>, 'Connection to www.woorisavingsbank.com timed out. (connect timeout=8)')) | https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='m.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='m.woorisavingsbank.com', port=443) at 0x7ff4ccd81e50>, 'Connection to m.woorisavingsbank.com timed out. (connect timeout=8)'))",
+      "fetch_error": "https://www.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='www.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.woorisavingsbank.com', port=443) at 0x7f9e18c79160>, 'Connection to www.woorisavingsbank.com timed out. (connect timeout=8)')) | https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='m.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='m.woorisavingsbank.com', port=443) at 0x7f9e18c45d10>, 'Connection to m.woorisavingsbank.com timed out. (connect timeout=8)'))",
       "note": "우리금융 공식 ISA 상품페이지 접속 실패로 마지막 검증 공식값 유지. 공식 금리안내 기준일 2026-07-31: 3개월 2.40%, 6개월 3.70%, 12개월 3.70%, 24개월 3.30%, 36개월 3.00%. 공식 페이지 접속이 복구되면 자동수집값을 우선 사용.",
-      "collected_at": "2026-09-11 03:38:40"
+      "collected_at": "2026-09-11 08:20:10",
+      "retry_attempt_at": "2026-09-11 08:19:53",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "KB",
@@ -10592,19 +10594,16 @@
         "24m": 3.0,
         "36m": null
       },
-      "status": "stale_retained_after_fetch_error",
+      "status": "verified_official",
       "source_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json",
-      "updated_at": "2026-09-10 03:48:29",
-      "note": "신한저축은행 공식 ISA정기예금 API. dscr10220.LIST의 CLASS_CD=24014, FM_TERM별 APLY_RATE 약정이율 사용. 공식 가입기간 3/6/12/24개월, 36개월 미제공. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
-      "disclosure_date": "2026-09-10",
-      "collected_at": "2026-09-10 03:48:29",
+      "updated_at": "2026-09-11 08:20:12",
+      "note": "신한저축은행 공식 ISA정기예금 API. dscr10220.LIST의 CLASS_CD=24014, FM_TERM별 APLY_RATE 약정이율 사용. 공식 가입기간 3/6/12/24개월, 36개월 미제공.",
+      "disclosure_date": "2026-09-11",
+      "collected_at": "2026-09-11 08:20:12",
       "disclosure_date_source": "shinhan_rate_guide_current_basis",
       "disclosure_date_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json",
-      "stale": true,
-      "retained_last_good": true,
-      "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-09-11 03:39:04",
-      "last_fetch_error": "신한 ISA 공식 API 수집 실패: HTTPSConnectionPool(host='www.shinhansavings.com', port=443): Max retries exceeded with url: /PD_0080 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.shinhansavings.com', port=443) at 0x7ff4ccd820d0>, 'Connection to www.shinhansavings.com timed out. (connect timeout=20)'))"
+      "retry_attempt_at": "2026-09-11 08:19:53",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "하나",
@@ -10907,16 +10906,16 @@
       "category": "IRP",
       "product": "퇴직연금 정기예금(DC/IRP)",
       "rates": {
-        "3m": null,
-        "6m": null,
-        "12m": 3.55,
+        "3m": 1.8,
+        "6m": 2.3,
+        "12m": 3.5,
         "24m": 2.0,
         "36m": 1.9
       },
-      "status": "fetch_or_parse_error",
-      "source_url": "https://www.shinhansavings.com/PD_0081",
-      "updated_at": "2026-09-11 03:39:24",
-      "note": "신한 IRP 공식 API 수집 실패: HTTPSConnectionPool(host='www.shinhansavings.com', port=443): Max retries exceeded with url: /PD_0081 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.shinhansavings.com', port=443) at 0x7ff4ccd81e50>, 'Connection to www.shinhansavings.com timed out. (connect timeout=20)'))",
+      "status": "verified_official",
+      "source_url": "https://www.shinhansavings.com/api/PD0081/selectSavPd.json",
+      "updated_at": "2026-09-11 08:20:13",
+      "note": "신한저축은행 공식 퇴직연금 정기예금 API. DC/IRP형(CLASS_CD=24016)의 FM_TERM별 APLY_RATE 약정이율 사용. DB형 대표금리(dscr10230)는 IRP 금리로 사용하지 않음.",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -10943,11 +10942,13 @@
       "disclosure_status": "verified_disclosure",
       "rate_type": "IRP/DC·IRP",
       "rate_basis": "IRP/DC·IRP 약정금리",
-      "disclosure_date": "2026-08-27",
-      "collected_at": "2026-09-11 03:39:24",
-      "disclosure_date_source": "kb_thirdparty_disclosure_page",
-      "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "rate_month": "2026-09"
+      "disclosure_date": "2026-08-01",
+      "collected_at": "2026-09-11 08:20:13",
+      "disclosure_date_source": "shinhan_rate_guide_bulSrDt_kst",
+      "disclosure_date_url": "https://www.shinhansavings.com/api/PD0081/selectSavPd.json",
+      "rate_month": "2026-08",
+      "retry_attempt_at": "2026-09-11 08:19:53",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "하나",
