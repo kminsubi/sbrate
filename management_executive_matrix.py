@@ -308,7 +308,7 @@ def build_executive_matrix(base: str | None = None) -> dict[str, Any]:
     return {
         "ok": True,
         "ready": all(readiness.values()),
-        "view": "executive_peer_matrix_v1",
+        "view": "executive_peer_matrix_v2",
         "base": base,
         "base_label": base_meta.get("label") or mr._quarter_label(base),
         "as_of": base_meta.get("as_of"),
