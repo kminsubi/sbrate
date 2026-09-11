@@ -50,7 +50,7 @@ jobs:
           grep -q 'PEER_COMPARE_VERSION = "20260827peer2"' management_report_v5_runtime.py
           grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
           grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"' management_report_v5_runtime.py
-          grep -q 'EXECUTIVE_MATRIX_VERSION = "20260911mx2"' management_report_v5_runtime.py
+          grep -q 'EXECUTIVE_MATRIX_VERSION = "20260911mx3"' management_report_v5_runtime.py
           grep -q '/api/management-executive-matrix' management_executive_matrix.py
           grep -q 'autoOpenFromManagementButton' static/js/management_executive_matrix.js
           grep -q "PANEL_Z = '100060'" static/js/industry_detail_viewport_fix.js
@@ -79,8 +79,8 @@ jobs:
               'management_peer_compare.js?v=20260827peer2',
               'management_peer_compare.css?v=20260827peer2',
               'management_terminology_patch.js?v=20260827term1',
-              'management_executive_matrix.js?v=20260911mx2',
-              'management_executive_matrix.css?v=20260911mx2',
+              'management_executive_matrix.js?v=20260911mx3',
+              'management_executive_matrix.css?v=20260911mx3',
               'industry_decision_support.js?v=20260827ds3',
               'industry_decision_support.css?v=20260827ds3',
               'industry_detail_viewport_fix.js?v=20260827ds5',

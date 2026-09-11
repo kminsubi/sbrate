@@ -44,7 +44,7 @@ jobs:
           grep -q 'PEER_COMPARE_VERSION = "20260827peer2"' management_report_v5_runtime.py
           grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
           grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"' management_report_v5_runtime.py
-          grep -q 'EXECUTIVE_MATRIX_VERSION = "20260911mx2"' management_report_v5_runtime.py
+          grep -q 'EXECUTIVE_MATRIX_VERSION = "20260911mx3"' management_report_v5_runtime.py
 
           grep -q 'install_management_executive_matrix' management_report_v5_runtime.py
           grep -q '/api/management-executive-matrix' management_executive_matrix.py
