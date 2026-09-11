@@ -43,6 +43,7 @@ GROUPS = (
             ("net_income", "당기순이익", "억원", "higher", "profitability"),
             ("net_interest_income", "이자 순수익", "억원", "higher", "profitability"),
             ("interest_income", "이자수익", "억원", "higher", "profitability"),
+            ("loan_interest_income", "대출채권 이자수익", "억원", "higher", "profitability"),
             ("interest_expense", "이자비용", "억원", "lower", "profitability"),
         ),
     },
@@ -342,7 +343,42 @@ def build_executive_matrix(base: str | None = None) -> dict[str, Any]:
             "세부 조달비용률",
             "세부 대손비용률",
         ],
-        "phase2_policy": "FISIS 원천 테이블·계정코드가 검증된 항목만 추가하며 미확인 수치는 생성하지 않습니다.",
+        "phase2_verified_source_map": {
+            "loan_interest_income": {
+                "table": "SE014",
+                "account": "A13",
+                "label": "이자수익_대출채권이자",
+                "status": "ACTIVE_IN_INTELLIGENCE_STORE",
+            },
+            "loan_receivable_trading_gain": {
+                "table": "SE006",
+                "account": "A40",
+                "label": "대출채권관련수익_대출채권매매이익",
+                "status": "SOURCE_VERIFIED_COLLECTOR_PENDING",
+            },
+            "loan_receivable_trading_loss": {
+                "table": "SE006",
+                "account": "B530",
+                "label": "대출채권관련손실_대출채권매매손실",
+                "status": "SOURCE_VERIFIED_COLLECTOR_PENDING",
+            },
+            "borrowing_interest_expense": {
+                "table": "SE014",
+                "account": "A22",
+                "label": "이자비용_차입금이자",
+                "status": "SOURCE_VERIFIED_COLLECTOR_PENDING",
+            },
+            "bond_interest_expense": {
+                "table": "SE014",
+                "account": "A23",
+                "label": "이자비용_사채이자",
+                "status": "SOURCE_VERIFIED_COLLECTOR_PENDING",
+            },
+        },
+        "phase2_policy": (
+            "FISIS 원천 테이블·계정코드가 검증된 항목만 추가합니다. "
+            "대출이자수익률은 검증된 대출평잔 분모가 확보되기 전까지 산출하지 않습니다."
+        ),
     }
 
 

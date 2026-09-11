@@ -39,22 +39,22 @@ def _intel(section, base=None, compare=None):
     values = {
         "우리금융저축은행": {
             "funding": [950, 760, 80, 73.68, 18, 14],
-            "profitability": [25, 20, 40, 75, 35],
+            "profitability": [25, 20, 40, 75, 60, 35],
             "soundness": [14, 110, 4.2, 5.1, 120, 45],
         },
         "신한저축은행": {
             "funding": [1100, 800, 72.7, 72.73, 20, 15],
-            "profitability": [30, 24, 44, 82, 38],
+            "profitability": [30, 24, 44, 82, 67, 38],
             "soundness": [13, 105, 4.8, 5.5, 115, 48],
         },
         "하나저축은행": {
             "funding": [850, 690, 81.2, 76.47, 16, 12],
-            "profitability": [18, 15, 31, 66, 35],
+            "profitability": [18, 15, 31, 66, 51, 35],
             "soundness": [15, 115, 3.7, 4.6, 130, 43],
         },
         "KB저축은행": {
             "funding": [1000, 770, 77, 75, 19, 14],
-            "profitability": [27, 22, 42, 79, 37],
+            "profitability": [27, 22, 42, 79, 63, 37],
             "soundness": [12.5, 100, 5.0, 5.9, 100, 50],
         },
     }
@@ -66,7 +66,7 @@ def _intel(section, base=None, compare=None):
         ],
         "profitability": [
             "operating_profit", "net_income", "net_interest_income",
-            "interest_income", "interest_expense",
+            "interest_income", "loan_interest_income", "interest_expense",
         ],
         "soundness": [
             "bis_ratio", "liquidity_ratio", "delinquency_ratio",
@@ -120,9 +120,14 @@ class ExecutiveMatrixTests(unittest.TestCase):
     def test_unverified_phase2_metrics_are_not_fabricated(self, _intel_mock, _store_mock):
         data = mx.build_executive_matrix("2026Q2")
         keys = {row["key"] for row in data["rows"]}
+        self.assertIn("loan_interest_income", keys)
         self.assertNotIn("loan_interest_yield", keys)
         self.assertIn("대출이자수익률", data["phase2_pending"])
-        self.assertIn("미확인 수치는 생성하지 않습니다", data["phase2_policy"])
+        verified = data["phase2_verified_source_map"]
+        self.assertEqual(verified["loan_receivable_trading_gain"]["account"], "A40")
+        self.assertEqual(verified["loan_receivable_trading_loss"]["account"], "B530")
+        self.assertEqual(verified["borrowing_interest_expense"]["account"], "A22")
+        self.assertIn("대출평잔", data["phase2_policy"])
 
 
 if __name__ == "__main__":
