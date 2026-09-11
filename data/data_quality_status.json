@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-11 08:20:14",
+  "generated_at": "2026-09-12 03:44:41",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": true,
+  "notify": false,
   "fingerprint": "fdb79803c7372568",
-  "previous_fingerprint": "4b5f95a9896e7c9a",
+  "previous_fingerprint": "fdb79803c7372568",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,11 +22,11 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 9,
+      "verified_today": 10,
       "retained_last_good": 0,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
-      "woori_rate_12m": 3.7
+      "woori_rate_12m": 3.45
     },
     "irp": {
       "rows": 13,
@@ -44,7 +44,7 @@
       "level": "WARNING",
       "key": "deposit:large_rate_change",
       "section": "정기예금",
-      "message": "비정상 급변 후보: 대명 E-플러스 정기예금 12개월 +0.68%p."
+      "message": "비정상 급변 후보: 대명 E-플러스 정기예금 12개월 -0.68%p."
     },
     {
       "level": "WARNING",
