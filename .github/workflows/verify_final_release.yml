@@ -23,6 +23,9 @@ on:
       - 'management_report_v5_runtime.py'
       - 'management_export_v2.py'
       - 'management_intelligence.py'
+      - 'management_executive_matrix.py'
+      - 'static/js/management_executive_matrix.js'
+      - 'static/css/management_executive_matrix.css'
       - 'fisis_*.py'
       - 'scheduler.py'
   workflow_dispatch:
@@ -42,11 +45,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile fisis_management.py fisis_intelligence_store.py fisis_profitability_period_patch.py management_intelligence.py management_peer_compare.py management_export_v2.py management_report_auto_update.py management_report_v5_runtime.py industry_decision_support.py management_terminology_patch.py scheduler.py
-          for f in static/js/dashboard.js static/js/mobile.js static/js/dashboard_final_guard.js static/js/management_report.js static/js/management_intelligence.js static/js/management_report_stability.js static/js/management_report_bank_focus.js static/js/management_report_mobile_bank_pin.js static/js/management_peer_compare.js static/js/management_terminology_patch.js static/js/industry_decision_support.js static/js/industry_detail_viewport_fix.js; do node --check "$f"; done
+          python -m py_compile fisis_management.py fisis_intelligence_store.py fisis_profitability_period_patch.py management_intelligence.py management_peer_compare.py management_export_v2.py management_report_auto_update.py management_report_v5_runtime.py management_executive_matrix.py industry_decision_support.py management_terminology_patch.py scheduler.py
+          for f in static/js/dashboard.js static/js/mobile.js static/js/dashboard_final_guard.js static/js/management_report.js static/js/management_intelligence.js static/js/management_report_stability.js static/js/management_report_bank_focus.js static/js/management_report_mobile_bank_pin.js static/js/management_peer_compare.js static/js/management_terminology_patch.js static/js/management_executive_matrix.js static/js/industry_decision_support.js static/js/industry_detail_viewport_fix.js; do node --check "$f"; done
           grep -q 'PEER_COMPARE_VERSION = "20260827peer2"' management_report_v5_runtime.py
           grep -q 'DECISION_SUPPORT_VERSION = "20260827ds3"' management_report_v5_runtime.py
           grep -q 'DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"' management_report_v5_runtime.py
+          grep -q 'EXECUTIVE_MATRIX_VERSION = "20260911mx2"' management_report_v5_runtime.py
+          grep -q '/api/management-executive-matrix' management_executive_matrix.py
+          grep -q 'autoOpenFromManagementButton' static/js/management_executive_matrix.js
           grep -q "PANEL_Z = '100060'" static/js/industry_detail_viewport_fix.js
           grep -q "BACKDROP_Z = '100050'" static/js/industry_detail_viewport_fix.js
           grep -q 'pointer-events:none' static/css/industry_decision_support.css
@@ -73,6 +79,8 @@ jobs:
               'management_peer_compare.js?v=20260827peer2',
               'management_peer_compare.css?v=20260827peer2',
               'management_terminology_patch.js?v=20260827term1',
+              'management_executive_matrix.js?v=20260911mx2',
+              'management_executive_matrix.css?v=20260911mx2',
               'industry_decision_support.js?v=20260827ds3',
               'industry_decision_support.css?v=20260827ds3',
               'industry_detail_viewport_fix.js?v=20260827ds5',
@@ -95,12 +103,25 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import io,json,math,urllib.parse,urllib.request,zipfile,html
+          import io,json,math,time,urllib.error,urllib.parse,urllib.request,zipfile,html
           B='https://sbrate.onrender.com'; H={'User-Agent':'SBRate-Final-Audit/6.0'}
           def raw(path,timeout=180):
-              req=urllib.request.Request(B+path,headers=H)
-              with urllib.request.urlopen(req,timeout=timeout) as r:
-                  assert r.status==200,(path,r.status); return r.read()
+              last=None
+              for attempt in range(5):
+                  try:
+                      req=urllib.request.Request(B+path,headers=H)
+                      with urllib.request.urlopen(req,timeout=timeout) as r:
+                          assert r.status==200,(path,r.status)
+                          return r.read()
+                  except urllib.error.HTTPError as exc:
+                      if exc.code not in (502,503,504):
+                          raise
+                      last=exc
+                  except urllib.error.URLError as exc:
+                      last=exc
+                  if attempt < 4:
+                      time.sleep(2*(attempt+1))
+              raise last
           def js(path): return json.loads(raw(path).decode('utf-8'))
           def items(d):
               if isinstance(d,list): return d
@@ -153,6 +174,19 @@ jobs:
           assert fm['total_assets']['delta_label']=='전년말比'
           assert fm['deposits']['delta_label']=='전분기比'
           assert fm['net_income']['delta_label']=='전년동기比'
+
+          matrix=js('/api/management-executive-matrix?'+urllib.parse.urlencode({'base':latest}))
+          assert matrix.get('ok') is True
+          assert matrix.get('view')=='executive_peer_matrix_v2'
+          assert [x.get('id') for x in matrix.get('peers') or []]==['woori','shinhan','hana','kb']
+          assert [x.get('label') for x in matrix.get('peers') or []]==['우리금융','신한','하나','KB']
+          matrix_rows=matrix.get('rows') or []
+          matrix_keys={x.get('key') for x in matrix_rows}
+          assert len(matrix_rows)>=20
+          assert 'loan_interest_income' in matrix_keys
+          assert 'loan_interest_yield' not in matrix_keys
+          assert (matrix.get('phase2_verified_source_map') or {}).get('loan_receivable_trading_gain',{}).get('account')=='A40'
+          assert (matrix.get('phase2_verified_source_map') or {}).get('loan_receivable_trading_loss',{}).get('account')=='B530'
 
           overview=js('/api/industry-overview?'+urllib.parse.urlencode({'mode':'single','base':latest}))
           assert overview.get('ok') is True
@@ -214,7 +248,14 @@ jobs:
             const header=p.locator('body > header'); ok(await header.count()===1,'PC header missing'); ok(['sticky','fixed'].includes(await header.evaluate(e=>getComputedStyle(e).position)),'PC header not sticky');
             const clock=p.locator('#header-current-datetime'), cb=await clock.boundingBox(); ok(await clock.isVisible()&&cb&&cb.x+cb.width<=1922,'clock clipped');
             const open=p.locator('#management-report-open'); ok((await open.innerText()).includes('업권현황'),'PC terminology');
-            await open.click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2400);
+            await open.click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000});
+            await p.waitForSelector('#management-executive-matrix.is-open',{timeout:15000}); await p.waitForTimeout(1200);
+            ok(await p.locator('#mx-body tr').count()>=20,'PC executive matrix rows');
+            const mxHeads=(await p.locator('.mx-title-row th').allTextContents()).map(x=>x.trim());
+            ok(mxHeads.includes('우리금융')&&mxHeads.includes('신한')&&mxHeads.includes('하나')&&mxHeads.includes('KB'),'PC matrix headers '+mxHeads.join('|'));
+            ok(await p.locator('.mx-best').count()>=1,'PC matrix best-cell highlight');
+            await p.locator('#mx-detail').click(); await p.waitForTimeout(250);
+            ok(!(await p.locator('#management-executive-matrix').evaluate(e=>e.classList.contains('is-open'))),'PC matrix detail transition');
             ok((await p.locator('#management-report-modal .mr-title-block h2').innerText()).includes('업권현황'),'modal title');
             ok((await p.locator('#mi-section-tabs [data-mi-section="general"]').innerText()).trim()==='경영지표','general tab');
             ok(await p.locator('#ids-quality-badge').isVisible(),'PC trust badge');
@@ -238,7 +279,11 @@ jobs:
             const p=await b.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true}), errors=errs(p);
             await p.goto(B+'/mobile',{waitUntil:'domcontentloaded',timeout:120000}); await settle(p);
             let dims=await p.evaluate(()=>({sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth})); ok(dims.sw<=dims.cw+2,'mobile overflow '+JSON.stringify(dims));
-            await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000}); await p.waitForTimeout(2400);
+            await p.locator('#management-report-open-mobile').click(); await p.waitForSelector('#management-report-modal.is-open',{timeout:15000});
+            await p.waitForSelector('#management-executive-matrix.is-open',{timeout:15000}); await p.waitForTimeout(1200);
+            ok(await p.locator('#mx-body tr').count()>=20,'mobile executive matrix rows');
+            await p.locator('#mx-detail').evaluate(e=>e.click()); await p.waitForTimeout(250);
+            ok(!(await p.locator('#management-executive-matrix').evaluate(e=>e.classList.contains('is-open'))),'mobile matrix detail transition');
             ok(await p.locator('#ids-quality-badge').isVisible(),'mobile trust badge');
             ok(await p.locator('#ids-brief-items .ids-brief-item').count()>=1,'mobile brief');
             const closed=await p.locator('#ids-bank-detail-panel').evaluate(e=>({parent:e.parentElement===document.body,z:Number(getComputedStyle(e).zIndex),pe:getComputedStyle(e).pointerEvents,vis:getComputedStyle(e).visibility}));
