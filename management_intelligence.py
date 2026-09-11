@@ -40,6 +40,7 @@ SECTION_FIELDS = {
         ("roe", "ROE", "%", "higher"),
         ("net_interest_income", "이자 순수익", "억원", "higher"),
         ("interest_income", "이자수익", "억원", "higher"),
+        ("loan_interest_income", "대출채권 이자수익", "억원", "higher"),
         ("interest_expense", "이자비용", "억원", "lower"),
         ("deposit_interest_expense", "예수금 이자비용", "억원", "lower"),
         ("time_deposit_interest_expense", "정기예금 이자비용", "억원", "lower"),
@@ -49,7 +50,8 @@ SECTION_FIELDS = {
 
 PROFITABILITY_CUMULATIVE_FIELDS = {
     "net_income", "operating_profit", "net_interest_income", "interest_income",
-    "interest_expense", "deposit_interest_expense", "time_deposit_interest_expense",
+    "loan_interest_income", "interest_expense", "deposit_interest_expense",
+    "time_deposit_interest_expense",
 }
 
 
