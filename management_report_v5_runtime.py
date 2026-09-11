@@ -3,6 +3,7 @@ import sys
 import industry_decision_support as _industry_decision_support
 from industry_decision_support import install_industry_decision_support
 from management_terminology_patch import install_management_terminology_patch
+from management_executive_matrix import install_management_executive_matrix
 
 
 ASSET_VERSION = "20260826mi7"
@@ -13,6 +14,7 @@ PEER_COMPARE_VERSION = "20260827peer2"
 TERMINOLOGY_VERSION = "20260827term1"
 DECISION_SUPPORT_VERSION = "20260827ds3"
 DECISION_VIEWPORT_FIX_VERSION = "20260827ds5"
+EXECUTIVE_MATRIX_VERSION = "20260911mx1"
 
 
 def install_management_report_v5_runtime():
@@ -23,6 +25,7 @@ def install_management_report_v5_runtime():
         return True
 
     install_management_terminology_patch()
+    install_management_executive_matrix()
     _industry_decision_support.ASSET_VERSION = DECISION_SUPPORT_VERSION
     install_industry_decision_support()
 
@@ -38,6 +41,12 @@ def install_management_report_v5_runtime():
                 and "text/html" in str(response.content_type or "")
             ):
                 html = response.get_data(as_text=True)
+                if "management_executive_matrix.css" not in html:
+                    html = html.replace(
+                        "</head>",
+                        f'<link rel="stylesheet" href="/static/css/management_executive_matrix.css?v={EXECUTIVE_MATRIX_VERSION}">\n</head>',
+                        1,
+                    )
                 if "management_report_v5_patch.css" not in html:
                     html = html.replace(
                         "</head>",
@@ -78,6 +87,12 @@ def install_management_report_v5_runtime():
                     html = html.replace(
                         "</head>",
                         f'<link rel="stylesheet" href="/static/css/management_peer_readability_patch.css?v={TERMINOLOGY_VERSION}">\n</head>',
+                        1,
+                    )
+                if "management_executive_matrix.js" not in html:
+                    html = html.replace(
+                        "</body>",
+                        f'<script src="/static/js/management_executive_matrix.js?v={EXECUTIVE_MATRIX_VERSION}"></script>\n</body>',
                         1,
                     )
                 if "management_report_v5_patch.js" not in html:
