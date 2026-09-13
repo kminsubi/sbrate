@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-09-14 03:20:10",
+  "snapshot_at": "2026-09-14 08:20:38",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-09-14 03:18:29",
@@ -10694,19 +10694,16 @@
         "24m": 1.5,
         "36m": 1.5
       },
-      "status": "stale_retained_after_fetch_error",
+      "status": "verified_official",
       "source_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255020&sysDsCd=01",
-      "updated_at": "2026-09-13 02:50:33",
-      "disclosure_date": "2026-09-13",
+      "updated_at": "2026-09-14 08:20:01",
+      "disclosure_date": "2026-09-14",
       "disclosure_date_source": "welcome_rate_table_reference_date",
       "disclosure_date_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255020&sysDsCd=01",
-      "note": "웰컴저축은행 공식 WELCOME ISA 정기예금 상세페이지. 금리안내 약정금리 표의 3/6/12/24/36개월 연이율 사용. 괄호 안 연수익률 및 중도해지이율 제외. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
-      "collected_at": "2026-09-13 02:50:33",
-      "stale": true,
-      "retained_last_good": true,
-      "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-09-14 03:19:58",
-      "last_fetch_error": "HTTPSConnectionPool(host='www.welcomebank.co.kr', port=443): Read timed out. (read timeout=15)"
+      "note": "웰컴저축은행 공식 WELCOME ISA 정기예금 상세페이지. 금리안내 약정금리 표의 3/6/12/24/36개월 연이율 사용. 괄호 안 연수익률 및 중도해지이율 제외.",
+      "collected_at": "2026-09-14 08:20:01",
+      "retry_attempt_at": "2026-09-14 08:19:58",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "애큐온",
@@ -11116,22 +11113,19 @@
         "24m": null,
         "36m": null
       },
-      "status": "stale_retained_after_fetch_error",
+      "status": "verified_official_partial",
       "source_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255021&sysDsCd=01",
-      "updated_at": "2026-09-13 02:50:35",
+      "updated_at": "2026-09-14 08:20:04",
       "rate_month": "2026-09",
       "rate_type": "DC/IRP",
-      "disclosure_date": "2026-09-13",
+      "disclosure_date": "2026-09-14",
       "disclosure_date_source": "welcome_rate_table_reference_date",
       "disclosure_date_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255021&sysDsCd=01",
-      "note": "웰컴저축은행 공식 WELCOME 퇴직연금 정기예금 상세페이지. 가장 최신 월의 12개월 DC/IRP형 약정금리만 사용. DB형 및 괄호 안 연수익률 제외. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
-      "collected_at": "2026-09-13 02:50:35",
+      "note": "웰컴저축은행 공식 WELCOME 퇴직연금 정기예금 상세페이지. 가장 최신 월의 12개월 DC/IRP형 약정금리만 사용. DB형 및 괄호 안 연수익률 제외.",
+      "collected_at": "2026-09-14 08:20:04",
       "rate_basis": "IRP/DC·IRP 약정금리",
-      "stale": true,
-      "retained_last_good": true,
-      "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-09-14 03:20:04",
-      "last_fetch_error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+      "retry_attempt_at": "2026-09-14 08:19:58",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "애큐온",
