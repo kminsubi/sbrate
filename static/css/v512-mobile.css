@@ -287,3 +287,20 @@ body:has(#mobile-product-tabs .product-tab.is-active[data-product="irp"]) .hero-
     display:none !important;
   }
 }
+
+/* Mobile source is shown once in the dedicated simulation row. */
+.data-meta-left::after{content:none !important;display:none !important;}
+.management-modal{max-width:680px;max-height:92vh;display:flex;flex-direction:column;}
+.management-body{overflow:auto;padding:12px !important;}
+.management-note,.management-insight{margin-bottom:9px;padding:9px 10px;border:1px solid #e6edf6;border-radius:11px;background:#f7f9fc;color:#506078;font-size:9.5px;line-height:1.5;}
+.management-table-wrap{overflow-x:auto;border:1px solid #e6edf6;border-radius:11px;}
+.management-table{width:100%;min-width:570px;border-collapse:collapse;font-size:9px;}
+.management-table th,.management-table td{padding:8px 6px;border-bottom:1px solid #edf1f6;text-align:right;vertical-align:middle;}
+.management-table thead th{background:#f7f9fc;color:#667489;text-align:center;white-space:nowrap;}
+.management-table tbody th{min-width:96px;text-align:left;color:#4b586b;}
+.management-table td.is-woori{background:#edf5ff;color:#1556c0;}
+.management-table td strong,.management-table td small,.management-table tbody th small{display:block;}
+.management-table td small,.management-table tbody th small{margin-top:2px;color:#8b96a6;font-size:7px;font-weight:500;}
+.management-insight{margin-top:9px;background:#f5f9ff;border-color:#dbe9ff;}
+.management-insight b{color:#1556c0;}
+.management-insight ul{margin:5px 0 0;padding-left:15px;}
