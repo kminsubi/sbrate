@@ -2129,3 +2129,35 @@ document.addEventListener("click", event => {
 document.addEventListener("DOMContentLoaded", () => {
   syncMobileProductPeriodAvailability("deposit");
 });
+
+/* MOBILE MANAGEMENT SNAPSHOT */
+function mobileManagementText(value){return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function mobileManagementValue(value,unit){const n=Number(value);if(!Number.isFinite(n))return "-";return unit==="%"?n.toFixed(2)+"%":Math.round(n).toLocaleString("ko-KR")+"억원";}
+function syncMobileSource(product){const node=$("mobile-simulation-source");if(node)node.textContent=product==="deposit"?"[출처 : 저축은행중앙회 비교공시]":"[출처 : 각 저축은행 공식 홈페이지]";}
+async function openMobileManagement(){
+ const modal=$("mobile-management-modal"),content=$("mobile-management-content"),basis=$("mobile-management-basis");
+ if(!modal||!content)return;modal.classList.remove("hidden");content.innerHTML='<div class="loading">경영현황을 불러오는 중입니다.</div>';
+ try{
+  const response=await fetch("/api/management-executive-matrix",{cache:"no-store"}),data=await response.json();
+  if(!response.ok||data?.ok===false)throw new Error(data?.error||"경영현황 조회에 실패했습니다.");
+  const peers=Array.isArray(data.peers)?data.peers:[], ids=peers.map(x=>x.id).filter(Boolean);
+  const keys=["total_assets","deposits","net_income","bis_ratio","delinquency_ratio"];
+  const rows=keys.map(key=>(data.rows||[]).find(row=>row.key===key)).filter(Boolean);
+  if(!rows.length||!ids.length)throw new Error("표시할 경영현황 데이터가 없습니다.");
+  if(basis)basis.textContent=(data.source||"FISIS")+" · "+(data.base_label||data.base||"-");
+  const head=ids.map(id=>"<th>"+mobileManagementText((peers.find(x=>x.id===id)||{}).label||id)+"</th>").join("");
+  const body=rows.map(row=>{
+   const cells=ids.map(id=>{const pack=(row.values||{})[id]||{},rank=Number((row.ranks||{})[id]);return '<td class="'+(id==="woori"?"is-woori":"")+'"><strong>'+mobileManagementValue(pack.base,row.unit)+'</strong><small>'+(Number.isFinite(rank)?rank+"위":"-")+'</small></td>';}).join("");
+   return "<tr><th>"+mobileManagementText(row.label)+"<small>"+mobileManagementText(row.direction==="lower"?"낮을수록 양호":row.direction==="neutral"?"참고지표":"높을수록 우위")+"</small></th>"+cells+"</tr>";
+  }).join("");
+  const notes=[...(data.insights?.strengths||[]),...(data.insights?.watchpoints||[])].slice(0,4);
+  content.innerHTML='<div class="management-note">우리금융 중심 핵심지표 요약입니다. 전체 지표는 PC 대시보드에서 확인할 수 있습니다.</div><div class="management-table-wrap"><table class="management-table"><thead><tr><th>지표</th>'+head+"</tr></thead><tbody>"+body+'</tbody></table></div><div class="management-insight"><b>핵심 해석</b><ul>'+notes.map(x=>"<li>"+mobileManagementText(x)+"</li>").join("")+"</ul></div>";
+ }catch(error){content.innerHTML='<div class="loading">'+mobileManagementText(error.message||"경영현황을 불러오지 못했습니다.")+"</div>";}
+}
+document.addEventListener("DOMContentLoaded",()=>{
+ syncMobileSource(document.querySelector("#mobile-product-tabs .product-tab.is-active")?.dataset.product||"deposit");
+ $("mobile-management-open")?.addEventListener("click",openMobileManagement);
+ $("mobile-management-close")?.addEventListener("click",()=>$("mobile-management-modal")?.classList.add("hidden"));
+ $("mobile-management-modal")?.addEventListener("click",event=>{if(event.target===$("mobile-management-modal"))$("mobile-management-modal").classList.add("hidden");});
+ document.querySelectorAll("#mobile-product-tabs .product-tab").forEach(button=>button.addEventListener("click",()=>syncMobileSource(button.dataset.product)));
+});
