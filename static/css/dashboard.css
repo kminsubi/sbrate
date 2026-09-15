@@ -1,6 +1,8 @@
 /*
  * SBRateBot dashboard stylesheet loader
- * Keep legacy behavior first, then apply the executive UI layer.
+ * Keep legacy behavior first, then apply the executive UI layer and its
+ * specificity guard for historical inline style patches in index.html.
  */
 @import url("/static/css/dashboard_legacy.css?v=20260915v1");
 @import url("/static/css/executive_ui_v6.css?v=20260915v1");
+@import url("/static/css/executive_ui_v6_priority.css?v=20260915v1");
