@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,9 +39,9 @@ class ExecutiveUiV6ContractTests(unittest.TestCase):
 
     def test_executive_ui_does_not_hide_or_reorder_live_sections(self):
         text = EXECUTIVE.read_text(encoding="utf-8").lower()
-        self.assertNotIn("display:none", text.replace(" ", ""))
-        self.assertNotIn("order:", text)
-        self.assertNotIn("position: fixed", text)
+        self.assertIsNone(re.search(r"display\s*:\s*none", text))
+        self.assertIsNone(re.search(r"(?:^|[;{])\s*order\s*:", text))
+        self.assertIsNone(re.search(r"position\s*:\s*fixed", text))
 
 
 if __name__ == "__main__":
