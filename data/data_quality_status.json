@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-15 08:56:52",
+  "generated_at": "2026-09-16 04:11:07",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
@@ -12,7 +12,7 @@
   },
   "counts": {
     "deposit": {
-      "items": 376,
+      "items": 378,
       "banks": 75,
       "previous_items": 376,
       "previous_banks": 75,
@@ -22,11 +22,11 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 10,
+      "verified_today": 9,
       "retained_last_good": 0,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
-      "woori_rate_12m": 3.45
+      "woori_rate_12m": 3.7
     },
     "irp": {
       "rows": 13,
