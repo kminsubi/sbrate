@@ -1,0 +1,307 @@
+/* =====================================================
+   SBRateBot Executive UI V6
+   Reference patterns: stat cards, benchmark, market pulse,
+   data-table toolbar and executive AI insight hierarchy.
+   Data bindings, DOM ids and JavaScript behavior are unchanged.
+===================================================== */
+
+:root {
+    --exec-blue:#1556c0;
+    --exec-blue-deep:#0f3f96;
+    --exec-blue-soft:#edf5ff;
+    --exec-ink:#172033;
+    --exec-muted:#718096;
+    --exec-line:#e5ebf3;
+    --exec-surface:#ffffff;
+    --exec-subtle:#f7f9fc;
+    --exec-shadow:0 8px 28px rgba(15,23,42,.045);
+}
+
+/* ---------- Executive summary: 3 equal information zones ---------- */
+#dashboard-hero-start {
+    gap:14px !important;
+    align-items:stretch;
+}
+
+#dashboard-hero-start > .col-span-4 {
+    min-width:0;
+    display:flex;
+}
+
+#dashboard-hero-start > .col-span-4 > .bg-white {
+    width:100%;
+    min-height:220px;
+    padding:16px !important;
+    border:1px solid var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+    background:var(--exec-surface) !important;
+}
+
+#dashboard-hero-start > .col-span-4:first-child > .bg-white {
+    border-top:3px solid var(--exec-blue) !important;
+    background:linear-gradient(145deg,#f4f8ff 0%,#ffffff 58%) !important;
+}
+
+#dashboard-hero-start > .col-span-4:nth-child(2) > .bg-white {
+    border-top:3px solid #94a3b8 !important;
+}
+
+#dashboard-hero-start > .col-span-4:last-child > .bg-white {
+    border-top:3px solid #d6a84b !important;
+    background:linear-gradient(145deg,#fffdf8 0%,#ffffff 58%) !important;
+}
+
+#dashboard-hero-start .text-sm.font-bold {
+    color:var(--exec-ink) !important;
+    letter-spacing:-.018em;
+}
+
+/* ---------- Market-position benchmark ---------- */
+#dashboard-hero-start > .col-span-4:first-child .bg-blue-50 {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:10px;
+    padding:13px !important;
+    border:1px solid #dbe8fb;
+    background:linear-gradient(180deg,#f2f7ff 0%,#edf5ff 100%) !important;
+}
+
+#dashboard-hero-start > .col-span-4:first-child .bg-blue-50 > .bg-white {
+    border:1px solid #d9e6f8;
+    box-shadow:0 1px 2px rgba(15,23,42,.02);
+}
+
+#kpi-rank {
+    min-width:58px;
+    text-align:right;
+    font-size:34px !important;
+    line-height:1 !important;
+    letter-spacing:-.04em;
+    font-variant-numeric:tabular-nums;
+}
+
+#kpi-woori-rate-mini,
+#kpi-best-rate-mini,
+#kpi-lowest-rate-mini {
+    margin-top:3px;
+    font-size:14px !important;
+    line-height:1.15;
+    font-variant-numeric:tabular-nums;
+}
+
+/* ---------- KPI Bento / stat-card treatment ---------- */
+#dashboard-hero-start > .col-span-4:nth-child(2) .grid.grid-cols-2.gap-2 {
+    gap:8px !important;
+}
+
+#dashboard-hero-start > .col-span-4:nth-child(2) .grid.grid-cols-2.gap-2 > .bg-gray-50 {
+    min-height:54px;
+    padding:10px 11px !important;
+    border:1px solid #edf1f6;
+    border-radius:11px !important;
+    background:linear-gradient(180deg,#fafbfd 0%,#f6f8fb 100%) !important;
+}
+
+#dashboard-hero-start > .col-span-4:nth-child(2) .grid.grid-cols-2.gap-2 > .bg-gray-50:hover {
+    border-color:#dbe5f2;
+    box-shadow:0 3px 10px rgba(15,23,42,.035);
+}
+
+#kpi-highest-gap,
+#kpi-lowest-gap,
+#kpi-average-rate,
+#kpi-average-gap,
+#kpi-product-count,
+#kpi-change-count {
+    font-size:15px !important;
+    font-weight:800 !important;
+    color:var(--exec-ink);
+    font-variant-numeric:tabular-nums;
+}
+
+#kpi-average-gap {
+    color:var(--exec-blue) !important;
+}
+
+/* ---------- Executive AI brief ---------- */
+#executive-summary-mini {
+    flex:1;
+    min-height:132px;
+    max-height:148px;
+    padding:12px 13px;
+    overflow:auto;
+    border:1px solid #eee7d7;
+    border-radius:11px;
+    background:rgba(255,255,255,.82);
+    color:#475467 !important;
+    line-height:1.55 !important;
+    word-break:keep-all;
+}
+
+/* ---------- AI workspace / market pulse ---------- */
+#dashboard-hero-start + .bg-white {
+    border:1px solid var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+}
+
+#wibee-market-status {
+    font-weight:700;
+    letter-spacing:-.01em;
+}
+
+#wibee-rise-count,
+#wibee-fall-count,
+#wibee-change-count,
+#wibee-woori-rate,
+#wibee-rank,
+#wibee-best-rate {
+    font-variant-numeric:tabular-nums;
+}
+
+#ai-question {
+    border-color:#d7e0ec !important;
+    background:#fff !important;
+}
+
+#ai-question:focus {
+    border-color:#8ab4ef !important;
+    box-shadow:0 0 0 3px rgba(21,86,192,.08) !important;
+}
+
+#ai-mini-answer {
+    color:#344054 !important;
+}
+
+/* ---------- Ranking / movement cards ---------- */
+#market-ranking-row {
+    gap:14px !important;
+}
+
+#market-ranking-row > .bg-white {
+    border:1px solid var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+}
+
+#market-top10-title,
+#market-left-card-title,
+#market-right-card-title {
+    letter-spacing:-.015em;
+}
+
+#market-ranking-row thead th {
+    color:#8a95a6 !important;
+    font-size:10px !important;
+    letter-spacing:.015em;
+}
+
+#market-ranking-row tbody td {
+    vertical-align:middle !important;
+    font-variant-numeric:tabular-nums;
+}
+
+#market-ranking-row tbody tr {
+    transition:background-color .12s ease;
+}
+
+#market-ranking-row tbody tr:not(.woori-table-row):hover {
+    background:#f8fafc;
+}
+
+/* ---------- Right-side intelligence center ---------- */
+#ai-analysis-center {
+    border:1px solid var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+    background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%) !important;
+}
+
+#ai-analysis-center h2 {
+    letter-spacing:-.018em;
+}
+
+#ai-center-tabs {
+    border:1px solid #edf1f6;
+}
+
+#ai-center-content {
+    color:#475467;
+}
+
+/* ---------- Product explorer / data-table toolbar ---------- */
+#product-search-panel {
+    border:1px solid var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+}
+
+#product-search-panel > div:first-child {
+    background:linear-gradient(90deg,#ffffff 0%,#f5f9ff 100%) !important;
+}
+
+#product-search-panel select,
+#product-search-panel input {
+    min-height:34px;
+    border-color:#d8e1ed !important;
+    background:#fff !important;
+}
+
+#product-search-panel select:focus,
+#product-search-panel input:focus {
+    border-color:#8ab4ef !important;
+    box-shadow:0 0 0 3px rgba(21,86,192,.07);
+}
+
+#product-search-panel table thead th {
+    color:#7c8798 !important;
+    font-size:10px !important;
+    letter-spacing:.015em;
+}
+
+#product-search-panel table tbody td {
+    font-variant-numeric:tabular-nums;
+}
+
+/* ---------- Notebook-density tuning ---------- */
+@media (max-width: 1500px) {
+    #dashboard-hero-start {
+        gap:10px !important;
+    }
+
+    #dashboard-hero-start > .col-span-4 > .bg-white {
+        min-height:206px;
+        padding:13px !important;
+    }
+
+    #dashboard-hero-start > .col-span-4:nth-child(2) .grid.grid-cols-2.gap-2 > .bg-gray-50 {
+        min-height:50px;
+        padding:8px 9px !important;
+    }
+
+    #executive-summary-mini {
+        min-height:120px;
+        max-height:136px;
+        padding:10px 11px;
+    }
+
+    #market-ranking-row {
+        gap:10px !important;
+    }
+
+    #market-ranking-row > .bg-white,
+    #ai-analysis-center,
+    #product-search-panel {
+        border-radius:16px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #market-ranking-row tbody tr,
+    #dashboard-hero-start > .col-span-4:nth-child(2) .grid.grid-cols-2.gap-2 > .bg-gray-50 {
+        transition:none !important;
+    }
+}
