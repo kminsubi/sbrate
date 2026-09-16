@@ -19,6 +19,7 @@ FISIS_SOURCE_NAME = "금융감독원 금융통계정보시스템(FISIS)"
 FISIS_SOURCE_URL = "https://fisis.fss.or.kr/"
 CACHE_KEY = "sbrate:management:fisis:v1"
 CACHE_MAX_AGE = timedelta(days=14)
+LATEST_QUARTER_RECHECK_INTERVAL = timedelta(hours=12)
 MIN_QUARTER_COVERAGE = 0.90
 KST = timezone(timedelta(hours=9))
 
@@ -152,7 +153,31 @@ def _cache_is_fresh(store):
     if not isinstance(quarters, dict) or not quarters:
         return False
     age = _cache_age(store)
-    return age is not None and age <= CACHE_MAX_AGE
+    if age is None or age > CACHE_MAX_AGE:
+        return False
+
+    expected = _latest_completed_quarter()
+    if expected in quarters:
+        return True
+
+    checked_at = str((store or {}).get("latest_quarter_checked_at") or "").strip()
+    if not checked_at:
+        return False
+    try:
+        checked = datetime.strptime(checked_at, "%Y-%m-%d %H:%M:%S").replace(tzinfo=KST)
+    except ValueError:
+        return False
+    return _now() - checked <= LATEST_QUARTER_RECHECK_INTERVAL
+
+
+def _latest_completed_quarter():
+    now = _now()
+    completed_month = ((now.month - 1) // 3) * 3
+    year = now.year
+    if completed_month == 0:
+        year -= 1
+        completed_month = 12
+    return f"{year:04d}Q{completed_month // 3}"
 
 
 def _load_store_once():
@@ -245,11 +270,9 @@ def _quarter_range():
     # Keep enough history for arbitrary quarter comparisons without approaching
     # FISIS's 40-quarter window limit.
     start = "202303"
-    completed_month = ((now.month - 1) // 3) * 3
-    year = now.year
-    if completed_month == 0:
-        year -= 1
-        completed_month = 12
+    latest = _latest_completed_quarter()
+    year = int(latest[:4])
+    completed_month = int(latest[-1]) * 3
     end = f"{year:04d}{completed_month:02d}"
     return start, end
 
@@ -477,6 +500,8 @@ def _build_store():
         "source_name": FISIS_SOURCE_NAME,
         "source_url": FISIS_SOURCE_URL,
         "updated_at": _now().strftime("%Y-%m-%d %H:%M:%S"),
+        "latest_expected_quarter": _latest_completed_quarter(),
+        "latest_quarter_checked_at": _now().strftime("%Y-%m-%d %H:%M:%S"),
         "quarter_range": {"start": start_month, "end": end_month},
         "active_company_count": len(companies),
         "minimum_quarter_coverage_ratio": MIN_QUARTER_COVERAGE,

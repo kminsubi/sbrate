@@ -311,7 +311,7 @@
       if (event.target.closest?.('#management-report-open,#management-report-open-mobile')) {
         setTimeout(() => {
           ensureUI();
-          if (peerActive) activatePeer();
+          activatePeer();
         }, 160);
       }
     }, true);
