@@ -1,7 +1,21 @@
 (() => {
   'use strict';
 
-  const state = { quarters: [], selected: '', autoOpened: false };
+  const state = {
+    quarters: [],
+    selected: '',
+    autoOpened: false,
+    industryLoadedQuarter: '',
+  };
+
+  const INDUSTRY_FIELDS = [
+    { key: 'total_assets', label: '총자산' },
+    { key: 'total_loans', label: '총여신' },
+    { key: 'bis_ratio', label: 'BIS' },
+    { key: 'delinquency_ratio', label: '연체율' },
+    { key: 'npl_ratio', label: 'NPL' },
+    { key: 'net_income', label: '당기순이익' },
+  ];
 
   function esc(value) {
     return String(value ?? '')
@@ -44,6 +58,11 @@
     return data;
   }
 
+  function closeModal() {
+    document.getElementById('management-report-modal')
+      ?.querySelector('#mr-close')?.click();
+  }
+
   function ensurePanel() {
     if (document.getElementById('management-executive-matrix')) return;
     const shell = document.querySelector('#management-report-modal .mr-shell');
@@ -54,7 +73,7 @@
     panel.className = 'mx-panel';
     panel.setAttribute('aria-hidden', 'true');
     panel.innerHTML = `
-      <div class="mx-sheet">
+      <div id="mx-peer-sheet" class="mx-sheet">
         <div class="mx-sheet-titlebar">
           <div>
             <strong>4대 금융지주 저축은행 경영현황</strong>
@@ -94,18 +113,87 @@
           <div id="mx-note" class="mx-note"></div>
         </div>
       </div>
+
+      <section id="mx-industry-detail" class="mx-industry-detail" aria-hidden="true" hidden>
+        <div class="mx-industry-head">
+          <div class="mx-industry-heading">
+            <span class="mx-industry-kicker">INDUSTRY DETAIL</span>
+            <strong>전체 업권 상세</strong>
+            <span id="mx-industry-source">금융감독원 FISIS 기준</span>
+          </div>
+          <div class="mx-industry-head-actions">
+            <button type="button" id="mx-industry-back">← 4대금융 비교</button>
+            <button type="button" id="mx-industry-close" aria-label="닫기">×</button>
+          </div>
+        </div>
+
+        <div class="mx-industry-toolbar">
+          <label>조회분기
+            <select id="mx-industry-quarter"></select>
+          </label>
+          <button type="button" id="mx-industry-refresh">조회</button>
+          <span id="mx-industry-status">데이터 확인중</span>
+        </div>
+
+        <div id="mx-industry-summary" class="mx-industry-summary">
+          <article><span>업권 기관수</span><strong>-</strong><small>저축은행</small></article>
+          <article><span>우리금융 자산순위</span><strong>-</strong><small>총자산 기준</small></article>
+          <article><span>우리금융 총자산</span><strong>-</strong><small>억원</small></article>
+          <article><span>우리금융 연체율</span><strong>-</strong><small>FISIS 기준</small></article>
+        </div>
+
+        <div class="mx-industry-table-gate">
+          <div>
+            <strong>업권현황 표</strong>
+            <span>필요할 때만 상세표를 열어 전체 저축은행을 비교합니다.</span>
+          </div>
+          <button type="button" id="mx-industry-table-toggle" aria-expanded="false">업권현황 표 보기</button>
+        </div>
+
+        <section id="mx-industry-table-section" class="mx-industry-table-section" hidden>
+          <div class="mx-industry-table-wrap" role="region" aria-label="전체 업권 경영현황 표" tabindex="0">
+            <table id="mx-industry-table" class="mx-industry-table">
+              <thead>
+                <tr>
+                  <th>순위</th>
+                  <th>저축은행</th>
+                  <th>총자산</th>
+                  <th>총여신</th>
+                  <th>BIS</th>
+                  <th>연체율</th>
+                  <th>NPL</th>
+                  <th>당기순이익</th>
+                </tr>
+              </thead>
+              <tbody id="mx-industry-body"></tbody>
+            </table>
+          </div>
+          <div id="mx-industry-note" class="mx-industry-note"></div>
+        </section>
+      </section>
     `;
     shell.appendChild(panel);
 
-    panel.querySelector('#mx-close').addEventListener('click', () => {
-      document.getElementById('management-report-modal')
-        ?.querySelector('#mr-close')?.click();
-    });
-    panel.querySelector('#mx-detail').addEventListener('click', closePanel);
+    panel.querySelector('#mx-close').addEventListener('click', closeModal);
+    panel.querySelector('#mx-detail').addEventListener('click', openIndustryDetail);
     panel.querySelector('#mx-refresh').addEventListener('click', () => loadMatrix());
     panel.querySelector('#mx-quarter').addEventListener('change', (event) => {
       state.selected = event.target.value;
+      syncQuarterSelects();
     });
+
+    panel.querySelector('#mx-industry-close').addEventListener('click', closeModal);
+    panel.querySelector('#mx-industry-back').addEventListener('click', closeIndustryDetail);
+    panel.querySelector('#mx-industry-refresh').addEventListener('click', () => {
+      state.selected = panel.querySelector('#mx-industry-quarter')?.value || state.selected;
+      syncQuarterSelects();
+      loadIndustryDetail();
+    });
+    panel.querySelector('#mx-industry-quarter').addEventListener('change', (event) => {
+      state.selected = event.target.value;
+      syncQuarterSelects();
+    });
+    panel.querySelector('#mx-industry-table-toggle').addEventListener('click', toggleIndustryTable);
   }
 
   function ensureLegacyTab() {
@@ -122,17 +210,26 @@
     tabs.insertBefore(btn, tabs.firstChild);
   }
 
+  function syncQuarterSelects() {
+    ['mx-quarter', 'mx-industry-quarter'].forEach(id => {
+      const select = document.getElementById(id);
+      if (!select) return;
+      select.innerHTML = state.quarters.map(item =>
+        `<option value="${esc(item.key)}">${esc(item.label)}</option>`
+      ).join('');
+      if (state.selected) select.value = state.selected;
+    });
+  }
+
   function fillQuarterSelect() {
-    const select = document.getElementById('mx-quarter');
-    if (!select) return;
-    select.innerHTML = state.quarters.map(item =>
-      `<option value="${esc(item.key)}">${esc(item.label)}</option>`
-    ).join('');
-    if (state.selected) select.value = state.selected;
+    syncQuarterSelects();
   }
 
   async function loadQuarters() {
-    if (state.quarters.length) return;
+    if (state.quarters.length) {
+      syncQuarterSelects();
+      return;
+    }
     const data = await fetchJson('/api/management-report/quarters');
     state.quarters = Array.isArray(data.quarters) ? data.quarters : [];
     const current = document.getElementById('mr-single-quarter')?.value
@@ -234,6 +331,176 @@
       + '<br><span>※ 노란색은 4대 금융지주 중 우위(1위) 셀입니다. 검증되지 않은 비율은 표시하지 않습니다.</span>';
   }
 
+  function comparisonQuarter(base) {
+    const index = state.quarters.findIndex(item => item.key === base);
+    if (index >= 0 && state.quarters[index + 1]?.key) return state.quarters[index + 1].key;
+    return state.quarters.find(item => item.key !== base)?.key || base;
+  }
+
+  function industryFieldMap(data) {
+    return new Map((data.fields || []).map(field => [field.key, field]));
+  }
+
+  function industryMetric(row, key) {
+    return row?.metrics?.[key]?.base ?? null;
+  }
+
+  function industryValueHtml(row, key, fieldMap) {
+    const value = industryMetric(row, key);
+    const field = fieldMap.get(key) || {};
+    const unit = field.unit || (['bis_ratio', 'delinquency_ratio', 'npl_ratio'].includes(key) ? '%' : '억원');
+    const text = fmt(value, unit);
+    if (text === '-') return '-';
+    if (unit === '억원') return `${text}<small>억원</small>`;
+    return text;
+  }
+
+  function renderIndustrySummary(data) {
+    const root = document.getElementById('mx-industry-summary');
+    if (!root) return;
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    const woori = rows.find(item => item.is_woori || String(item.bank || '').includes('우리금융'));
+    const asset = industryMetric(woori, 'total_assets');
+    const delinquency = industryMetric(woori, 'delinquency_ratio');
+
+    root.innerHTML = `
+      <article>
+        <span>업권 기관수</span>
+        <strong>${rows.length.toLocaleString('ko-KR')}개</strong>
+        <small>저축은행</small>
+      </article>
+      <article>
+        <span>우리금융 자산순위</span>
+        <strong>${woori?.rank ? `${woori.rank}위` : '-'}</strong>
+        <small>총자산 기준</small>
+      </article>
+      <article>
+        <span>우리금융 총자산</span>
+        <strong>${asset == null ? '-' : Math.round(Number(asset)).toLocaleString('ko-KR')}</strong>
+        <small>억원</small>
+      </article>
+      <article>
+        <span>우리금융 연체율</span>
+        <strong>${delinquency == null ? '-' : Number(delinquency).toFixed(2) + '%'}</strong>
+        <small>FISIS 기준</small>
+      </article>
+    `;
+  }
+
+  function renderIndustryTable(data) {
+    const body = document.getElementById('mx-industry-body');
+    if (!body) return;
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    const fieldMap = industryFieldMap(data);
+
+    body.innerHTML = rows.map(item => {
+      const isWoori = item.is_woori || String(item.bank || '').includes('우리금융');
+      return `
+        <tr class="${isWoori ? 'mx-industry-woori' : ''}">
+          <td class="mx-industry-rank">${item.rank || '-'}</td>
+          <td class="mx-industry-bank">
+            <strong>${esc(item.bank || '-')}</strong>
+            <span>${esc(item.region || '-')}</span>
+          </td>
+          ${INDUSTRY_FIELDS.map(field => `
+            <td class="mx-industry-number" data-field="${field.key}">
+              ${industryValueHtml(item, field.key, fieldMap)}
+            </td>
+          `).join('')}
+        </tr>
+      `;
+    }).join('');
+
+    const note = document.getElementById('mx-industry-note');
+    if (note) {
+      note.innerHTML =
+        `<b>기준</b> ${esc(data.base_label || data.base || '-')} · 총자산 순위 기준`
+        + ` &nbsp; <b>출처</b> ${esc(data.source_name || data.source || '금융감독원 금융통계정보시스템(FISIS)')}`
+        + '<br><span>※ 우리금융저축은행은 파란색으로 고정 강조합니다. 모바일에서는 표 영역을 좌우로 스크롤해 전체 지표를 확인할 수 있습니다.</span>';
+    }
+  }
+
+  async function loadIndustryDetail() {
+    const quarter = state.selected || document.getElementById('mx-industry-quarter')?.value || '';
+    const status = document.getElementById('mx-industry-status');
+    const body = document.getElementById('mx-industry-body');
+    if (!quarter) return;
+
+    if (status) status.textContent = '전체 업권 데이터를 불러오는 중';
+    if (body) body.innerHTML = '<tr><td colspan="8" class="mx-industry-loading">데이터를 불러오고 있습니다.</td></tr>';
+
+    try {
+      const compare = comparisonQuarter(quarter);
+      const data = await fetchJson(
+        '/api/management-report?base=' + encodeURIComponent(quarter)
+        + '&compare=' + encodeURIComponent(compare)
+      );
+      state.industryLoadedQuarter = quarter;
+      renderIndustrySummary(data);
+      renderIndustryTable(data);
+
+      const source = document.getElementById('mx-industry-source');
+      if (source) {
+        source.textContent = `${data.source_name || '금융감독원 FISIS'} · ${data.base_label || data.base || quarter}`;
+      }
+      if (status) status.textContent = `${data.base_label || data.base || quarter} · ${Array.isArray(data.rows) ? data.rows.length : 0}개 기관`;
+    } catch (error) {
+      if (status) status.textContent = '조회 실패';
+      if (body) {
+        body.innerHTML = `<tr><td colspan="8" class="mx-error">${esc(error.message)}</td></tr>`;
+      }
+    }
+  }
+
+  function resetIndustryTableGate() {
+    const section = document.getElementById('mx-industry-table-section');
+    const button = document.getElementById('mx-industry-table-toggle');
+    if (section) section.hidden = true;
+    if (button) {
+      button.setAttribute('aria-expanded', 'false');
+      button.textContent = '업권현황 표 보기';
+    }
+  }
+
+  function toggleIndustryTable() {
+    const section = document.getElementById('mx-industry-table-section');
+    const button = document.getElementById('mx-industry-table-toggle');
+    if (!section || !button) return;
+    section.hidden = !section.hidden;
+    button.setAttribute('aria-expanded', section.hidden ? 'false' : 'true');
+    button.textContent = section.hidden ? '업권현황 표 보기' : '업권현황 표 닫기';
+    if (!section.hidden) {
+      section.querySelector('.mx-industry-table-wrap')?.focus({ preventScroll: true });
+    }
+  }
+
+  async function openIndustryDetail() {
+    ensurePanel();
+    await loadQuarters();
+
+    const sheet = document.getElementById('mx-peer-sheet');
+    const detail = document.getElementById('mx-industry-detail');
+    if (!detail) return;
+
+    if (sheet) sheet.hidden = true;
+    detail.hidden = false;
+    detail.setAttribute('aria-hidden', 'false');
+    syncQuarterSelects();
+    resetIndustryTableGate();
+    await loadIndustryDetail();
+  }
+
+  function closeIndustryDetail() {
+    const sheet = document.getElementById('mx-peer-sheet');
+    const detail = document.getElementById('mx-industry-detail');
+    if (detail) {
+      detail.hidden = true;
+      detail.setAttribute('aria-hidden', 'true');
+    }
+    if (sheet) sheet.hidden = false;
+    resetIndustryTableGate();
+  }
+
   async function loadMatrix() {
     const quarter = state.selected || document.getElementById('mx-quarter')?.value || '';
     const coverage = document.getElementById('mx-coverage');
@@ -271,6 +538,7 @@
 
     panel.classList.add('is-open');
     panel.setAttribute('aria-hidden', 'false');
+    closeIndustryDetail();
 
     document.querySelectorAll('#management-report-modal [data-mr-mode]')
       .forEach(btn => btn.classList.remove('is-active'));
@@ -288,6 +556,7 @@
   function closePanel() {
     const panel = document.getElementById('management-executive-matrix');
     if (!panel) return;
+    closeIndustryDetail();
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
     document.getElementById('mx-launch')?.classList.remove('is-active');
