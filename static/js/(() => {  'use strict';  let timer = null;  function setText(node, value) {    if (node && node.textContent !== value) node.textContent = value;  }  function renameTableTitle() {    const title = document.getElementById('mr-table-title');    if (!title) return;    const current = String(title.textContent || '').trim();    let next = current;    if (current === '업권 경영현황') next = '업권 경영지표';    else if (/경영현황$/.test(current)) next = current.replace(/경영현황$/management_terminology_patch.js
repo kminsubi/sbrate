@@ -30,14 +30,14 @@
   function applyTerminology() {
     const desktop = document.getElementById('management-report-open');
     if (desktop) {
-      setText(desktop, '📑 업권현황');
-      desktop.title = 'FISIS 저축은행 업권현황 열기';
+      setText(desktop, '📑 경영관리');
+      desktop.title = 'FISIS 저축은행 경영관리 열기';
     }
 
     const mobile = document.getElementById('management-report-open-mobile');
     if (mobile) {
-      setText(mobile, '📑 업권현황');
-      mobile.title = 'FISIS 저축은행 업권현황 열기';
+      setText(mobile, '📑 경영관리');
+      mobile.title = 'FISIS 저축은행 경영관리 열기';
     }
 
     const shell = document.querySelector('#management-report-modal .mr-shell');
