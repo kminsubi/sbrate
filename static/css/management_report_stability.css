@@ -128,7 +128,9 @@ body{
   overflow-x:hidden!important;
   overscroll-behavior:contain!important;
   -webkit-overflow-scrolling:touch!important;
+  scrollbar-width:none!important;
 }
+#management-report-modal .mr-shell::-webkit-scrollbar{width:0!important;height:0!important}
 
 #management-report-modal #mi-content{
   flex:0 0 auto!important;
