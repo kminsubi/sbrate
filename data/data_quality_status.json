@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-17 04:03:03",
+  "generated_at": "2026-09-17 08:44:21",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
@@ -22,11 +22,11 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 9,
+      "verified_today": 10,
       "retained_last_good": 0,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
-      "woori_rate_12m": 3.7
+      "woori_rate_12m": 3.45
     },
     "irp": {
       "rows": 13,
