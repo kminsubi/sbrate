@@ -19,7 +19,7 @@ FISIS_SOURCE_NAME = "금융감독원 금융통계정보시스템(FISIS)"
 FISIS_SOURCE_URL = "https://fisis.fss.or.kr/"
 CACHE_KEY = "sbrate:management:fisis:v1"
 CACHE_MAX_AGE = timedelta(days=14)
-LATEST_QUARTER_RECHECK_INTERVAL = timedelta(hours=12)
+LATEST_QUARTER_RECHECK_INTERVAL = timedelta(hours=1)
 MIN_QUARTER_COVERAGE = 0.90
 KST = timezone(timedelta(hours=9))
 
