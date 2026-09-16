@@ -309,17 +309,13 @@
         return;
       }
       if (event.target.closest?.('#management-report-open,#management-report-open-mobile')) {
-        // The FISIS modal renders its tabs asynchronously.  Activate the peer
-        // comparison after each render phase so management always lands on the
-        // intended default instead of briefly falling back to 경영지표.
-        [160, 500, 1100].forEach(delay => {
-          setTimeout(() => {
-            const modal = document.getElementById('management-report-modal');
-            if (!modal || modal.hidden) return;
-            ensureUI();
-            activatePeer();
-          }, delay);
-        });
+        // Keep the shared entry on the operational management-indicator view.
+        // A previously opened peer tab is restored only when the user selects it.
+        setTimeout(() => {
+          const modal = document.getElementById('management-report-modal');
+          if (!modal || modal.hidden) return;
+          deactivatePeer('general');
+        }, 220);
       }
     }, true);
   }

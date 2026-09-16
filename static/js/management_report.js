@@ -386,6 +386,7 @@
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('mr-lock');
+    document.documentElement.classList.add('mr-lock');
 
     try {
       if (!state.quarters.length) await loadQuarters();
@@ -402,6 +403,7 @@
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('mr-lock');
+    document.documentElement.classList.remove('mr-lock');
   }
 
   async function switchMode(mode) {

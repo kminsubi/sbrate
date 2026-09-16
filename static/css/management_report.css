@@ -1,5 +1,4 @@
-body.mr-lock{overflow:hidden!important}
-html:has(body.mr-lock){overflow:hidden!important}
+html.mr-lock,body.mr-lock{overflow:hidden!important}
 .mr-open-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #bfdbfe;background:#eff6ff;color:#1556c0;padding:6px 11px;border-radius:9px;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer;transition:.16s ease;flex:0 0 auto}
 .mr-open-btn:hover{background:#dbeafe;border-color:#93c5fd}
 .mr-open-btn-mobile{padding:5px 8px;font-size:10px;margin-left:5px}
