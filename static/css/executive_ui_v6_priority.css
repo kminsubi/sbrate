@@ -1,0 +1,77 @@
+/*
+ * Executive UI V6 cascade guard.
+ * index.html still contains historical inline style patches after dashboard.css.
+ * Prefixing with body increases specificity so the V6 visual contract remains
+ * authoritative without rewriting the large template or changing DOM/JS.
+ */
+
+body #dashboard-hero-start > .col-span-4 > .bg-white {
+    border-color:var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+}
+
+body #dashboard-hero-start > .col-span-4:first-child > .bg-white {
+    border-top:3px solid var(--exec-blue) !important;
+    background:linear-gradient(145deg,#f4f8ff 0%,#ffffff 58%) !important;
+}
+
+body #dashboard-hero-start > .col-span-4:nth-child(2) > .bg-white {
+    border-top:3px solid #94a3b8 !important;
+    background:#ffffff !important;
+}
+
+body #dashboard-hero-start > .col-span-4:last-child > .bg-white {
+    border-top:3px solid #d6a84b !important;
+    background:linear-gradient(145deg,#fffdf8 0%,#ffffff 58%) !important;
+}
+
+body #dashboard-hero-start .text-sm.font-bold,
+body #market-ranking-row .text-xs.font-bold,
+body #ai-analysis-center h2 {
+    letter-spacing:-.018em !important;
+}
+
+body #ai-analysis-center {
+    border-color:var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+    background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%) !important;
+}
+
+body #market-ranking-row > .bg-white {
+    border-color:var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+}
+
+body #product-search-panel {
+    border-color:var(--exec-line) !important;
+    border-radius:18px !important;
+    box-shadow:var(--exec-shadow) !important;
+}
+
+body #product-search-panel > div:first-child {
+    background:linear-gradient(90deg,#ffffff 0%,#f5f9ff 100%) !important;
+}
+
+body #ai-question {
+    border-color:#d7e0ec !important;
+    background:#ffffff !important;
+}
+
+body #ai-question:focus {
+    border-color:#8ab4ef !important;
+    box-shadow:0 0 0 3px rgba(21,86,192,.08) !important;
+}
+
+@media (max-width:1500px) {
+    body #dashboard-hero-start > .col-span-4 > .bg-white {
+        border-radius:16px !important;
+    }
+    body #market-ranking-row > .bg-white,
+    body #ai-analysis-center,
+    body #product-search-panel {
+        border-radius:16px !important;
+    }
+}
