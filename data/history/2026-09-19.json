@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-09-19 03:39:18",
+  "snapshot_at": "2026-09-19 08:30:01",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-09-19 03:36:39",
@@ -10667,19 +10667,16 @@
         "24m": 2.9,
         "36m": 2.8
       },
-      "status": "stale_retained_after_fetch_error",
+      "status": "verified_official",
       "source_url": "https://www.hanasavings.com/YPR/YPR0103",
-      "updated_at": "2026-09-18 04:11:59",
-      "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "updated_at": "2026-09-19 08:29:20",
+      "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리",
       "disclosure_date": "2026-08-16",
-      "collected_at": "2026-09-18 04:11:59",
+      "collected_at": "2026-09-19 08:29:20",
       "disclosure_date_source": "hana_rate_table_current_basis",
       "disclosure_date_url": "https://www.hanasavings.com/YPR/YPR0103",
-      "stale": true,
-      "retained_last_good": true,
-      "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-09-19 03:37:13",
-      "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fe108612990>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))"
+      "retry_attempt_at": "2026-09-19 08:29:17",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "SBI",
@@ -10814,20 +10811,17 @@
         "24m": 2.1,
         "36m": null
       },
-      "status": "stale_retained_after_fetch_error",
+      "status": "verified_official",
       "source_url": "https://www.idbsb.com/w2/itb/dps/inr/dpstInrstGuidance.xml",
-      "updated_at": "2026-09-18 04:13:28",
+      "updated_at": "2026-09-19 08:29:29",
       "effective_date": "2026-07-08",
       "api_url": "https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do",
-      "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-08 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-08",
       "disclosure_date": "2026-07-08",
-      "collected_at": "2026-09-18 04:13:28",
+      "collected_at": "2026-09-19 08:29:29",
       "disclosure_date_source": "existing_collector",
-      "stale": true,
-      "retained_last_good": true,
-      "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-09-19 03:39:17",
-      "last_fetch_error": "DB official API TLS/request failed | normal: HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)'))) | compat_seclevel1: 503 Server Error: Service Unavailable for url: https://www.idbsb.com/w2/itb/dps/inr/dpstInrstGuidance.xml | compat_seclevel0: 503 Server Error: Service Unavailable for url: https://www.idbsb.com/w2/itb/dps/inr/dpstInrstGuidance.xml"
+      "retry_attempt_at": "2026-09-19 08:29:17",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "JT친애",
@@ -11014,16 +11008,20 @@
       "category": "IRP",
       "product": "퇴직연금 정기예금(DC/IRP)",
       "rates": {
-        "3m": null,
-        "6m": null,
-        "12m": 3.7,
+        "3m": 2.6,
+        "6m": 2.6,
+        "12m": 3.5,
         "24m": 3.0,
         "36m": 2.9
       },
-      "status": "fetch_or_parse_error",
+      "status": "verified_official",
       "source_url": "https://www.hanasavings.com/YPR/YPR0104",
-      "updated_at": "2026-09-19 03:37:28",
-      "error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0104 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fe108610cd0>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
+      "updated_at": "2026-09-19 08:29:22",
+      "note": "하나저축은행 공식 퇴직연금 정기예금 DC/IRP형 연이율",
+      "rate_month": "2026-08",
+      "rate_type": "IRP/DC·IRP",
+      "rate_basis": "IRP/DC·IRP 약정금리",
+      "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -11048,13 +11046,11 @@
         }
       ],
       "disclosure_status": "verified_disclosure",
-      "rate_type": "IRP/DC·IRP",
-      "rate_basis": "IRP/DC·IRP 약정금리",
       "disclosure_date": "2026-08-27",
-      "collected_at": "2026-09-19 03:37:28",
-      "disclosure_date_source": "kb_thirdparty_disclosure_page",
+      "collected_at": "2026-09-19 08:29:22",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "rate_month": "2026-09"
+      "retry_attempt_at": "2026-09-19 08:29:17",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "SBI",

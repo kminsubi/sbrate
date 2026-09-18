@@ -72,19 +72,16 @@
       "24m": 2.9,
       "36m": 2.8
     },
-    "status": "stale_retained_after_fetch_error",
+    "status": "verified_official",
     "source_url": "https://www.hanasavings.com/YPR/YPR0103",
-    "updated_at": "2026-09-18 04:11:59",
-    "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+    "updated_at": "2026-09-19 08:29:20",
+    "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리",
     "disclosure_date": "2026-08-16",
-    "collected_at": "2026-09-18 04:11:59",
+    "collected_at": "2026-09-19 08:29:20",
     "disclosure_date_source": "hana_rate_table_current_basis",
     "disclosure_date_url": "https://www.hanasavings.com/YPR/YPR0103",
-    "stale": true,
-    "retained_last_good": true,
-    "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-09-19 03:37:13",
-    "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fe108612990>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))"
+    "retry_attempt_at": "2026-09-19 08:29:17",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "SBI",
@@ -219,20 +216,17 @@
       "24m": 2.1,
       "36m": null
     },
-    "status": "stale_retained_after_fetch_error",
+    "status": "verified_official",
     "source_url": "https://www.idbsb.com/w2/itb/dps/inr/dpstInrstGuidance.xml",
-    "updated_at": "2026-09-18 04:13:28",
+    "updated_at": "2026-09-19 08:29:29",
     "effective_date": "2026-07-08",
     "api_url": "https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do",
-    "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-08 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+    "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-08",
     "disclosure_date": "2026-07-08",
-    "collected_at": "2026-09-18 04:13:28",
+    "collected_at": "2026-09-19 08:29:29",
     "disclosure_date_source": "existing_collector",
-    "stale": true,
-    "retained_last_good": true,
-    "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-09-19 03:39:17",
-    "last_fetch_error": "DB official API TLS/request failed | normal: HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)'))) | compat_seclevel1: 503 Server Error: Service Unavailable for url: https://www.idbsb.com/w2/itb/dps/inr/dpstInrstGuidance.xml | compat_seclevel0: 503 Server Error: Service Unavailable for url: https://www.idbsb.com/w2/itb/dps/inr/dpstInrstGuidance.xml"
+    "retry_attempt_at": "2026-09-19 08:29:17",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "JT친애",
