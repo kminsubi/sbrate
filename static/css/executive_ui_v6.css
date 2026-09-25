@@ -143,14 +143,20 @@
     overflow-wrap:anywhere;
 }
 
-/* Let the brief grow with its text and wrap metrics inside narrow cards. */
+/* Keep the five metrics and detail action in the original three-column order. */
 #executive-summary-mini .grid-cols-3 {
-    grid-template-columns:repeat(auto-fit,minmax(min(100%,110px),1fr));
-    gap:4px 8px;
+    grid-template-columns:max-content max-content minmax(0,1fr);
+    gap:2px 6px;
+    justify-content:space-between;
 }
 
 #executive-summary-mini .whitespace-nowrap {
     white-space:normal;
+}
+
+#executive-summary-mini .grid-cols-3 b {
+    margin-left:2px;
+    white-space:nowrap;
 }
 
 /* ---------- AI workspace / market pulse ---------- */
@@ -296,6 +302,17 @@
 
     #executive-summary-mini {
         padding:10px 11px;
+    }
+
+    #executive-summary-mini .grid-cols-3 {
+        font-size:10px;
+        letter-spacing:-.02em;
+        column-gap:4px;
+    }
+
+    #executive-summary-mini #market-detail-btn {
+        font-size:inherit;
+        letter-spacing:inherit;
     }
 
     #market-ranking-row {
