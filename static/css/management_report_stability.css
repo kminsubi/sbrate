@@ -132,10 +132,16 @@ body{
 }
 #management-report-modal .mr-shell::-webkit-scrollbar{width:0!important;height:0!important}
 
-/* Keep table rows reachable when the summaries fill a short desktop viewport. */
+/* Match the industry soundness table's generous, self-scrolling viewport. */
 @media(min-width:901px){
   #management-report-modal .mr-table-card{
-    min-height:320px;
+    flex:0 0 auto!important;
+    min-height:0!important;
+  }
+  #management-report-modal .mr-table-wrap{
+    flex:0 0 auto!important;
+    max-height:54vh!important;
+    overflow:auto!important;
   }
 }
 

@@ -4,5 +4,5 @@
  * specificity guard for historical inline style patches in index.html.
  */
 @import url("/static/css/dashboard_legacy.css?v=20260915v1");
-@import url("/static/css/executive_ui_v6.css?v=20260925compact2");
+@import url("/static/css/executive_ui_v6.css?v=20260925compact3");
 @import url("/static/css/executive_ui_v6_priority.css?v=20260915v1");

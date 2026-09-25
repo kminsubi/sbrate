@@ -13,7 +13,7 @@ class ExecutiveUiV6ContractTests(unittest.TestCase):
     def test_dashboard_loader_imports_legacy_executive_and_priority_in_order(self):
         text = LOADER.read_text(encoding="utf-8")
         legacy = '@import url("/static/css/dashboard_legacy.css?v=20260915v1");'
-        executive = '@import url("/static/css/executive_ui_v6.css?v=20260925compact2");'
+        executive = '@import url("/static/css/executive_ui_v6.css?v=20260925compact3");'
         priority = '@import url("/static/css/executive_ui_v6_priority.css?v=20260915v1");'
         self.assertIn(legacy, text)
         self.assertIn(executive, text)

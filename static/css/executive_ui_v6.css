@@ -39,8 +39,14 @@
 }
 
 #dashboard-hero-start > .col-span-4:first-child > .bg-white {
+    display:flex;
+    flex-direction:column;
     border-top:3px solid var(--exec-blue) !important;
     background:linear-gradient(145deg,#f4f8ff 0%,#ffffff 58%) !important;
+}
+
+#dashboard-hero-start > .col-span-4:first-child > .bg-white > .mb-4 {
+    margin-bottom:10px !important;
 }
 
 #dashboard-hero-start > .col-span-4:nth-child(2) > .bg-white {
