@@ -332,6 +332,69 @@
     }
 }
 
+/* The desktop 9/3 split and fixed-height assistant make mobile cards unreadable. */
+@media (max-width: 900px) {
+    #dashboard-intelligence-row {
+        display:block !important;
+    }
+
+    #dashboard-intelligence-row > main {
+        width:100% !important;
+    }
+
+    #dashboard-intelligence-row > #ai-analysis-center {
+        position:relative !important;
+        inset:auto !important;
+        width:100% !important;
+        height:auto !important;
+        margin-top:16px !important;
+        overflow:visible !important;
+    }
+
+    #dashboard-hero-start,
+    #dashboard-hero-start + .bg-white,
+    #dashboard-hero-start + .bg-white > .col-span-8 > .grid,
+    #market-ranking-row {
+        grid-template-columns:minmax(0,1fr) !important;
+    }
+
+    #dashboard-hero-start > .col-span-4,
+    #dashboard-hero-start + .bg-white > .col-span-4,
+    #dashboard-hero-start + .bg-white > .col-span-8,
+    #market-ranking-row > .col-span-2 {
+        grid-column:1 / -1 !important;
+        width:100% !important;
+        min-width:0 !important;
+    }
+
+    #dashboard-hero-start > .col-span-4 > .bg-white {
+        min-height:0;
+    }
+
+    #dashboard-hero-start + .bg-white > .col-span-4,
+    #dashboard-hero-start + .bg-white > .col-span-8 {
+        height:auto !important;
+        min-height:0 !important;
+        max-height:none !important;
+        overflow:visible !important;
+    }
+
+    #dashboard-hero-start + .bg-white > .col-span-8 > .grid > * {
+        min-height:170px;
+        height:auto !important;
+        overflow:visible !important;
+    }
+
+    #market-ranking-row > .col-span-2:first-child > .grid {
+        grid-template-columns:minmax(0,1fr) !important;
+    }
+
+    #ai-analysis-center > #ai-center-content {
+        max-height:none !important;
+        overflow:visible !important;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     #market-ranking-row tbody tr,
     #dashboard-hero-start > .col-span-4:nth-child(2) .grid.grid-cols-2.gap-2 > .bg-gray-50 {

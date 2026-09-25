@@ -6,7 +6,7 @@ from management_terminology_patch import install_management_terminology_patch
 
 
 ASSET_VERSION = "20260826mi7"
-STABILITY_VERSION = "20260925scroll2"
+STABILITY_VERSION = "20260925mobile2"
 DASHBOARD_GUARD_VERSION = "20260826df1"
 MOBILE_BANK_PIN_VERSION = "20260826pin1"
 PEER_COMPARE_VERSION = "20260827peer2"
