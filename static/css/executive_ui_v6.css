@@ -128,17 +128,29 @@
 
 /* ---------- Executive AI brief ---------- */
 #executive-summary-mini {
-    flex:1;
-    min-height:132px;
-    max-height:148px;
+    flex:1 0 auto;
+    min-width:0;
+    min-height:0;
+    max-height:none;
     padding:12px 13px;
-    overflow:auto;
+    overflow:visible;
     border:1px solid #eee7d7;
     border-radius:11px;
     background:rgba(255,255,255,.82);
     color:#475467 !important;
     line-height:1.55 !important;
     word-break:keep-all;
+    overflow-wrap:anywhere;
+}
+
+/* Let the brief grow with its text and wrap metrics inside narrow cards. */
+#executive-summary-mini .grid-cols-3 {
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,110px),1fr));
+    gap:4px 8px;
+}
+
+#executive-summary-mini .whitespace-nowrap {
+    white-space:normal;
 }
 
 /* ---------- AI workspace / market pulse ---------- */
@@ -283,8 +295,6 @@
     }
 
     #executive-summary-mini {
-        min-height:120px;
-        max-height:136px;
         padding:10px 11px;
     }
 

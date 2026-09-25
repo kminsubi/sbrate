@@ -132,6 +132,13 @@ body{
 }
 #management-report-modal .mr-shell::-webkit-scrollbar{width:0!important;height:0!important}
 
+/* Keep table rows reachable when the summaries fill a short desktop viewport. */
+@media(min-width:901px){
+  #management-report-modal .mr-table-card{
+    min-height:320px;
+  }
+}
+
 #management-report-modal #mi-content{
   flex:0 0 auto!important;
   min-height:0!important;
