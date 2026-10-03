@@ -43,8 +43,10 @@
     "stale": true,
     "retained_last_good": true,
     "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-10-03 05:06:01",
-    "last_fetch_error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+    "last_attempt_at": "2026-10-03 09:40:43",
+    "last_fetch_error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+    "retry_attempt_at": "2026-10-03 09:40:42",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "신한",
