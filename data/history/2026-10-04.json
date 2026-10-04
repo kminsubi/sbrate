@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-10-04 03:51:21",
+  "snapshot_at": "2026-10-04 09:00:38",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-10-04 03:47:43",
@@ -10630,7 +10630,7 @@
       "status": "stale_retained_after_fetch_error",
       "source_url": "https://www.kbsavings.com/websquare/engine/callJsonService.jsp?serviceID=S_CommonItemService_getItemInfo",
       "updated_at": "2026-10-02 05:27:02",
-      "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
       "disclosure_date": "2026-09-07",
       "collected_at": "2026-10-02 05:27:02",
       "disclosure_date_source": "kb_rate_table_sejeon_basis",
@@ -10638,9 +10638,9 @@
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-04 03:47:52",
+      "last_attempt_at": "2026-10-04 08:59:52",
       "last_fetch_error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
-      "retry_attempt_at": "2026-10-03 09:40:42",
+      "retry_attempt_at": "2026-10-04 08:59:51",
       "retry_phase": "06:30_second_check"
     },
     {
@@ -10654,19 +10654,16 @@
         "24m": 3.0,
         "36m": null
       },
-      "status": "stale_retained_after_fetch_error",
+      "status": "verified_official",
       "source_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json",
-      "updated_at": "2026-10-03 05:06:08",
-      "note": "신한저축은행 공식 ISA정기예금 API. dscr10220.LIST의 CLASS_CD=24014, FM_TERM별 APLY_RATE 약정이율 사용. 공식 가입기간 3/6/12/24개월, 36개월 미제공. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
-      "disclosure_date": "2026-10-03",
-      "collected_at": "2026-10-03 05:06:08",
+      "updated_at": "2026-10-04 08:59:58",
+      "note": "신한저축은행 공식 ISA정기예금 API. dscr10220.LIST의 CLASS_CD=24014, FM_TERM별 APLY_RATE 약정이율 사용. 공식 가입기간 3/6/12/24개월, 36개월 미제공.",
+      "disclosure_date": "2026-10-04",
+      "collected_at": "2026-10-04 08:59:58",
       "disclosure_date_source": "shinhan_rate_guide_current_basis",
       "disclosure_date_url": "https://www.shinhansavings.com/api/PD0080/selectSavPd.json",
-      "stale": true,
-      "retained_last_good": true,
-      "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-04 03:48:17",
-      "last_fetch_error": "신한 ISA 공식 API 수집 실패: HTTPSConnectionPool(host='www.shinhansavings.com', port=443): Max retries exceeded with url: /PD_0080 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.shinhansavings.com', port=443) at 0x7f1473f6e710>, 'Connection to www.shinhansavings.com timed out. (connect timeout=20)'))"
+      "retry_attempt_at": "2026-10-04 08:59:51",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "하나",
@@ -10679,19 +10676,16 @@
         "24m": 2.9,
         "36m": 2.8
       },
-      "status": "stale_retained_after_fetch_error",
+      "status": "verified_official",
       "source_url": "https://www.hanasavings.com/YPR/YPR0103",
-      "updated_at": "2026-10-03 05:06:14",
-      "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "updated_at": "2026-10-04 09:00:01",
+      "note": "하나저축은행 공식 ISA 정기예금 상세페이지 적용금리",
       "disclosure_date": "2026-10-01",
-      "collected_at": "2026-10-03 05:06:14",
+      "collected_at": "2026-10-04 09:00:01",
       "disclosure_date_source": "hana_rate_table_current_basis",
       "disclosure_date_url": "https://www.hanasavings.com/YPR/YPR0103",
-      "stale": true,
-      "retained_last_good": true,
-      "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-04 03:49:33",
-      "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7f147496ac10>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))"
+      "retry_attempt_at": "2026-10-04 08:59:51",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "SBI",
@@ -10935,7 +10929,7 @@
       },
       "status": "fetch_or_parse_error",
       "source_url": "https://www.kbsavings.com/websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18",
-      "updated_at": "2026-10-04 03:47:53",
+      "updated_at": "2026-10-04 08:59:53",
       "note": "KB IRP 공식 API 수집 실패: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
       "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
       "disclosure_sources": [
@@ -10965,26 +10959,28 @@
       "rate_type": "IRP/DC·IRP",
       "rate_basis": "IRP/DC·IRP 약정금리",
       "disclosure_date": "2026-09-28",
-      "collected_at": "2026-10-04 03:47:53",
+      "collected_at": "2026-10-04 08:59:53",
       "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "rate_month": "2026-10"
+      "rate_month": "2026-10",
+      "retry_attempt_at": "2026-10-04 08:59:51",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "신한",
       "category": "IRP",
       "product": "퇴직연금 정기예금(DC/IRP)",
       "rates": {
-        "3m": null,
-        "6m": null,
-        "12m": 3.55,
+        "3m": 1.9,
+        "6m": 2.4,
+        "12m": 3.7,
         "24m": 2.0,
         "36m": 1.9
       },
-      "status": "fetch_or_parse_error",
-      "source_url": "https://www.shinhansavings.com/PD_0081",
-      "updated_at": "2026-10-04 03:48:37",
-      "note": "신한 IRP 공식 API 수집 실패: HTTPSConnectionPool(host='www.shinhansavings.com', port=443): Max retries exceeded with url: /PD_0081 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.shinhansavings.com', port=443) at 0x7f1473e1f750>, 'Connection to www.shinhansavings.com timed out. (connect timeout=20)'))",
+      "status": "verified_official",
+      "source_url": "https://www.shinhansavings.com/api/PD0081/selectSavPd.json",
+      "updated_at": "2026-10-04 08:59:59",
+      "note": "신한저축은행 공식 퇴직연금 정기예금 API. DC/IRP형(CLASS_CD=24016)의 FM_TERM별 APLY_RATE 약정이율 사용. DB형 대표금리(dscr10230)는 IRP 금리로 사용하지 않음.",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -11011,27 +11007,33 @@
       "disclosure_status": "verified_disclosure",
       "rate_type": "IRP/DC·IRP",
       "rate_basis": "IRP/DC·IRP 약정금리",
-      "disclosure_date": "2026-09-28",
-      "collected_at": "2026-10-04 03:48:37",
-      "disclosure_date_source": "kb_thirdparty_disclosure_page",
-      "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "rate_month": "2026-10"
+      "disclosure_date": "2026-08-01",
+      "collected_at": "2026-10-04 08:59:59",
+      "disclosure_date_source": "shinhan_rate_guide_bulSrDt_kst",
+      "disclosure_date_url": "https://www.shinhansavings.com/api/PD0081/selectSavPd.json",
+      "rate_month": "2026-08",
+      "retry_attempt_at": "2026-10-04 08:59:51",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "하나",
       "category": "IRP",
       "product": "퇴직연금 정기예금(DC/IRP)",
       "rates": {
-        "3m": null,
-        "6m": null,
-        "12m": 3.7,
+        "3m": 2.6,
+        "6m": 2.6,
+        "12m": 3.5,
         "24m": 3.0,
         "36m": 2.9
       },
-      "status": "fetch_or_parse_error",
+      "status": "verified_official",
       "source_url": "https://www.hanasavings.com/YPR/YPR0104",
-      "updated_at": "2026-10-04 03:49:48",
-      "error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0104 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7f1473b64190>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
+      "updated_at": "2026-10-04 09:00:03",
+      "note": "하나저축은행 공식 퇴직연금 정기예금 DC/IRP형 연이율",
+      "rate_month": "2026-08",
+      "rate_type": "IRP/DC·IRP",
+      "rate_basis": "IRP/DC·IRP 약정금리",
+      "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -11056,13 +11058,11 @@
         }
       ],
       "disclosure_status": "verified_disclosure",
-      "rate_type": "IRP/DC·IRP",
-      "rate_basis": "IRP/DC·IRP 약정금리",
       "disclosure_date": "2026-09-28",
-      "collected_at": "2026-10-04 03:49:48",
-      "disclosure_date_source": "kb_thirdparty_disclosure_page",
+      "collected_at": "2026-10-04 09:00:03",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "rate_month": "2026-10"
+      "retry_attempt_at": "2026-10-04 08:59:51",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "SBI",
