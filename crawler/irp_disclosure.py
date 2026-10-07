@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 
-TARGET_BANKS_FILE = DATA_DIR / "target_banks.json"
+TARGET_BANKS_FILE = BASE_DIR / "target_banks.json"
 OUTPUT_FILE = DATA_DIR / "irp_disclosure_rates.json"
 
 DISCLOSURE_URLS = [
@@ -132,6 +132,11 @@ def save_json(path, data):
 
 
 def load_targets():
+    if not TARGET_BANKS_FILE.is_file():
+        raise FileNotFoundError(
+            f"IRP disclosure target file not found: {TARGET_BANKS_FILE}"
+        )
+
     data = load_json(TARGET_BANKS_FILE, {})
 
     if isinstance(data, dict):
@@ -141,11 +146,16 @@ def load_targets():
     else:
         values = []
 
-    return [
+    targets = [
         clean_text(x)
         for x in values
         if clean_text(x)
     ]
+    if not targets:
+        raise ValueError(
+            f"IRP disclosure target list is empty: {TARGET_BANKS_FILE}"
+        )
+    return targets
 
 
 def fetch_html(url):

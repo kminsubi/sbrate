@@ -2,6 +2,8 @@ import json,re
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 import requests,urllib3
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 
 from ok import collect_ok
@@ -16,6 +18,23 @@ IRP_PERIODS=[3,6,12,24,36]
 PERIODS=ISA_PERIODS
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 S=requests.Session(); S.headers.update({"User-Agent":"Mozilla/5.0","Accept-Language":"ko-KR,ko;q=0.9"})
+KB_SESSION = requests.Session()
+KB_SESSION.headers.update({"User-Agent":"Mozilla/5.0","Accept-Language":"ko-KR,ko;q=0.9"})
+KB_SESSION.mount(
+    "https://www.kbsavings.com/",
+    HTTPAdapter(
+        max_retries=Retry(
+            total=2,
+            connect=2,
+            read=2,
+            status=2,
+            backoff_factor=0.5,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=frozenset({"GET", "POST"}),
+            respect_retry_after_header=True,
+        )
+    ),
+)
 
 def load(p):
     with p.open("r",encoding="utf-8-sig") as f:return json.load(f)
@@ -1012,7 +1031,7 @@ def kb_item_info(item_code):
     )
 
     # 브라우저와 유사하게 상품 상세 화면을 먼저 열어 세션 준비
-    warm = S.get(
+    warm = KB_SESSION.get(
         page_url,
         timeout=30,
         verify=False,
@@ -1042,7 +1061,7 @@ def kb_item_info(item_code):
 
     for payload_no, request_payload in enumerate(payloads, start=1):
         try:
-            r = S.post(
+            r = KB_SESSION.post(
                 api_url,
                 json=request_payload,
                 timeout=30,
