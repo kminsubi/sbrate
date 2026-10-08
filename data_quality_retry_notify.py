@@ -87,16 +87,17 @@ def warning_actionable(issue, previous, today, isa_rows, irp_rows, days):
     key = str(issue.get("key") or "").lower()
     if str(issue.get("level") or "").upper() == "ERROR":
         return True
+    # A missing rate must never be hidden by a recent alert's cooldown.
+    if ":fetch_failed_no_value:" in key or ":collector_failed" in key:
+        return True
+    is_freshness = ":retained:" in key or ":disclosure_not_refreshed:" in key
+    row = row_for_issue(issue, isa_rows, irp_rows) if is_freshness else None
+    if is_freshness and (row is None or not has_rate(row)):
+        return True
     last_sent = parsed_date(previous.get("last_notified"))
     if last_sent and (today - last_sent).days < days:
         return False
-    if ":fetch_failed_no_value:" in key or ":collector_failed" in key:
-        return True
-    if ":retained:" not in key and ":disclosure_not_refreshed:" not in key:
-        return True
-
-    row = row_for_issue(issue, isa_rows, irp_rows)
-    if row is None or not has_rate(row):
+    if not is_freshness:
         return True
     if ":retained:" in key:
         # Never use last_attempt_at or today's collector touch for a stale value.
