@@ -245,6 +245,7 @@ jobs:
           echo "Quality status : ${{ steps.quality.outputs.status }}"
           echo "Retry alert    : ${{ steps.retry_alert.outputs.notify }}"
           echo "Remaining issues: ${{ steps.retry_alert.outputs.issue_count }}"
+          echo "Actionable alerts: ${{ steps.retry_alert.outputs.alert_count }}"
 
       - name: Notify remaining failures after second check
         if: >-
@@ -270,6 +271,9 @@ jobs:
             -H "X-SBRate-Secret: ${{ secrets.TELEGRAM_BRIEF_SECRET }}" \
             --data-binary @data/data_quality_retry_status.json \
             "https://sbrate.onrender.com/telegram/data-quality"
+
+          # Record notification only after the HTTP request succeeded.
+          python data_quality_retry_notify.py --mark-sent
 
       - name: Save final daily history snapshot
         if: >-
@@ -305,6 +309,10 @@ jobs:
             git add -f data/data_quality_status.json
           fi
 
+          if [ -f "data/data_quality_retry_alert_state.json" ]; then
+            git add -f data/data_quality_retry_alert_state.json
+          fi
+
           if [ -d "data/history" ]; then
             git add data/history/*.json 2>/dev/null || true
           fi
@@ -322,6 +330,7 @@ jobs:
           (
             steps.retry.outcome != 'success' ||
             steps.quality.outcome != 'success' ||
+            steps.retry_alert.outcome != 'success' ||
             steps.quality.outputs.block == 'true'
           )
         run: |
