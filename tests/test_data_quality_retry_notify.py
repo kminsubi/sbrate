@@ -61,6 +61,12 @@ class RetryNotifyTests(unittest.TestCase):
         payload, _, _ = mod.build_alert(self.source, {}, [row], [self.nh], self.today)
         self.assertEqual([x["key"] for x in payload["issues"]], ["isa:retained:kb"])
 
+    def test_missing_rate_bypasses_recent_warning_cooldown(self):
+        old = {"active": {"isa:retained:kb": {"first_seen": "2026-10-02", "last_notified": "2026-10-08"}}}
+        kb = dict(self.kb, rates={"12m": None})
+        payload, _, _ = mod.build_alert(self.source, old, [kb], [self.nh], self.today)
+        self.assertEqual([x["key"] for x in payload["issues"]], ["isa:retained:kb"])
+
     def test_errors_bypass_throttle(self):
         issue = {"level": "ERROR", "key": "irp:collector_failed", "message": "fail"}
         source = {"issues": [issue], "generated_at": self.source["generated_at"]}
