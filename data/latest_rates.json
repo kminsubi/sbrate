@@ -1507,7 +1507,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -1563,7 +1563,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -2711,7 +2711,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -5986,9 +5986,9 @@
         "tel": "0436405000",
         "change_1": 0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": -0.1,
-        "change_24": 0.3,
+        "change_6": 0.0,
+        "change_12": 0.0,
+        "change_24": 0.0,
         "change_36": 0
     },
     {
@@ -7415,7 +7415,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.01,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
