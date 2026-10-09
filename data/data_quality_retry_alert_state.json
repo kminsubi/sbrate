@@ -1,13 +1,9 @@
 {
-  "version": 1,
   "active": {
     "isa:retained:kb": {
       "first_seen": "2026-10-08",
       "last_notified": "2026-10-08"
-    },
-    "irp:disclosure_not_refreshed:nh": {
-      "first_seen": "2026-10-08",
-      "last_notified": "2026-10-08"
     }
-  }
+  },
+  "version": 1
 }

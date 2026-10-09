@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-09 05:49:43",
+  "generated_at": "2026-10-09 10:21:51",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "49d41c42cb0d24b7",
-  "previous_fingerprint": "de487edec50abd55",
+  "fingerprint": "5c8d9151ebb451c1",
+  "previous_fingerprint": "49d41c42cb0d24b7",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,8 +22,8 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 8,
-      "retained_last_good": 2,
+      "verified_today": 9,
+      "retained_last_good": 1,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
       "woori_rate_12m": 3.7
@@ -32,7 +32,7 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 12,
-      "verified_today": 6,
+      "verified_today": 12,
       "retained_last_good": 0,
       "unavailable_rows": 1,
       "fetch_failed_rows": 0,
@@ -48,12 +48,6 @@
     },
     {
       "level": "WARNING",
-      "key": "isa:retained:신한",
-      "section": "ISA",
-      "message": "신한 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
-    },
-    {
-      "level": "WARNING",
       "key": "isa:unavailable_rows",
       "section": "ISA",
       "message": "금리 미확보 은행이 3개사입니다. 오늘 실패한 은행과는 별도 관리합니다."
@@ -63,42 +57,6 @@
       "key": "irp:unavailable_rows",
       "section": "IRP",
       "message": "금리 미확보 은행이 1개사입니다. 오늘 실패한 은행과는 별도 관리합니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "irp:missing_disclosure",
-      "section": "IRP",
-      "message": "오늘 공식확인이 되지 않은 데이터 중 공시기준일이 없는 은행이 5개사입니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "irp:old_unverified_disclosure",
-      "section": "IRP",
-      "message": "오늘 공식확인이 되지 않은 데이터 중 기준일 장기 미갱신 후보가 있습니다: 우리금융 69일."
-    },
-    {
-      "level": "WARNING",
-      "key": "irp:disclosure_not_refreshed:우리금융",
-      "section": "IRP",
-      "message": "우리금융 IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "irp:disclosure_not_refreshed:sbi",
-      "section": "IRP",
-      "message": "SBI IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "irp:disclosure_not_refreshed:db",
-      "section": "IRP",
-      "message": "DB IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "irp:disclosure_not_refreshed:jt친애",
-      "section": "IRP",
-      "message": "JT친애 IRP 공통공시를 오늘 재확인하지 못해 최신 검증 상태가 아닙니다."
     }
   ]
 }
