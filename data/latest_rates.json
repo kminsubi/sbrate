@@ -834,8 +834,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -862,8 +862,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -890,8 +890,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -918,8 +918,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2693,16 +2693,16 @@
         "top_1m": "1",
         "top_3m": "1.5",
         "top_6m": "2.2",
-        "top_12m": "3.7",
+        "top_12m": "3.5",
         "top_24m": "2",
         "top_36m": null,
         "base_1m": "1",
         "base_3m": "1.5",
         "base_6m": "2.2",
-        "base_12m": "3.7",
+        "base_12m": "3.5",
         "base_24m": "2",
         "base_36m": null,
-        "reg_date": "2026-10-08 00:00:00.0",
+        "reg_date": "2026-10-15 00:00:00.0",
         "join_target": "제한없음",
         "sweetener": "없음",
         "url": "https://www.wooleebank.co.kr/ProdList_001.act?rnum=14",
@@ -2711,7 +2711,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.0,
+        "change_12": -0.2,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -7583,7 +7583,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7611,7 +7611,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7639,7 +7639,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7667,7 +7667,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7695,7 +7695,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7723,7 +7723,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7751,7 +7751,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7890,8 +7890,8 @@
         "tel": "0542754060",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.25,
-        "change_12": 0.25,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7918,8 +7918,8 @@
         "tel": "0542754060",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.25,
-        "change_12": 0.25,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -7949,7 +7949,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.25
+        "change_36": 0.0
     },
     {
         "bank": "머스트삼일",
@@ -7977,7 +7977,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.25
+        "change_36": 0.0
     },
     {
         "bank": "오성",
@@ -8339,7 +8339,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -8395,7 +8395,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": -0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
