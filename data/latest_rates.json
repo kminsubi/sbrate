@@ -302,8 +302,8 @@
         "tel": "16440052",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": -0.8,
-        "change_12": 0.15,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -330,8 +330,8 @@
         "tel": "16440052",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": -0.8,
-        "change_12": 0.15,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -361,7 +361,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.15
+        "change_36": 0.0
     },
     {
         "bank": "OSB",
@@ -389,7 +389,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.15
+        "change_36": 0.0
     },
     {
         "bank": "DB",
@@ -415,7 +415,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -443,7 +443,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -471,7 +471,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -499,7 +499,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -527,7 +527,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -555,7 +555,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -582,7 +582,7 @@
         "tel": "16004902",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.1,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -610,7 +610,7 @@
         "tel": "16004902",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.1,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -3299,7 +3299,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.06,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -3326,8 +3326,8 @@
         "tel": "0537565200",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 1.0,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -3607,7 +3607,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -3635,7 +3635,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -4055,7 +4055,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -4083,7 +4083,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -4671,7 +4671,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -4699,7 +4699,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -4727,7 +4727,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -4755,7 +4755,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -4811,7 +4811,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -4839,7 +4839,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -4895,7 +4895,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -4922,7 +4922,7 @@
         "tel": "15990722",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.4,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -4950,7 +4950,7 @@
         "tel": "15990722",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.4,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -9011,7 +9011,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.01,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -9064,11 +9064,11 @@
         "url": "https://www.jt-bank.co.kr/",
         "homepage": "http://www.jt-bank.co.kr/",
         "tel": "16888877",
-        "change_1": 0.05,
-        "change_3": 0.05,
+        "change_1": 0.0,
+        "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.01,
-        "change_24": 0.01,
+        "change_12": 0.0,
+        "change_24": 0.0,
         "change_36": 0.0
     },
     {
