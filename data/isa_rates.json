@@ -12,15 +12,17 @@
     },
     "status": "verified_official_fallback",
     "source_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-    "updated_at": "2026-10-20 05:41:34",
+    "updated_at": "2026-10-20 09:34:15",
     "collector": "woori_isa_verified_fallback",
     "disclosure_date": "2026-07-31",
     "reference_date": "2026-07-31",
     "disclosure_date_source": "verified_official_fallback_date",
     "disclosure_date_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-    "fetch_error": "https://www.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='www.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.woorisavingsbank.com', port=443) at 0x7fcd694356a0>, 'Connection to www.woorisavingsbank.com timed out. (connect timeout=8)')) | https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='m.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='m.woorisavingsbank.com', port=443) at 0x7fcd69401f90>, 'Connection to m.woorisavingsbank.com timed out. (connect timeout=8)'))",
+    "fetch_error": "https://www.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='www.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.woorisavingsbank.com', port=443) at 0x7f6042cb17f0>, 'Connection to www.woorisavingsbank.com timed out. (connect timeout=8)')) | https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='m.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='m.woorisavingsbank.com', port=443) at 0x7f6042c79f90>, 'Connection to m.woorisavingsbank.com timed out. (connect timeout=8)'))",
     "note": "우리금융 공식 ISA 상품페이지 접속 실패로 마지막 검증 공식값 유지. 공식 금리안내 기준일 2026-07-31: 3개월 2.40%, 6개월 3.70%, 12개월 3.70%, 24개월 3.30%, 36개월 3.00%. 공식 페이지 접속이 복구되면 자동수집값을 우선 사용.",
-    "collected_at": "2026-10-20 05:41:34"
+    "collected_at": "2026-10-20 09:34:15",
+    "retry_attempt_at": "2026-10-20 09:33:58",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "KB",
@@ -36,7 +38,7 @@
     "status": "stale_retained_after_fetch_error",
     "source_url": "https://www.kbsavings.com/websquare/engine/callJsonService.jsp?serviceID=S_CommonItemService_getItemInfo",
     "updated_at": "2026-10-02 05:27:02",
-    "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+    "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
     "disclosure_date": "2026-09-07",
     "collected_at": "2026-10-02 05:27:02",
     "disclosure_date_source": "kb_rate_table_sejeon_basis",
@@ -44,9 +46,9 @@
     "stale": true,
     "retained_last_good": true,
     "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-10-20 05:41:37",
+    "last_attempt_at": "2026-10-20 09:34:19",
     "last_fetch_error": "HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB13 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
-    "retry_attempt_at": "2026-10-19 08:34:29",
+    "retry_attempt_at": "2026-10-20 09:33:58",
     "retry_phase": "06:30_second_check"
   },
   {
@@ -91,8 +93,10 @@
     "stale": true,
     "retained_last_good": true,
     "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-10-20 05:42:10",
-    "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7fcd68e3aad0>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))"
+    "last_attempt_at": "2026-10-20 09:34:47",
+    "last_fetch_error": "HTTPSConnectionPool(host='www.hanasavings.com', port=443): Max retries exceeded with url: /YPR/YPR0103 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.hanasavings.com', port=443) at 0x7f60426b2e90>, 'Connection to www.hanasavings.com timed out. (connect timeout=15)'))",
+    "retry_attempt_at": "2026-10-20 09:33:58",
+    "retry_phase": "06:30_second_check"
   },
   {
     "bank": "SBI",
