@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-10-21 09:04:14",
+  "generated_at": "2026-10-22 04:31:28",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": false,
-  "fingerprint": "39c218da1c1260fc",
+  "notify": true,
+  "fingerprint": "5c8d9151ebb451c1",
   "previous_fingerprint": "39c218da1c1260fc",
   "collector_outcomes": {
     "deposit": "success",
@@ -40,12 +40,6 @@
     }
   },
   "issues": [
-    {
-      "level": "WARNING",
-      "key": "deposit:large_rate_change",
-      "section": "정기예금",
-      "message": "비정상 급변 후보: 머스트삼일 정기예금 12개월 +0.50%p."
-    },
     {
       "level": "WARNING",
       "key": "isa:retained:kb",
