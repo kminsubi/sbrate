@@ -60,7 +60,7 @@
     },
     "status": "fetch_or_parse_error",
     "source_url": "https://www.kbsavings.com/websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18",
-    "updated_at": "2026-10-22 04:30:00",
+    "updated_at": "2026-10-22 09:09:38",
     "note": "KB IRP 공식 API 수집 실패: HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
     "error": "HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
     "disclosure_sources": [
@@ -89,11 +89,11 @@
     "disclosure_status": "verified_disclosure",
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_date": "2026-09-28",
-    "collected_at": "2026-10-22 04:30:00",
-    "disclosure_date_source": "kb_thirdparty_disclosure_page",
-    "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-    "rate_month": "2026-10",
+    "disclosure_date": null,
+    "collected_at": "2026-10-22 09:09:38",
+    "disclosure_date_source": "not_found",
+    "retry_attempt_at": "2026-10-22 09:09:29",
+    "retry_phase": "06:30_second_check",
     "disclosure_checked_at": "2026-10-22 04:29:51"
   },
   {
