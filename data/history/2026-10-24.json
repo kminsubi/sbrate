@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-10-24 04:31:04",
+  "snapshot_at": "2026-10-24 08:58:22",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-10-24 04:29:06",
@@ -10686,7 +10686,7 @@
       "status": "stale_retained_after_fetch_error",
       "source_url": "https://www.kbsavings.com/websquare/engine/callJsonService.jsp?serviceID=S_CommonItemService_getItemInfo",
       "updated_at": "2026-10-02 05:27:02",
-      "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
       "disclosure_date": "2026-09-07",
       "collected_at": "2026-10-02 05:27:02",
       "disclosure_date_source": "kb_rate_table_sejeon_basis",
@@ -10694,9 +10694,9 @@
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-24 04:29:19",
+      "last_attempt_at": "2026-10-24 08:57:45",
       "last_fetch_error": "HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB13 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
-      "retry_attempt_at": "2026-10-23 09:06:39",
+      "retry_attempt_at": "2026-10-24 08:57:41",
       "retry_phase": "06:30_second_check"
     },
     {
@@ -10781,8 +10781,10 @@
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-24 04:29:47",
-      "last_fetch_error": "400 Client Error: Bad Request for url: https://www.oksavingsbank.com/serviceEndpoint/httpService/request.json"
+      "last_attempt_at": "2026-10-24 08:58:18",
+      "last_fetch_error": "400 Client Error: Bad Request for url: https://www.oksavingsbank.com/serviceEndpoint/httpService/request.json",
+      "retry_attempt_at": "2026-10-24 08:57:41",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "한국투자",
@@ -10882,16 +10884,16 @@
       "updated_at": "2026-10-22 04:31:28",
       "effective_date": "2026-07-08",
       "api_url": "https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do",
-      "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-08 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "note": "DB저축은행 공식 홈페이지 ISA 금리안내 API 자동수집. 기준일=2026-07-08 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
       "disclosure_date": "2026-07-08",
       "collected_at": "2026-10-22 04:31:28",
       "disclosure_date_source": "existing_collector",
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-24 04:31:03",
+      "last_attempt_at": "2026-10-24 08:58:22",
       "last_fetch_error": "DB official API TLS/request failed | normal: HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)'))) | compat_seclevel1: 400 Client Error: Bad Request for url: https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do | compat_seclevel0: 400 Client Error: Bad Request for url: https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do",
-      "retry_attempt_at": "2026-10-23 09:06:39",
+      "retry_attempt_at": "2026-10-24 08:57:41",
       "retry_phase": "06:30_second_check"
     },
     {
@@ -10994,7 +10996,7 @@
       },
       "status": "fetch_or_parse_error",
       "source_url": "https://www.kbsavings.com/websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18",
-      "updated_at": "2026-10-24 04:29:22",
+      "updated_at": "2026-10-24 08:57:51",
       "note": "KB IRP 공식 API 수집 실패: HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
       "error": "HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
       "disclosure_sources": [
@@ -11023,11 +11025,11 @@
       "disclosure_status": "verified_disclosure",
       "rate_type": "IRP/DC·IRP",
       "rate_basis": "IRP/DC·IRP 약정금리",
-      "disclosure_date": "2026-09-28",
-      "collected_at": "2026-10-24 04:29:22",
-      "disclosure_date_source": "kb_thirdparty_disclosure_page",
-      "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "rate_month": "2026-10",
+      "disclosure_date": null,
+      "collected_at": "2026-10-24 08:57:51",
+      "disclosure_date_source": "not_found",
+      "retry_attempt_at": "2026-10-24 08:57:41",
+      "retry_phase": "06:30_second_check",
       "disclosure_checked_at": "2026-10-24 04:29:11"
     },
     {
@@ -11218,8 +11220,10 @@
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-24 04:29:47",
-      "last_fetch_error": "400 Client Error: Bad Request for url: https://www.oksavingsbank.com/serviceEndpoint/httpService/request.json"
+      "last_attempt_at": "2026-10-24 08:58:18",
+      "last_fetch_error": "400 Client Error: Bad Request for url: https://www.oksavingsbank.com/serviceEndpoint/httpService/request.json",
+      "retry_attempt_at": "2026-10-24 08:57:41",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "한국투자",
