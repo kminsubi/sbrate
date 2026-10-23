@@ -1,5 +1,5 @@
 {
-  "snapshot_at": "2026-10-23 04:24:10",
+  "snapshot_at": "2026-10-23 09:07:03",
   "timezone": "Asia/Seoul",
   "update_info": {
     "last_update": "2026-10-23 04:22:17",
@@ -10656,22 +10656,23 @@
       "product": "ISA 정기예금",
       "rates": {
         "3m": 2.4,
-        "6m": 3.7,
-        "12m": 3.7,
+        "6m": 3.98,
+        "12m": 3.98,
         "24m": 3.3,
         "36m": 3.0
       },
-      "status": "verified_official_fallback",
+      "status": "verified_official",
       "source_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-      "updated_at": "2026-10-23 04:22:39",
-      "collector": "woori_isa_verified_fallback",
-      "disclosure_date": "2026-07-31",
-      "reference_date": "2026-07-31",
-      "disclosure_date_source": "verified_official_fallback_date",
+      "updated_at": "2026-10-23 09:06:43",
+      "collector": "woori_isa_official_product_page",
+      "disclosure_date": "2026-10-23",
+      "reference_date": "2026-10-23",
+      "disclosure_date_source": "woori_isa_rate_table_reference_date",
       "disclosure_date_url": "https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315",
-      "fetch_error": "https://www.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='www.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.woorisavingsbank.com', port=443) at 0x7f12ed1656a0>, 'Connection to www.woorisavingsbank.com timed out. (connect timeout=8)')) | https://m.woorisavingsbank.com/product/deposite/view.do?depositeOrder=high&page=1&prdSn=315: HTTPSConnectionPool(host='m.woorisavingsbank.com', port=443): Max retries exceeded with url: /product/deposite/view.do?depositeOrder=high&page=1&prdSn=315 (Caused by ConnectTimeoutError(<HTTPSConnection(host='m.woorisavingsbank.com', port=443) at 0x7f12ed14d810>, 'Connection to m.woorisavingsbank.com timed out. (connect timeout=8)'))",
-      "note": "우리금융 공식 ISA 상품페이지 접속 실패로 마지막 검증 공식값 유지. 공식 금리안내 기준일 2026-07-31: 3개월 2.40%, 6개월 3.70%, 12개월 3.70%, 24개월 3.30%, 36개월 3.00%. 공식 페이지 접속이 복구되면 자동수집값을 우선 사용.",
-      "collected_at": "2026-10-23 04:22:39"
+      "note": "우리금융저축은행 공식 ISA 정기예금 상품페이지의 금리안내 표 자동수집. 기간별 단리(이율) 사용, 복리 수익률/중도해지이율 제외.",
+      "collected_at": "2026-10-23 09:06:43",
+      "retry_attempt_at": "2026-10-23 09:06:39",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "KB",
@@ -10687,7 +10688,7 @@
       "status": "stale_retained_after_fetch_error",
       "source_url": "https://www.kbsavings.com/websquare/engine/callJsonService.jsp?serviceID=S_CommonItemService_getItemInfo",
       "updated_at": "2026-10-02 05:27:02",
-      "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+      "note": "KB저축은행 공식 WebSquare 상품정보 API. ITEM_CODE=IB13(ISA정기예금)의 이율안내 표에서 기간별 적용이율만 수집. 복리수익률/중도해지이율 제외. API payload#2 사용. | 이번 공식소스 수집 실패로 직전 정상금리 유지",
       "disclosure_date": "2026-09-07",
       "collected_at": "2026-10-02 05:27:02",
       "disclosure_date_source": "kb_rate_table_sejeon_basis",
@@ -10695,9 +10696,9 @@
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-23 04:22:42",
+      "last_attempt_at": "2026-10-23 09:06:47",
       "last_fetch_error": "HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB13 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
-      "retry_attempt_at": "2026-10-22 09:09:29",
+      "retry_attempt_at": "2026-10-23 09:06:39",
       "retry_phase": "06:30_second_check"
     },
     {
@@ -10885,8 +10886,10 @@
       "stale": true,
       "retained_last_good": true,
       "last_fetch_status": "fetch_or_parse_error",
-      "last_attempt_at": "2026-10-23 04:24:09",
-      "last_fetch_error": "DB official API TLS/request failed | normal: HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)'))) | compat_seclevel1: 400 Client Error: Bad Request for url: https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do | compat_seclevel0: 400 Client Error: Bad Request for url: https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do"
+      "last_attempt_at": "2026-10-23 09:07:03",
+      "last_fetch_error": "DB official API TLS/request failed | normal: HTTPSConnectionPool(host='www.idbsb.com', port=443): Max retries exceeded with url: /w2/itb/dps/inr/dpstInrstGuidance.xml (Caused by SSLError(SSLError(1, '[SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1032)'))) | compat_seclevel1: 400 Client Error: Bad Request for url: https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do | compat_seclevel0: 400 Client Error: Bad Request for url: https://www.idbsb.com/itb/dps/inr/selectDpstInrstGuidance.do",
+      "retry_attempt_at": "2026-10-23 09:06:39",
+      "retry_phase": "06:30_second_check"
     },
     {
       "bank": "JT친애",
@@ -10973,7 +10976,7 @@
       "disclosure_date": "2026-08-01",
       "collected_at": "2026-10-23 04:22:39",
       "disclosure_date_source": "existing_collector",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "KB",
@@ -10988,7 +10991,7 @@
       },
       "status": "fetch_or_parse_error",
       "source_url": "https://www.kbsavings.com/websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18",
-      "updated_at": "2026-10-23 04:22:45",
+      "updated_at": "2026-10-23 09:06:52",
       "note": "KB IRP 공식 API 수집 실패: HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
       "error": "HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
       "disclosure_sources": [
@@ -11018,11 +11021,13 @@
       "rate_type": "IRP/DC·IRP",
       "rate_basis": "IRP/DC·IRP 약정금리",
       "disclosure_date": "2026-09-28",
-      "collected_at": "2026-10-23 04:22:45",
+      "collected_at": "2026-10-23 09:06:52",
       "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
       "rate_month": "2026-10",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "retry_attempt_at": "2026-10-23 09:06:39",
+      "retry_phase": "06:30_second_check",
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "신한",
@@ -11070,7 +11075,7 @@
       "disclosure_date_source": "shinhan_rate_guide_bulSrDt_kst",
       "disclosure_date_url": "https://www.shinhansavings.com/api/PD0081/selectSavPd.json",
       "rate_month": "2026-08",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "하나",
@@ -11118,7 +11123,7 @@
       "disclosure_date": "2026-09-28",
       "collected_at": "2026-10-23 04:23:02",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "SBI",
@@ -11166,7 +11171,7 @@
       "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
       "rate_month": "2026-10",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "OK",
@@ -11191,7 +11196,7 @@
       "rate_type": "IRP/DC·IRP",
       "rate_month": "2026-10",
       "rate_basis": "IRP/DC·IRP 약정금리",
-      "disclosure_checked_at": "2026-10-23 04:22:22",
+      "disclosure_checked_at": "2026-10-23 09:06:39",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -11248,7 +11253,7 @@
       "disclosure_date_source": "not_collected",
       "rate_type": "IRP/DC·IRP",
       "rate_basis": "IRP/DC·IRP 약정금리",
-      "disclosure_checked_at": "2026-10-23 04:22:22",
+      "disclosure_checked_at": "2026-10-23 09:06:39",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -11296,7 +11301,7 @@
       "note": "웰컴저축은행 공식 WELCOME 퇴직연금 정기예금 상세페이지. 가장 최신 월의 12개월 DC/IRP형 약정금리만 사용. DB형 및 괄호 안 연수익률 제외.",
       "collected_at": "2026-10-23 04:24:01",
       "rate_basis": "IRP/DC·IRP 약정금리",
-      "disclosure_checked_at": "2026-10-23 04:22:22",
+      "disclosure_checked_at": "2026-10-23 09:06:39",
       "disclosure_sources": [
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -11354,7 +11359,7 @@
       "disclosure_date_source": "acuon_official_api:payload.CHNG_DATETIME",
       "disclosure_date_url": "https://www.acuonsb.co.kr/sd_TUB_GD_INFO_T.jct",
       "rate_month": "2026-10",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "다올",
@@ -11401,7 +11406,7 @@
       "collected_at": "2026-10-23 04:24:05",
       "disclosure_date_source": "existing_collector",
       "rate_month": "2026-08",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "DB",
@@ -11449,7 +11454,7 @@
       "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
       "rate_month": "2026-10",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "JT친애",
@@ -11497,7 +11502,7 @@
       "disclosure_date_source": "kb_thirdparty_disclosure_page",
       "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
       "rate_month": "2026-10",
-      "disclosure_checked_at": "2026-10-23 04:22:22"
+      "disclosure_checked_at": "2026-10-23 09:06:39"
     },
     {
       "bank": "NH",
