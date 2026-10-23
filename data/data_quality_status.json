@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-23 09:07:03",
+  "generated_at": "2026-10-24 04:31:03",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "020b5d68bc3ab2cc",
-  "previous_fingerprint": "5790956afac12d9c",
+  "fingerprint": "cf7fb8667c376153",
+  "previous_fingerprint": "020b5d68bc3ab2cc",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,8 +22,8 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 8,
-      "retained_last_good": 2,
+      "verified_today": 7,
+      "retained_last_good": 3,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
       "woori_rate_12m": 3.98
@@ -33,7 +33,7 @@
       "banks": 13,
       "valid_rate_rows": 12,
       "verified_today": 12,
-      "retained_last_good": 0,
+      "retained_last_good": 1,
       "unavailable_rows": 1,
       "fetch_failed_rows": 0,
       "woori_rate_12m": 3.6
@@ -44,13 +44,19 @@
       "level": "WARNING",
       "key": "deposit:large_rate_change",
       "section": "정기예금",
-      "message": "비정상 급변 후보: 에스앤티 정기예금 6개월 +0.65%p."
+      "message": "비정상 급변 후보: 엠에스 e-정기예금 3개월 +1.15%p."
     },
     {
       "level": "WARNING",
       "key": "isa:retained:kb",
       "section": "ISA",
       "message": "KB 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "isa:retained:ok",
+      "section": "ISA",
+      "message": "OK 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
     },
     {
       "level": "WARNING",
@@ -63,6 +69,12 @@
       "key": "isa:unavailable_rows",
       "section": "ISA",
       "message": "금리 미확보 은행이 3개사입니다. 오늘 실패한 은행과는 별도 관리합니다."
+    },
+    {
+      "level": "WARNING",
+      "key": "irp:retained:ok",
+      "section": "IRP",
+      "message": "OK 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
     },
     {
       "level": "WARNING",
