@@ -975,7 +975,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -1003,7 +1003,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0.0,
-        "change_12": 0.04,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -1031,7 +1031,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0.0,
-        "change_12": 0.04,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -1059,7 +1059,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -1087,7 +1087,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.04,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -1115,7 +1115,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.04,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -1142,7 +1142,7 @@
         "tel": "18338889",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.3,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -1170,7 +1170,7 @@
         "tel": "18338889",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.25,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -1198,7 +1198,7 @@
         "tel": "18338889",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.25,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -1617,11 +1617,11 @@
         "homepage": "https://www.barosavings.com/",
         "tel": "0234670100",
         "change_1": 0.0,
-        "change_3": 0.2,
-        "change_6": 0.2,
-        "change_12": 0.08,
-        "change_24": 0.2,
-        "change_36": 0.2
+        "change_3": 0.0,
+        "change_6": 0.0,
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "바로",
@@ -1645,11 +1645,11 @@
         "homepage": "https://www.barosavings.com/",
         "tel": "0234670100",
         "change_1": 0.0,
-        "change_3": 0.2,
-        "change_6": 0.2,
-        "change_12": 0.05,
-        "change_24": 0.2,
-        "change_36": 0.2
+        "change_3": 0.0,
+        "change_6": 0.0,
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "바로",
@@ -1673,11 +1673,11 @@
         "homepage": "https://www.barosavings.com/",
         "tel": "0234670100",
         "change_1": 0.0,
-        "change_3": 0.2,
-        "change_6": 0.2,
-        "change_12": 0.05,
-        "change_24": 0.2,
-        "change_36": 0.2
+        "change_3": 0.0,
+        "change_6": 0.0,
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "바로",
@@ -1702,7 +1702,7 @@
         "tel": "0234670100",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.1,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -1730,7 +1730,7 @@
         "tel": "0234670100",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.1,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -2739,7 +2739,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2767,7 +2767,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2795,7 +2795,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -2823,7 +2823,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3103,7 +3103,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -3131,7 +3131,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -3159,7 +3159,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3187,7 +3187,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3215,7 +3215,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3271,7 +3271,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3325,7 +3325,7 @@
         "homepage": "https://www.mssb.co.kr",
         "tel": "0537565200",
         "change_1": 0.0,
-        "change_3": 1.15,
+        "change_3": 0.0,
         "change_6": 0.0,
         "change_12": 0.0,
         "change_24": 0.0,
@@ -7247,7 +7247,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.06,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -7751,7 +7751,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -9064,12 +9064,12 @@
         "url": "https://www.jt-bank.co.kr/",
         "homepage": "http://www.jt-bank.co.kr/",
         "tel": "16888877",
-        "change_1": -0.1,
-        "change_3": -0.1,
-        "change_6": -0.1,
-        "change_12": -0.1,
-        "change_24": -0.1,
-        "change_36": -0.1
+        "change_1": 0.0,
+        "change_3": 0.0,
+        "change_6": 0.0,
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "JT",
