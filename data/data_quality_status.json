@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-27 05:43:49",
+  "generated_at": "2026-10-27 09:43:41",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "62c63e8b3046b82d",
-  "previous_fingerprint": "2f0e5b7d92242de3",
+  "fingerprint": "2f0e5b7d92242de3",
+  "previous_fingerprint": "62c63e8b3046b82d",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,11 +22,11 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 5,
-      "retained_last_good": 4,
+      "verified_today": 7,
+      "retained_last_good": 3,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
-      "woori_rate_12m": 3.7
+      "woori_rate_12m": 3.98
     },
     "irp": {
       "rows": 13,
@@ -48,12 +48,6 @@
     },
     {
       "level": "WARNING",
-      "key": "isa:retained:하나",
-      "section": "ISA",
-      "message": "하나 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
-    },
-    {
-      "level": "WARNING",
       "key": "isa:retained:ok",
       "section": "ISA",
       "message": "OK 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
@@ -69,12 +63,6 @@
       "key": "isa:unavailable_rows",
       "section": "ISA",
       "message": "금리 미확보 은행이 3개사입니다. 오늘 실패한 은행과는 별도 관리합니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "isa:old_unverified_disclosure",
-      "section": "ISA",
-      "message": "오늘 공식확인이 되지 않은 데이터 중 기준일 장기 미갱신 후보가 있습니다: 우리금융 88일."
     },
     {
       "level": "WARNING",
