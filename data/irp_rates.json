@@ -6,13 +6,13 @@
     "rates": {
       "3m": null,
       "6m": null,
-      "12m": 3.6,
+      "12m": 4.0,
       "24m": 3.6,
-      "36m": 3.0
+      "36m": 3.2
     },
     "status": "verified_disclosure_merged",
     "source_url": "https://www.woorisavingsbank.com/product/deposite/list.do",
-    "updated_at": "2026-10-28 05:11:53",
+    "updated_at": "2026-10-29 05:29:08",
     "rate_month": "2026-08",
     "rate_type": "IRP/DC·IRP",
     "effective_date": "2026-08-01",
@@ -23,7 +23,7 @@
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "우리금융저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 3.6
+        "irp_rate": 4.0
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
@@ -37,15 +37,15 @@
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "우리금융저축은행/정기예금",
         "period": "36m",
-        "irp_rate": 3.0
+        "irp_rate": 3.2
       }
     ],
     "disclosure_status": "verified_disclosure",
     "rate_basis": "IRP/DC·IRP 약정금리",
     "disclosure_date": "2026-08-01",
-    "collected_at": "2026-10-28 05:11:53",
+    "collected_at": "2026-10-29 05:29:08",
     "disclosure_date_source": "existing_collector",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "KB",
@@ -60,7 +60,7 @@
     },
     "status": "fetch_or_parse_error",
     "source_url": "https://www.kbsavings.com/websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18",
-    "updated_at": "2026-10-28 09:41:26",
+    "updated_at": "2026-10-29 05:29:14",
     "note": "KB IRP 공식 API 수집 실패: HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
     "error": "HTTPSConnectionPool(host='www.kbsavings.com', port=443): Max retries exceeded with url: /websquare/websquare.jsp?w2xPath=/jsp/depositItemInfo/depositItemInfo.xml&ITEM_CODE=IB18 (Caused by ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))",
     "disclosure_sources": [
@@ -89,14 +89,12 @@
     "disclosure_status": "verified_disclosure",
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_date": "2026-09-28",
-    "collected_at": "2026-10-28 09:41:26",
+    "disclosure_date": "2026-10-28",
+    "collected_at": "2026-10-29 05:29:14",
     "disclosure_date_source": "kb_thirdparty_disclosure_page",
     "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-    "rate_month": "2026-10",
-    "retry_attempt_at": "2026-10-28 09:41:16",
-    "retry_phase": "06:30_second_check",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "rate_month": "2026-11",
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "신한",
@@ -111,7 +109,7 @@
     },
     "status": "verified_official",
     "source_url": "https://www.shinhansavings.com/api/PD0081/selectSavPd.json",
-    "updated_at": "2026-10-28 05:12:13",
+    "updated_at": "2026-10-29 05:29:25",
     "note": "신한저축은행 공식 퇴직연금 정기예금 API. DC/IRP형(CLASS_CD=24016)의 FM_TERM별 APLY_RATE 약정이율 사용. DB형 대표금리(dscr10230)는 IRP 금리로 사용하지 않음.",
     "disclosure_sources": [
       {
@@ -119,7 +117,7 @@
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "신한저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 3.7
+        "irp_rate": 3.8
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
@@ -140,11 +138,11 @@
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
     "disclosure_date": "2026-08-01",
-    "collected_at": "2026-10-28 05:12:13",
+    "collected_at": "2026-10-29 05:29:25",
     "disclosure_date_source": "shinhan_rate_guide_bulSrDt_kst",
     "disclosure_date_url": "https://www.shinhansavings.com/api/PD0081/selectSavPd.json",
     "rate_month": "2026-08",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "하나",
@@ -159,7 +157,7 @@
     },
     "status": "verified_official",
     "source_url": "https://www.hanasavings.com/YPR/YPR0104",
-    "updated_at": "2026-10-28 05:12:19",
+    "updated_at": "2026-10-29 05:29:30",
     "note": "하나저축은행 공식 퇴직연금 정기예금 DC/IRP형 연이율",
     "rate_month": "2026-08",
     "rate_type": "IRP/DC·IRP",
@@ -185,14 +183,14 @@
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "하나저축은행/정기예금",
         "period": "36m",
-        "irp_rate": 2.9
+        "irp_rate": 3.0
       }
     ],
     "disclosure_status": "verified_disclosure",
-    "disclosure_date": "2026-09-28",
-    "collected_at": "2026-10-28 05:12:19",
+    "disclosure_date": "2026-10-28",
+    "collected_at": "2026-10-29 05:29:30",
     "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "SBI",
@@ -201,13 +199,13 @@
     "rates": {
       "3m": null,
       "6m": null,
-      "12m": 3.85,
-      "24m": 3.95,
-      "36m": 3.95
+      "12m": 4.0,
+      "24m": 4.1,
+      "36m": 4.1
     },
     "status": "verified_disclosure_merged",
     "source_url": "https://www.sbisb.co.kr/gds0010100.act",
-    "updated_at": "2026-10-28 05:12:21",
+    "updated_at": "2026-10-29 05:29:31",
     "note": "공식 상품공시 화면에 퇴직연금 카테고리 존재 확인. 상세 금리 값은 현재 공개 HTML에서 확인되지 않아 None 유지. | 최신 사업자 IRP 공시값 우선 적용",
     "disclosure_sources": [
       {
@@ -215,32 +213,32 @@
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "SBI저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 3.85
+        "irp_rate": 4.0
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "SBI저축은행/정기예금",
         "period": "24m",
-        "irp_rate": 3.95
+        "irp_rate": 4.1
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "SBI저축은행/정기예금",
         "period": "36m",
-        "irp_rate": 3.95
+        "irp_rate": 4.1
       }
     ],
     "disclosure_status": "verified_disclosure",
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_date": "2026-09-28",
-    "collected_at": "2026-10-28 05:12:21",
+    "disclosure_date": "2026-10-28",
+    "collected_at": "2026-10-29 05:29:31",
     "disclosure_date_source": "kb_thirdparty_disclosure_page",
     "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-    "rate_month": "2026-10",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "rate_month": "2026-11",
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "OK",
@@ -258,35 +256,35 @@
     "updated_at": "2026-10-23 04:23:07",
     "effective_date": "2026-10-01",
     "depsGdsSqno": "1237",
-    "note": "OK저축은행 공식 홈페이지 상품정보 API 자동수집. IRP / depsGdsSqno=1237 / 시행일=2026-10-01 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
+    "note": "OK저축은행 공식 홈페이지 상품정보 API 자동수집. IRP / depsGdsSqno=1237 / 시행일=2026-10-01 | 이번 공식소스 수집 실패로 직전 정상금리 유지 | 이번 공식소스 수집 실패로 직전 정상금리 유지",
     "disclosure_date": "2026-10-01",
     "collected_at": "2026-10-23 04:23:07",
     "disclosure_date_source": "existing_collector",
     "rate_type": "IRP/DC·IRP",
     "rate_month": "2026-10",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_checked_at": "2026-10-28 09:41:15",
+    "disclosure_checked_at": "2026-10-29 05:29:04",
     "disclosure_sources": [
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "OK저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 4.0
+        "irp_rate": 4.16
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "OK저축은행/정기예금",
         "period": "24m",
-        "irp_rate": 3.5
+        "irp_rate": 3.66
       }
     ],
     "disclosure_status": "verified_disclosure_partial",
     "stale": true,
     "retained_last_good": true,
     "last_fetch_status": "fetch_or_parse_error",
-    "last_attempt_at": "2026-10-28 09:41:36",
+    "last_attempt_at": "2026-10-29 05:29:35",
     "last_fetch_error": "400 Client Error: Bad Request for url: https://www.oksavingsbank.com/serviceEndpoint/httpService/request.json",
     "retry_attempt_at": "2026-10-28 09:41:16",
     "retry_phase": "06:30_second_check"
@@ -304,7 +302,7 @@
     },
     "status": "verified_official",
     "source_url": "https://sb.koreainvestment.com/?PRD-PDS001-11#",
-    "updated_at": "2026-10-28 05:13:16",
+    "updated_at": "2026-10-29 05:30:21",
     "db_rates": {
       "3m": 2.0,
       "6m": 2.3,
@@ -325,18 +323,18 @@
     "browser": "Chrome",
     "selenium_attempt": 1,
     "disclosure_date": null,
-    "collected_at": "2026-10-28 05:13:16",
+    "collected_at": "2026-10-29 05:30:21",
     "disclosure_date_source": "not_collected",
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_checked_at": "2026-10-28 09:41:15",
+    "disclosure_checked_at": "2026-10-29 05:29:04",
     "disclosure_sources": [
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "한국투자저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 3.85
+        "irp_rate": 4.1
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
@@ -362,29 +360,29 @@
     "rates": {
       "3m": null,
       "6m": null,
-      "12m": 3.8,
+      "12m": 3.9,
       "24m": null,
       "36m": null
     },
     "status": "verified_official_partial",
     "source_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255021&sysDsCd=01",
-    "updated_at": "2026-10-28 05:13:23",
-    "rate_month": "2026-10",
+    "updated_at": "2026-10-29 05:30:26",
+    "rate_month": "2026-11",
     "rate_type": "DC/IRP",
-    "disclosure_date": "2026-10-28",
+    "disclosure_date": "2026-10-29",
     "disclosure_date_source": "welcome_rate_table_reference_date",
     "disclosure_date_url": "https://www.welcomebank.co.kr/ib20/mnu/IBNFPMDSP001?ib20_wc=IBNFPMDSP001_00:IBNFPMCMN001_00&prdCd=1120255021&sysDsCd=01",
     "note": "웰컴저축은행 공식 WELCOME 퇴직연금 정기예금 상세페이지. 가장 최신 월의 12개월 DC/IRP형 약정금리만 사용. DB형 및 괄호 안 연수익률 제외.",
-    "collected_at": "2026-10-28 05:13:23",
+    "collected_at": "2026-10-29 05:30:26",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_checked_at": "2026-10-28 09:41:15",
+    "disclosure_checked_at": "2026-10-29 05:29:04",
     "disclosure_sources": [
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "웰컴저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 3.8
+        "irp_rate": 3.9
       }
     ],
     "disclosure_status": "verified_disclosure_partial"
@@ -402,7 +400,7 @@
     },
     "status": "verified_official",
     "source_url": "https://www.acuonsb.co.kr/sd_TUB_GD_INFO_T.jct",
-    "updated_at": "2026-10-28 05:13:25",
+    "updated_at": "2026-10-29 05:30:29",
     "note": "애큐온저축은행 공식 JEX 퇴직연금 상품정보 API. GD_INFO_C=1201171의 DC/IRP형 약정금리만 사용. REC_001, INT_TYPE=1, COND_TRM별 CONT_APLY_INT 기준.",
     "disclosure_sources": [
       {
@@ -410,32 +408,32 @@
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "애큐온저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 3.95
+        "irp_rate": 4.13
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "애큐온저축은행/정기예금",
         "period": "24m",
-        "irp_rate": 3.95
+        "irp_rate": 3.9
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "애큐온저축은행/정기예금",
         "period": "36m",
-        "irp_rate": 3.95
+        "irp_rate": 3.6
       }
     ],
     "disclosure_status": "verified_disclosure",
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
     "disclosure_date": "2026-10-01",
-    "collected_at": "2026-10-28 05:13:25",
+    "collected_at": "2026-10-29 05:30:29",
     "disclosure_date_source": "acuon_official_api:payload.CHNG_DATETIME",
     "disclosure_date_url": "https://www.acuonsb.co.kr/sd_TUB_GD_INFO_T.jct",
     "rate_month": "2026-10",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "다올",
@@ -450,7 +448,7 @@
     },
     "status": "verified_official",
     "source_url": "https://www.daolsb.com/deposit/goods.do?gds_cd=DA106",
-    "updated_at": "2026-10-28 05:13:26",
+    "updated_at": "2026-10-29 05:30:30",
     "note": "다올저축은행 공식 퇴직연금 정기예금 DC형/IRP형 약정이율, 최종금리변경일 2026-08-01",
     "disclosure_sources": [
       {
@@ -458,7 +456,7 @@
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "다올저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 4.06
+        "irp_rate": 4.1
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
@@ -479,10 +477,10 @@
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
     "disclosure_date": "2026-08-01",
-    "collected_at": "2026-10-28 05:13:26",
+    "collected_at": "2026-10-29 05:30:30",
     "disclosure_date_source": "existing_collector",
     "rate_month": "2026-08",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "DB",
@@ -491,46 +489,46 @@
     "rates": {
       "3m": null,
       "6m": null,
-      "12m": 3.85,
-      "24m": 3.85,
-      "36m": 3.75
+      "12m": 4.05,
+      "24m": 4.05,
+      "36m": 3.95
     },
     "status": "verified_disclosure_merged",
     "source_url": null,
-    "updated_at": "2026-10-28 05:13:30",
+    "updated_at": "2026-10-29 05:30:33",
     "disclosure_sources": [
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "DB저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 3.85
+        "irp_rate": 4.05
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "DB저축은행/정기예금",
         "period": "24m",
-        "irp_rate": 3.85
+        "irp_rate": 4.05
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "DB저축은행/정기예금",
         "period": "36m",
-        "irp_rate": 3.75
+        "irp_rate": 3.95
       }
     ],
     "disclosure_status": "verified_disclosure",
     "rate_type": "IRP/DC·IRP",
     "note": "최신 사업자 IRP 공시값 우선 적용",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_date": "2026-09-28",
-    "collected_at": "2026-10-28 05:13:30",
+    "disclosure_date": "2026-10-28",
+    "collected_at": "2026-10-29 05:30:33",
     "disclosure_date_source": "kb_thirdparty_disclosure_page",
     "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-    "rate_month": "2026-10",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "rate_month": "2026-11",
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "JT친애",
@@ -539,46 +537,46 @@
     "rates": {
       "3m": null,
       "6m": null,
-      "12m": 4.0,
-      "24m": 3.9,
-      "36m": 3.8
+      "12m": 4.08,
+      "24m": 3.98,
+      "36m": 3.88
     },
     "status": "verified_disclosure_merged",
     "source_url": null,
-    "updated_at": "2026-10-28 05:13:30",
+    "updated_at": "2026-10-29 05:30:33",
     "disclosure_sources": [
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "제이티친애저축은행/정기예금",
         "period": "12m",
-        "irp_rate": 4.0
+        "irp_rate": 4.08
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "제이티친애저축은행/정기예금",
         "period": "24m",
-        "irp_rate": 3.9
+        "irp_rate": 3.98
       },
       {
         "source_name": "KB퇴직연금_타사제공상품",
         "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
         "product": "제이티친애저축은행/정기예금",
         "period": "36m",
-        "irp_rate": 3.8
+        "irp_rate": 3.88
       }
     ],
     "disclosure_status": "verified_disclosure",
     "rate_type": "IRP/DC·IRP",
     "note": "최신 사업자 IRP 공시값 우선 적용",
     "rate_basis": "IRP/DC·IRP 약정금리",
-    "disclosure_date": "2026-09-28",
-    "collected_at": "2026-10-28 05:13:30",
+    "disclosure_date": "2026-10-28",
+    "collected_at": "2026-10-29 05:30:33",
     "disclosure_date_source": "kb_thirdparty_disclosure_page",
     "disclosure_date_url": "https://okbfex.kbstar.com/quics?page=C110015",
-    "rate_month": "2026-10",
-    "disclosure_checked_at": "2026-10-28 09:41:15"
+    "rate_month": "2026-11",
+    "disclosure_checked_at": "2026-10-29 05:29:04"
   },
   {
     "bank": "NH",
@@ -593,12 +591,12 @@
     },
     "status": "verified_source_rate_pending",
     "source_url": "https://www.nhsavingsbank.co.kr/dpisPrd/view.do?prdCode=24601",
-    "updated_at": "2026-10-28 05:13:30",
+    "updated_at": "2026-10-29 05:30:33",
     "note": "공식 상세페이지에서 상품 존재 확인. 금리는 월별 공지/첨부 기반이라 전용 수집기 전까지 None 유지.",
     "rate_type": "IRP/DC·IRP",
     "rate_basis": "IRP/DC·IRP 약정금리",
     "disclosure_date": null,
-    "collected_at": "2026-10-28 05:13:30",
+    "collected_at": "2026-10-29 05:30:33",
     "disclosure_date_source": "not_found"
   }
 ]

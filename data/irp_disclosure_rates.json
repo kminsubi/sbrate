@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-28 09:41:15",
+  "generated_at": "2026-10-29 05:29:04",
   "timezone": "Asia/Seoul",
   "strategy": "retirement_provider_disclosure",
   "sources": [
@@ -16,9 +16,9 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 3.6,
+        "12m": 4.0,
         "24m": 3.6,
-        "36m": 3.0
+        "36m": 3.2
       },
       "status": "verified_disclosure",
       "sources": [
@@ -27,7 +27,7 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "우리금융저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 3.6
+          "irp_rate": 4.0
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -41,10 +41,10 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "우리금융저축은행/정기예금",
           "period": "36m",
-          "irp_rate": 3.0
+          "irp_rate": 3.2
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "KB": {
@@ -80,7 +80,7 @@
           "irp_rate": 2.4
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "신한": {
@@ -88,7 +88,7 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 3.7,
+        "12m": 3.8,
         "24m": 2.0,
         "36m": 1.9
       },
@@ -99,7 +99,7 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "신한저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 3.7
+          "irp_rate": 3.8
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -116,7 +116,7 @@
           "irp_rate": 1.9
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "하나": {
@@ -126,7 +126,7 @@
         "6m": null,
         "12m": 3.5,
         "24m": 3.0,
-        "36m": 2.9
+        "36m": 3.0
       },
       "status": "verified_disclosure",
       "sources": [
@@ -149,10 +149,10 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "하나저축은행/정기예금",
           "period": "36m",
-          "irp_rate": 2.9
+          "irp_rate": 3.0
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "SBI": {
@@ -160,9 +160,9 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 3.85,
-        "24m": 3.95,
-        "36m": 3.95
+        "12m": 4.0,
+        "24m": 4.1,
+        "36m": 4.1
       },
       "status": "verified_disclosure",
       "sources": [
@@ -171,24 +171,24 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "SBI저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 3.85
+          "irp_rate": 4.0
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "SBI저축은행/정기예금",
           "period": "24m",
-          "irp_rate": 3.95
+          "irp_rate": 4.1
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "SBI저축은행/정기예금",
           "period": "36m",
-          "irp_rate": 3.95
+          "irp_rate": 4.1
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "OK": {
@@ -196,8 +196,8 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 4.0,
-        "24m": 3.5,
+        "12m": 4.16,
+        "24m": 3.66,
         "36m": null
       },
       "status": "verified_disclosure_partial",
@@ -207,17 +207,17 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "OK저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 4.0
+          "irp_rate": 4.16
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "OK저축은행/정기예금",
           "period": "24m",
-          "irp_rate": 3.5
+          "irp_rate": 3.66
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "한국투자": {
@@ -225,7 +225,7 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 3.85,
+        "12m": 4.1,
         "24m": 2.0,
         "36m": 2.0
       },
@@ -236,7 +236,7 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "한국투자저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 3.85
+          "irp_rate": 4.1
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -253,7 +253,7 @@
           "irp_rate": 2.0
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "웰컴": {
@@ -261,7 +261,7 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 3.8,
+        "12m": 3.9,
         "24m": null,
         "36m": null
       },
@@ -272,10 +272,10 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "웰컴저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 3.8
+          "irp_rate": 3.9
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "애큐온": {
@@ -283,9 +283,9 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 3.95,
-        "24m": 3.95,
-        "36m": 3.95
+        "12m": 4.13,
+        "24m": 3.9,
+        "36m": 3.6
       },
       "status": "verified_disclosure",
       "sources": [
@@ -294,24 +294,24 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "애큐온저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 3.95
+          "irp_rate": 4.13
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "애큐온저축은행/정기예금",
           "period": "24m",
-          "irp_rate": 3.95
+          "irp_rate": 3.9
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "애큐온저축은행/정기예금",
           "period": "36m",
-          "irp_rate": 3.95
+          "irp_rate": 3.6
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "다올": {
@@ -319,7 +319,7 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 4.06,
+        "12m": 4.1,
         "24m": 3.4,
         "36m": 2.4
       },
@@ -330,7 +330,7 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "다올저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 4.06
+          "irp_rate": 4.1
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
@@ -347,7 +347,7 @@
           "irp_rate": 2.4
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "DB": {
@@ -355,9 +355,9 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 3.85,
-        "24m": 3.85,
-        "36m": 3.75
+        "12m": 4.05,
+        "24m": 4.05,
+        "36m": 3.95
       },
       "status": "verified_disclosure",
       "sources": [
@@ -366,24 +366,24 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "DB저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 3.85
+          "irp_rate": 4.05
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "DB저축은행/정기예금",
           "period": "24m",
-          "irp_rate": 3.85
+          "irp_rate": 4.05
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "DB저축은행/정기예금",
           "period": "36m",
-          "irp_rate": 3.75
+          "irp_rate": 3.95
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     },
     "JT친애": {
@@ -391,9 +391,9 @@
       "rates": {
         "3m": null,
         "6m": null,
-        "12m": 4.0,
-        "24m": 3.9,
-        "36m": 3.8
+        "12m": 4.08,
+        "24m": 3.98,
+        "36m": 3.88
       },
       "status": "verified_disclosure",
       "sources": [
@@ -402,24 +402,24 @@
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "제이티친애저축은행/정기예금",
           "period": "12m",
-          "irp_rate": 4.0
+          "irp_rate": 4.08
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "제이티친애저축은행/정기예금",
           "period": "24m",
-          "irp_rate": 3.9
+          "irp_rate": 3.98
         },
         {
           "source_name": "KB퇴직연금_타사제공상품",
           "source_url": "https://okbfex.kbstar.com/quics?page=C110015",
           "product": "제이티친애저축은행/정기예금",
           "period": "36m",
-          "irp_rate": 3.8
+          "irp_rate": 3.88
         }
       ],
-      "updated_at": "2026-10-28 09:41:15",
+      "updated_at": "2026-10-29 05:29:04",
       "verification_timezone": "Asia/Seoul"
     }
   },
