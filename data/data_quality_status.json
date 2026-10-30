@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-30 05:29:56",
+  "generated_at": "2026-10-30 10:18:48",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": true,
+  "notify": false,
   "fingerprint": "2f0e5b7d92242de3",
-  "previous_fingerprint": "cf7fb8667c376153",
+  "previous_fingerprint": "2f0e5b7d92242de3",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
