@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30 10:18:48",
+  "generated_at": "2026-10-31 05:02:01",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
@@ -12,7 +12,7 @@
   },
   "counts": {
     "deposit": {
-      "items": 380,
+      "items": 381,
       "banks": 75,
       "previous_items": 380,
       "previous_banks": 75,

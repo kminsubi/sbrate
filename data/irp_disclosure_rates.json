@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30 10:18:22",
+  "generated_at": "2026-10-31 05:00:35",
   "timezone": "Asia/Seoul",
   "strategy": "retirement_provider_disclosure",
   "sources": [
@@ -44,7 +44,7 @@
           "irp_rate": 3.2
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "KB": {
@@ -80,7 +80,7 @@
           "irp_rate": 2.4
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "신한": {
@@ -116,7 +116,7 @@
           "irp_rate": 1.9
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "하나": {
@@ -152,7 +152,7 @@
           "irp_rate": 3.0
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "SBI": {
@@ -188,7 +188,7 @@
           "irp_rate": 4.1
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "OK": {
@@ -217,7 +217,7 @@
           "irp_rate": 3.66
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "한국투자": {
@@ -253,7 +253,7 @@
           "irp_rate": 2.0
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "웰컴": {
@@ -275,7 +275,7 @@
           "irp_rate": 3.9
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "애큐온": {
@@ -311,7 +311,7 @@
           "irp_rate": 3.6
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "다올": {
@@ -347,7 +347,7 @@
           "irp_rate": 2.4
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "DB": {
@@ -383,7 +383,7 @@
           "irp_rate": 3.95
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     },
     "JT친애": {
@@ -419,7 +419,7 @@
           "irp_rate": 3.88
         }
       ],
-      "updated_at": "2026-10-30 10:18:22",
+      "updated_at": "2026-10-31 05:00:35",
       "verification_timezone": "Asia/Seoul"
     }
   },
