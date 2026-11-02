@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-11-02 04:56:07",
+  "generated_at": "2026-11-02 10:01:13",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "8ca2d26323d98061",
-  "previous_fingerprint": "2f0e5b7d92242de3",
+  "fingerprint": "53c228c75e0c8186",
+  "previous_fingerprint": "8ca2d26323d98061",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -22,8 +22,8 @@
       "rows": 13,
       "banks": 13,
       "valid_rate_rows": 10,
-      "verified_today": 5,
-      "retained_last_good": 5,
+      "verified_today": 6,
+      "retained_last_good": 4,
       "unavailable_rows": 3,
       "fetch_failed_rows": 0,
       "woori_rate_12m": 3.98
@@ -45,12 +45,6 @@
       "key": "isa:retained:kb",
       "section": "ISA",
       "message": "KB 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
-    },
-    {
-      "level": "WARNING",
-      "key": "isa:retained:신한",
-      "section": "ISA",
-      "message": "신한 오늘 공식확인 실패 → 직전 정상값 유지 중입니다."
     },
     {
       "level": "WARNING",
