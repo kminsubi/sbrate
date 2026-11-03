@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-11-03 12:02:16",
+  "generated_at": "2026-11-04 06:14:06",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "cf7fb8667c376153",
-  "previous_fingerprint": "a8e6b674e1661d96",
+  "fingerprint": "2f0e5b7d92242de3",
+  "previous_fingerprint": "cf7fb8667c376153",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
   },
   "counts": {
     "deposit": {
-      "items": 381,
+      "items": 379,
       "banks": 75,
       "previous_items": 381,
       "previous_banks": 75,
@@ -40,12 +40,6 @@
     }
   },
   "issues": [
-    {
-      "level": "WARNING",
-      "key": "deposit:large_rate_change",
-      "section": "정기예금",
-      "message": "비정상 급변 후보: 한국투자 한투 ACE 정기예금 6개월 +1.65%p."
-    },
     {
       "level": "WARNING",
       "key": "isa:retained:kb",
