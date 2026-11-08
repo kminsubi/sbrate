@@ -1393,11 +1393,11 @@
         "homepage": "http://www.thekbank.co.kr",
         "tel": "025695600",
         "change_1": 0.0,
-        "change_3": 0.35,
-        "change_6": 0.35,
-        "change_12": 0.35,
-        "change_24": 0.35,
-        "change_36": 0.35
+        "change_3": 0.0,
+        "change_6": 0.0,
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "더케이",
@@ -1421,11 +1421,11 @@
         "homepage": "http://www.thekbank.co.kr",
         "tel": "025695600",
         "change_1": 0.0,
-        "change_3": 0.35,
-        "change_6": 0.35,
-        "change_12": 0.35,
-        "change_24": 0.35,
-        "change_36": 0.35
+        "change_3": 0.0,
+        "change_6": 0.0,
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "더케이",
@@ -1451,7 +1451,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.35,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -1479,7 +1479,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.35,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -1647,7 +1647,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.02,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -1675,7 +1675,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.02,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -2487,7 +2487,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.13,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -2515,7 +2515,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": -0.2,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -2683,7 +2683,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.5,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -6519,7 +6519,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -6547,7 +6547,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -6575,7 +6575,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -6633,7 +6633,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.1
+        "change_36": 0.0
     },
     {
         "bank": "상상인플러스",
@@ -6661,7 +6661,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.1
+        "change_36": 0.0
     },
     {
         "bank": "상상인플러스",
@@ -6689,7 +6689,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.1
+        "change_36": 0.0
     },
     {
         "bank": "상상인플러스",
@@ -6770,7 +6770,7 @@
         "tel": "16002100",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.7,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -6799,7 +6799,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -6826,7 +6826,7 @@
         "tel": "16002100",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.7,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -6855,7 +6855,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -6882,7 +6882,7 @@
         "tel": "16002100",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.7,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
         "change_36": 0
@@ -6911,7 +6911,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -6969,7 +6969,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.1
+        "change_36": 0.0
     },
     {
         "bank": "상상인플러스",
@@ -6997,7 +6997,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.1
+        "change_36": 0.0
     },
     {
         "bank": "상상인플러스",
@@ -7025,7 +7025,7 @@
         "change_6": 0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.1
+        "change_36": 0.0
     },
     {
         "bank": "아산",
@@ -7498,8 +7498,8 @@
         "tel": "16613651",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.2,
-        "change_12": -0.01,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -7526,7 +7526,7 @@
         "tel": "16613651",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.2,
+        "change_6": 0.0,
         "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
@@ -7554,7 +7554,7 @@
         "tel": "16613651",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.2,
+        "change_6": 0.0,
         "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
@@ -9207,7 +9207,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -9235,9 +9235,9 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.2,
-        "change_24": 0.2,
-        "change_36": 0.2
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "NH",
@@ -9263,7 +9263,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -9655,7 +9655,7 @@
         "change_1": 0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -9683,7 +9683,7 @@
         "change_1": 0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -9711,7 +9711,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -9739,7 +9739,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.3,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -9765,11 +9765,11 @@
         "homepage": "http://www.kbsavings.com/",
         "tel": "18990900",
         "change_1": 0,
-        "change_3": 0.7,
-        "change_6": 0.8,
+        "change_3": 0.0,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.9
+        "change_36": 0.0
     },
     {
         "bank": "KB",
@@ -9793,11 +9793,11 @@
         "homepage": "http://www.kbsavings.com/",
         "tel": "18990900",
         "change_1": 0,
-        "change_3": 0.7,
-        "change_6": 0.8,
+        "change_3": 0.0,
+        "change_6": 0.0,
         "change_12": 0,
         "change_24": 0,
-        "change_36": 0.9
+        "change_36": 0.0
     },
     {
         "bank": "하나",
