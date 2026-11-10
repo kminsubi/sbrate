@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-10 12:46:52",
+  "generated_at": "2026-11-11 06:24:55",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
@@ -44,7 +44,7 @@
       "level": "WARNING",
       "key": "deposit:large_rate_change",
       "section": "정기예금",
-      "message": "비정상 급변 후보: 애큐온 정기예금 6개월 +1.90%p."
+      "message": "비정상 급변 후보: 모아 정기예금 3개월 +1.80%p."
     },
     {
       "level": "WARNING",
