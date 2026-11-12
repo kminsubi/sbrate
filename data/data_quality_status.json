@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-11-12 11:28:38",
+  "generated_at": "2026-11-13 06:55:15",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
-  "notify": true,
+  "notify": false,
   "fingerprint": "2f0e5b7d92242de3",
-  "previous_fingerprint": "628450965560e8c0",
+  "previous_fingerprint": "2f0e5b7d92242de3",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
   },
   "counts": {
     "deposit": {
-      "items": 379,
+      "items": 380,
       "banks": 75,
       "previous_items": 379,
       "previous_banks": 75,
