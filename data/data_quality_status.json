@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-14 10:40:16",
+  "generated_at": "2026-11-15 05:03:12",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
@@ -14,7 +14,7 @@
     "deposit": {
       "items": 379,
       "banks": 75,
-      "previous_items": 380,
+      "previous_items": 379,
       "previous_banks": 75,
       "woori_rate_12m": 3.6
     },
