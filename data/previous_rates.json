@@ -806,8 +806,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -834,8 +834,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -862,8 +862,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -890,8 +890,8 @@
         "tel": "0222710071",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.1,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -8227,7 +8227,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -8255,7 +8255,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -8283,7 +8283,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
