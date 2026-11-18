@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-11-18 12:06:21",
+  "generated_at": "2026-11-19 07:41:43",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
   "notify": true,
-  "fingerprint": "e08db0d5ab653347",
-  "previous_fingerprint": "554fe74eb672029f",
+  "fingerprint": "53c228c75e0c8186",
+  "previous_fingerprint": "e08db0d5ab653347",
   "collector_outcomes": {
     "deposit": "success",
     "pension": "success"
@@ -40,12 +40,6 @@
     }
   },
   "issues": [
-    {
-      "level": "WARNING",
-      "key": "deposit:large_rate_change",
-      "section": "정기예금",
-      "message": "비정상 급변 후보: 동원제일 정기예금 6개월 +0.50%p."
-    },
     {
       "level": "WARNING",
       "key": "isa:retained:kb",
