@@ -610,8 +610,8 @@
         "tel": "15884111",
         "change_1": 0.0,
         "change_3": 0.0,
-        "change_6": 0.4,
-        "change_12": 0.1,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
@@ -695,7 +695,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -750,8 +750,8 @@
         "tel": "15884111",
         "change_1": 0,
         "change_3": 0,
-        "change_6": 0.4,
-        "change_12": 0,
+        "change_6": 0.0,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -2067,9 +2067,9 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.05,
-        "change_24": 0.05,
-        "change_36": 0.05
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "유안타",
@@ -2095,9 +2095,9 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.05,
-        "change_24": 0.05,
-        "change_36": 0.05
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "유안타",
@@ -2123,7 +2123,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.05,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -2151,9 +2151,9 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.05,
-        "change_24": 0.05,
-        "change_36": 0.05
+        "change_12": 0.0,
+        "change_24": 0.0,
+        "change_36": 0.0
     },
     {
         "bank": "유안타",
@@ -2179,7 +2179,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.05,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -2207,7 +2207,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.05,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3075,7 +3075,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -3103,7 +3103,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.15,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0
     },
@@ -3131,7 +3131,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3159,7 +3159,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.15,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3187,7 +3187,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.15,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -3243,7 +3243,7 @@
         "change_1": 0,
         "change_3": 0,
         "change_6": 0,
-        "change_12": 0.1,
+        "change_12": 0.0,
         "change_24": 0,
         "change_36": 0
     },
@@ -5875,7 +5875,7 @@
         "change_1": 0.0,
         "change_3": 0.0,
         "change_6": 0.0,
-        "change_12": 0.06,
+        "change_12": 0.0,
         "change_24": 0.0,
         "change_36": 0.0
     },
