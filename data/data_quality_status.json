@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-26 12:44:30",
+  "generated_at": "2026-11-27 06:48:20",
   "timezone": "Asia/Seoul",
   "status": "WARNING",
   "block": false,
@@ -36,7 +36,7 @@
       "retained_last_good": 1,
       "unavailable_rows": 1,
       "fetch_failed_rows": 0,
-      "woori_rate_12m": 4.0
+      "woori_rate_12m": 4.15
     }
   },
   "issues": [
